@@ -44,7 +44,7 @@ jobs:
           echo $branch_name
 
       - name: Neon Database Create Branch Action
-        uses: neondatabase/create-branch-action@v3
+        uses: neondatabase/create-branch-action@v5
         id: create_branch
         with:
           project_id: ${{ secrets.NEON_PROJECT_ID }}
