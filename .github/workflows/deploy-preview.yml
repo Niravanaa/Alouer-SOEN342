@@ -48,10 +48,10 @@ jobs:
         id: create_branch
         with:
           project_id: ${{ secrets.NEON_PROJECT_ID }}
+          database: alouerdb
           branch_name: ${{steps.get_pull_request_branch_name.outputs.branch_name}}
           api_key: ${{ secrets.NEON_API_KEY }}
           username: ${{ secrets.PG_USERNAME }}
-          password: ${{ secrets.PG_PASSWORD }}
 
       - name: Set Database URL in .environment
         run: |
