@@ -11,9 +11,11 @@
 		"format": "prettier --write ./src/**/*.{js,svelte,html,ts}",
 		"lint": "eslint \"./src/**/*.{js,ts,svelte}\"",
 		"lint:fix": "eslint --fix \"./src/**/*.{js,ts,svelte}\"",
+		"prisma:validate": "npx prisma format && npx prisma validate",
 		"prelint": "npm run format",
 		"prepare": "husky",
-		"seed": "tsx prisma/seed.ts"
+		"seed": "tsx prisma/seed.ts",
+		"test": "vitest run --passWithNoTests"
 	},
 	"lint-staged": {
 		"*.{js,ts,svelte}": [
