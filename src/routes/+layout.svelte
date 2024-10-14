@@ -1,7 +1,34 @@
-<script>
+<script lang="ts">
   import "../app.css";
+  import { toggleMode } from "mode-watcher";
   import { ModeWatcher } from "mode-watcher";
-  import Button from "$lib/components/ui/button/button.svelte";
+  import { Button } from "$lib/components/ui/button";
+  import Sun from "svelte-radix/Sun.svelte";
+  import Moon from "svelte-radix/Moon.svelte";
+  import { Toaster } from "$lib/components/ui/sonner";
+  import * as Avatar from "$lib/components/ui/avatar";
+  import * as Popover from "$lib/components/ui/popover";
+  import type { PageData } from "./$types";
+  
+  export let data: PageData;
+
+  $: user = data.user;
+
+  function logout() {
+    fetch('/logout', {
+      method: 'POST'
+    })
+    .then(res => {
+      if (res.ok) {
+        window.location.href = "/";
+      } else {
+        console.error("Logout failed", res.status);
+      }
+    })
+    .catch(error => {
+      console.error("Error during logout:", error);
+    });
+  }
 </script>
 
 <nav class="shadow-md">
@@ -13,8 +40,37 @@
       <a href="/" class="hover:text-blue-500">Home</a>
       <a href="/about" class="hover:text-blue-500">About</a>
       <a href="/contact" class="hover:text-blue-500">Contact</a>
-      <Button>Login</Button>
-      <ModeWatcher />
+      <Button on:click={toggleMode} variant="outline" size="icon">
+        <Sun
+          class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+        />
+        <Moon
+          class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+        />
+        <span class="sr-only">Toggle theme</span>
+      </Button>
+      <Popover.Root portal={null}>
+        <Popover.Trigger asChild let:builder>
+          <Button builders={[builder]} variant="ghost">
+            <Avatar.Root>
+              <Avatar.Fallback>{user ? `${user.firstName[0]}${user.lastName[0]}` : '?'}</Avatar.Fallback>
+            </Avatar.Root>
+          </Button>
+        </Popover.Trigger>
+        <Popover.Content class="w-48 p-4">
+          <div class="grid gap-2">
+            {#if user}
+              <Button href="/dashboard">Dashboard</Button>
+              <Button on:click={logout}>Log Out</Button>
+            {:else}
+              <Button href="/login">Log In</Button>
+              <Button href="/register">Register</Button>
+            {/if}
+          </div>
+        </Popover.Content>
+      </Popover.Root>
+
+      
     </div>
     <div class="md:hidden">
       <button id="mobile-menu-button" class="focus:outline-none">
@@ -31,11 +87,21 @@
     </div>
   </div>
   <div class="md:hidden hidden" id="mobile-menu">
-    <a href="/" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Home</a>
-    <a href="/about" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">About</a>
-    <a href="/contact" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Contact</a>
-    <ModeWatcher />
+    <a href="/" class="block px-4 py-2">Home</a>
+    <a href="/about" class="block px-4 py-2">About</a>
+    <a href="/contact" class="block px-4 py-2">Contact</a>
+    <Button on:click={toggleMode} variant="outline" size="icon">
+      <Sun
+        class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+      />
+      <Moon
+        class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+      />
+      <span class="sr-only">Toggle theme</span>
+    </Button>
   </div>
 </nav>
 
+<Toaster richColors  />
+<ModeWatcher />
 <slot />

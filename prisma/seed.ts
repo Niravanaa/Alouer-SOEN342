@@ -1,115 +1,125 @@
-import { PrismaClient, Role } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { hash } from "bcrypt";
-import crypto from "crypto";
-import { parseArgs } from "node:util"; // Node.js built-in utility module
+import { parseArgs } from "node:util";
+
+type User = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  phone: string;
+  role: "CLIENT" | "INSTRUCTOR" | "ADMINISTRATOR";
+  specialization?: string[];
+  availability?: string[];
+};
 
 const prisma = new PrismaClient();
 
-async function seedMain() {
+async function seedUsers(users: User[]) {
   const saltRounds = 10;
-
-  // Main users to be seeded
-  const users = [
-    {
-      email: "instructor@example.com",
-      password: "instructor123",
-      role: Role.INSTRUCTOR,
-    },
-    {
-      email: "client@example.com",
-      password: "client123",
-      role: Role.CLIENT,
-    },
-    {
-      email: "admin@example.com",
-      password: "admin123",
-      role: Role.ADMINISTRATOR,
-    },
-  ];
 
   for (const user of users) {
     const hashedPassword = await hash(user.password, saltRounds);
-    const userId = crypto.randomUUID();
 
+    // Create or update user
     const createdUser = await prisma.user.upsert({
       where: { email: user.email },
-      update: {},
+      update: {}, // No updates for existing users
       create: {
-        id: userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
+        phone: user.phone,
+        password: hashedPassword,
         role: user.role,
+        specialization: user.specialization || [],
+        availability: user.availability || [],
       },
     });
 
-    await prisma.key.create({
-      data: {
-        id: crypto.randomUUID(),
-        hashed_password: hashedPassword,
-        user_id: createdUser.id,
-      },
-    });
-
-    console.log(
-      `Created user with email: ${createdUser.email} and role: ${createdUser.role}`,
-    );
+    console.log(`Created user with email: ${createdUser.email}`);
   }
 }
 
-async function testSeed() {
-  const saltRounds = 10;
-
-  // Test users to be seeded
-  const testUsers = [
+async function seedMain() {
+  // Main users to be seeded
+  const users: User[] = [
     {
-      email: "testinstructor@example.com",
-      password: "testinstructor123",
-      role: Role.INSTRUCTOR,
+      firstName: "Instructor",
+      lastName: "User",
+      email: "instructor@example.com",
+      password: "instructor123",
+      phone: "123-456-7890",
+      role: "INSTRUCTOR",
+      specialization: ["Swimming", "Gymnastics"],
+      availability: ["MONDAY", "WEDNESDAY"],
     },
     {
-      email: "testclient@example.com",
-      password: "testclient123",
-      role: Role.CLIENT,
+      firstName: "Client",
+      lastName: "User",
+      email: "client@example.com",
+      password: "client123",
+      phone: "123-456-7890",
+      role: "CLIENT",
     },
     {
-      email: "testadmin@example.com",
-      password: "testadmin123",
-      role: Role.ADMINISTRATOR,
+      firstName: "Admin",
+      lastName: "User",
+      email: "admin@example.com",
+      password: "admin123",
+      phone: "",
+      role: "ADMINISTRATOR",
     },
   ];
 
-  for (const user of testUsers) {
-    const hashedPassword = await hash(user.password, saltRounds);
-    const userId = crypto.randomUUID();
+  await seedUsers(users);
+}
 
-    const createdUser = await prisma.user.upsert({
-      where: { email: user.email },
-      update: {},
-      create: {
-        id: userId,
-        email: user.email,
-        role: user.role,
-      },
-    });
+async function testSeed() {
+  // Test users to be seeded
+  const testUsers: User[] = [
+    {
+      firstName: "TestInstructor",
+      lastName: "User",
+      email: "testinstructor@example.com",
+      password: "testinstructor123",
+      phone: "123-456-7890",
+      role: "INSTRUCTOR",
+      specialization: ["Yoga", "Pilates"],
+      availability: ["TUESDAY", "THURSDAY"],
+    },
+    {
+      firstName: "TestClient",
+      lastName: "User",
+      email: "testclient@example.com",
+      password: "testclient123",
+      phone: "123-456-7890",
+      role: "CLIENT",
+    },
+    {
+      firstName: "TestAdmin",
+      lastName: "User",
+      email: "testadmin@example.com",
+      password: "testadmin123",
+      phone: "",
+      role: "ADMINISTRATOR",
+    },
+  ];
 
-    await prisma.key.create({
-      data: {
-        id: crypto.randomUUID(),
-        hashed_password: hashedPassword,
-        user_id: createdUser.id,
-      },
-    });
+  await seedUsers(testUsers);
 
-    console.log(
-      `Created test user with email: ${createdUser.email} and role: ${createdUser.role}`,
-    );
-  }
+  const clients = await prisma.user.findMany({ where: { role: "CLIENT" } });
+  const instructors = await prisma.user.findMany({
+    where: { role: "INSTRUCTOR" },
+  });
+  const admins = await prisma.user.findMany({
+    where: { role: "ADMINISTRATOR" },
+  });
 
-  const users = await prisma.user.findMany();
-  const keys = await prisma.key.findMany();
-
-  console.log("Previewing existing users and keys:");
-  console.log("Users:", users);
-  console.log("Keys:", keys);
+  console.log("Previewing existing users:");
+  console.log("Clients:", clients);
+  console.log("Instructors:", instructors);
+  console.log("Admins:", admins);
 }
 
 async function main() {
@@ -126,6 +136,7 @@ async function main() {
       await testSeed();
       break;
     default:
+      await testSeed();
       console.log(
         `Invalid environment "${environment}". Please provide a valid environment.`,
       );
