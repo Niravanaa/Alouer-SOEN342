@@ -50,3 +50,4 @@ jobs:
           vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
           --env DATABASE_URL=$DATABASE_URL --env
           DIRECT_DATABASE_URL=$DIRECT_DATABASE_URL --env
+          JWT_ACCESS_SECRET=$JWT_ACCESS_SECRET
