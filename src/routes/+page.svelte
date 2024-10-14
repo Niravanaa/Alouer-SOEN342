@@ -1,11 +1,17 @@
 <script lang="ts">
-  import { toggleMode } from "mode-watcher";
-  import { Button } from "$lib/components/ui/button";
- </script>
- 
- <div class="flex items-center justify-center h-screen">
-  <Button on:click={toggleMode} variant="default">
-    <span>Toggle theme</span>
-  </Button>
-</div>
+    import { onMount } from "svelte";
+    import { toast } from "svelte-sonner";
+    import type { PageData } from "./$types";
 
+    export let data: PageData;
+
+    onMount(() => {
+        let message = "";
+
+        if (data.toastData) { ({ message } = data.toastData) };
+
+        if (message != "") {
+            toast.success(message);
+        }
+    });
+</script>

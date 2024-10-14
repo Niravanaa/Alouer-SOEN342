@@ -17,29 +17,104 @@ enum Role {
 }
 
 model User {
-  id    String @id @unique
-  role  Role   @default(CLIENT)
-  email String @unique
-
-  auth_session Session[]
-  key          Key[]
+  id             Int        @id @default(autoincrement())
+  firstName      String
+  lastName       String
+  email          String     @unique
+  password       String
+  phone          String
+  role           Role
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  // Optional fields for INSTRUCTOR
+  specialization String[]
+  availability   String[]
+  Location       Location[]
+  Lesson         Lesson[]
+  // Optional fields for CLIENT
+  bookings       Booking[]
+  children       Child[]    @relation("ParentChildren")
 }
 
-model Session {
-  id             String @id @unique
-  user_id        String
-  active_expires BigInt
-  idle_expires   BigInt
-  user           User   @relation(references: [id], fields: [user_id], onDelete: Cascade)
-
-  @@index([user_id])
+model Child {
+  id          Int       @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  dateOfBirth DateTime?
+  parentId    Int
+  parent      User      @relation("ParentChildren", fields: [parentId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
-model Key {
-  id              String  @id @unique
-  hashed_password String?
-  user_id         String
-  user            User    @relation(references: [id], fields: [user_id], onDelete: Cascade)
+model Location {
+  id           Int        @id @default(autoincrement())
+  name         String
+  address      String
+  city         String
+  province     String
+  schedules    Schedule[]
+  lessons      Lesson[]
+  instructor   User?      @relation(fields: [instructorId], references: [id])
+  instructorId Int?
+}
 
-  @@index([user_id])
+model Lesson {
+  id           Int        @id @default(autoincrement())
+  type         LessonType // Group or Private
+  title        String
+  instructor   User?      @relation(fields: [instructorId], references: [id])
+  instructorId Int?
+  location     Location   @relation(fields: [locationId], references: [id])
+  locationId   Int
+  schedule     Schedule   @relation(fields: [scheduleId], references: [id])
+  scheduleId   Int
+  bookings     Booking[]
+  startTime    DateTime
+  endTime      DateTime
+}
+
+model Schedule {
+  id         Int        @id @default(autoincrement())
+  startDate  DateTime
+  endDate    DateTime
+  dayOfWeek  DayOfWeek
+  timeSlots  TimeSlot[]
+  locationId Int
+  location   Location   @relation(fields: [locationId], references: [id])
+  Lesson     Lesson[]
+}
+
+model Booking {
+  id          Int      @id @default(autoincrement())
+  client      User     @relation(fields: [clientId], references: [id])
+  clientId    Int
+  lesson      Lesson   @relation(fields: [lessonId], references: [id])
+  lessonId    Int
+  bookingTime DateTime @default(now())
+  isAvailable Boolean  @default(true)
+}
+
+model TimeSlot {
+  id         Int      @id @default(autoincrement())
+  startTime  DateTime
+  endTime    DateTime
+  lessonId   Int?
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  scheduleId Int
+}
+
+enum LessonType {
+  GROUP
+  PRIVATE
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
 }
