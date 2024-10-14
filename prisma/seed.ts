@@ -136,7 +136,6 @@ async function main() {
       await testSeed();
       break;
     default:
-      await testSeed();
       console.log(
         `Invalid environment "${environment}". Please provide a valid environment.`,
       );
