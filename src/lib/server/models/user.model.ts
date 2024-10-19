@@ -73,7 +73,7 @@ const loginUser = async (email: string, password: string) => {
   const jwtUser = {
     id: user.id,
     email: user.email,
-    role: user.role,
+    role: user.role.toString(),
   };
 
   const token = jwt.sign(jwtUser, JWT_ACCESS_SECRET, {

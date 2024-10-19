@@ -2,7 +2,7 @@
   import AdminDashboard from "$lib/components/ui/dashboard/admin/admin-dashboard.svelte";
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
-  import type { PageData } from "./$types";
+  import type { PageData } from "./$types"; 
   
   export let data: PageData;
 

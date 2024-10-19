@@ -1,5 +1,4 @@
 import prisma from "$lib/server/prisma";
-import { Role } from "@prisma/client";
 import type { Actions, PageServerLoad } from "./$types";
 import { toastStore } from "$lib/stores/toastStore";
 import { get } from "svelte/store";
@@ -41,7 +40,7 @@ export const actions: Actions = {
     const formData = await request.formData();
     const email = formData.get("email")?.toString();
 
-    if (locals.user.role != Role.ADMINISTRATOR) {
+    if (locals.user.role != "ADMINISTRATOR") {
       return { error: "You are not authorized to delete a user." };
     }
 
@@ -70,7 +69,7 @@ export const actions: Actions = {
     throw redirect(302, "/login");
   },
   addLesson: async ({ request, locals }) => {
-    if (locals.user.role != Role.ADMINISTRATOR) {
+    if (locals.user.role != "ADMINISTRATOR") {
       return { error: "You are not authorized to add a lesson." };
     }
 
@@ -110,7 +109,7 @@ export const actions: Actions = {
   },
 
   editLesson: async ({ request, locals }) => {
-    if (locals.user.role != Role.ADMINISTRATOR) {
+    if (locals.user.role != "ADMINISTRATOR") {
       return { error: "You are not authorized to edit a lesson." };
     }
 
