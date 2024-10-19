@@ -1,0 +1,28 @@
+@startuml
+skinparam sequenceMessageAlign center 
+
+actor "<u>:Instructor" as Instructor 
+entity "<u>:System" as System
+
+Instructor -> System: requestRegister() 
+activate System
+System --> Instructor: displayRegistrationForm
+deactivate System
+
+Instructor -> System: inputCredentials(firstName, lastName, email, password, phoneNumber) 
+activate System
+System -> System: validateInput() 
+
+alt validInput 
+    System -> System: dbRegisterInstructor() 
+    alt registerSuccess
+        System --> Instructor: returnSuccessMessage
+    else registerFailure
+        System --> Instructor: returnFailureMessage
+    end
+else invalidInput 
+    System --> Instructor: returnFailureMessage
+end 
+
+deactivate System
+@enduml

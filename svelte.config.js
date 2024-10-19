@@ -14,7 +14,7 @@ const config = {
 		adapter: adapter(),
 	},
 	optimizeDeps: {
-		exclude: ['svelte-sonner']
+		exclude: ['svelte-sonner', 'layercake']
 	},
 };
 

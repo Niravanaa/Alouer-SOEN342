@@ -29,6 +29,12 @@
       console.error("Error during logout:", error);
     });
   }
+
+  let isMobileMenuOpen = false;
+
+  function toggleMobileMenu() {
+    isMobileMenuOpen = !isMobileMenuOpen;
+  }
 </script>
 
 <nav class="shadow-md">
@@ -36,10 +42,9 @@
     <div class="text-xl font-bold">
       <a href="/">Alouer</a> 
     </div>
-    <div class="md:flex items-center space-x-4">
+    <div class="md:flex items-center space-x-4 hidden"> <!-- Hide on mobile -->
       <a href="/" class="hover:text-blue-500">Home</a>
-      <a href="/about" class="hover:text-blue-500">About</a>
-      <a href="/contact" class="hover:text-blue-500">Contact</a>
+      <a href="/offerings" class="hover:text-blue-500">Offerings</a>
       <Button on:click={toggleMode} variant="outline" size="icon">
         <Sun
           class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
@@ -69,11 +74,30 @@
           </div>
         </Popover.Content>
       </Popover.Root>
-
-      
     </div>
-    <div class="md:hidden">
-      <button id="mobile-menu-button" class="focus:outline-none">
+    <div class="md:hidden"> <!-- Mobile menu button -->
+      <Popover.Root portal={null}>
+        <Popover.Trigger asChild let:builder>
+          <Button builders={[builder]} variant="ghost">
+            <Avatar.Root>
+              <Avatar.Fallback>{user ? `${user.firstName[0]}${user.lastName[0]}` : '?'}</Avatar.Fallback>
+            </Avatar.Root>
+          </Button>
+        </Popover.Trigger>
+        <Popover.Content class="w-48 p-4">
+          <div class="grid gap-2">
+            {#if user}
+              <Button href="/dashboard">Dashboard</Button>
+              <Button on:click={logout}>Log Out</Button>
+            {:else}
+              <Button href="/login">Log In</Button>
+              <Button href="/register">Register</Button>
+            {/if}
+          </div>
+        </Popover.Content>
+      </Popover.Root>
+
+      <button id="mobile-menu-button" class="focus:outline-none" on:click={toggleMobileMenu}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -86,22 +110,30 @@
       </button>
     </div>
   </div>
-  <div class="md:hidden hidden" id="mobile-menu">
-    <a href="/" class="block px-4 py-2">Home</a>
-    <a href="/about" class="block px-4 py-2">About</a>
-    <a href="/contact" class="block px-4 py-2">Contact</a>
-    <Button on:click={toggleMode} variant="outline" size="icon">
-      <Sun
-        class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
-      />
-      <Moon
-        class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
-      />
-      <span class="sr-only">Toggle theme</span>
-    </Button>
-  </div>
+  {#if isMobileMenuOpen} <!-- Conditional rendering for mobile menu -->
+    <div class="md:hidden flex flex-col items-center">
+      <a href="/" class="block px-4 py-2">Home</a>
+      <a href="/offerings" class="block px-4 py-2">Offerings</a>
+      <Button on:click={toggleMode} variant="outline" size="icon" class="my-2">
+        <Sun
+          class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+        />
+        <Moon
+          class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+        />
+        <span class="sr-only">Toggle theme</span>
+      </Button>
+    </div>
+{/if}
+
 </nav>
 
-<Toaster richColors  />
+<Toaster richColors />
 <ModeWatcher />
-<slot />
+<div class="container mx-auto p-5">
+  <slot />
+</div>
+
+<footer class="py-20 text-center">
+  <div>© 2024 Alouer. All rights reserved.</div>
+</footer>

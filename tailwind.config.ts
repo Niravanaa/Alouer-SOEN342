@@ -6,6 +6,7 @@ const config = {
   content: [
     "./src/**/*.{html,js,svelte,ts}",
     "./src/components/ui/**/*.{html,js,svelte,ts}",
+    "./node_modules/layerchart/**/*.{svelte,js}",
   ],
   safelist: ["dark"],
   theme: {

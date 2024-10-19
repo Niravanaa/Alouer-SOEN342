@@ -1,0 +1,106 @@
+@startuml
+enum Role {
+    INSTRUCTOR
+    CLIENT
+    ADMINISTRATOR
+}
+
+enum LessonType {
+    GROUP
+    PRIVATE
+}
+
+entity "Administrator" {
+}
+
+entity "Users" {
+    // Collection of Clients and Instructors
+}
+
+entity "Client" {
+    +id: Int
+    +firstName: String
+    +lastName: String
+    +email: String
+    +password: String
+    +phone: String
+    +role: Role
+    +createdAt: DateTime
+    +updatedAt: DateTime
+}
+
+entity "Children" {
+    // Collection of Children
+}
+
+entity "Child" {
+    +id: Int
+    +firstName: String
+    +lastName: String
+    +dateOfBirth: DateTime?
+    +parentId: Int
+    +createdAt: DateTime
+    +updatedAt: DateTime
+}
+
+entity "Locations" {
+    // Collection of Locations
+}
+
+entity "Location" {
+    +id: Int
+    +name: String
+    +address: String
+    +city: String
+    +province: String
+    +postalCode: String
+}
+
+entity "Lessons" {
+    // Collection of Lessons
+}
+
+entity "Lesson" {
+    +id: Int
+    +type: LessonType
+    +title: String
+    +locationId: Int
+    +isAvailable: Boolean
+    +startTime: DateTime
+    +endTime: DateTime
+    +createdAt: DateTime
+    +updatedAt: DateTime
+}
+
+entity "Bookings" {
+    // Collection of Bookings
+}
+
+entity "Booking" {
+    +id: Int
+    +clientId: Int
+    +lessonId: Int
+    +createdAt: DateTime
+    +updatedAt: DateTime
+}
+
+entity "Instructor" {
+    +specialization: String[]
+}
+
+Client <|-- Administrator
+Client <|-- Instructor
+
+Client "1" --o "0..*" Child : has
+Instructor "1" --o "0..*" Lesson : teaches
+Location "1" --o "0..*" Lesson : offers
+Lesson "1" --o "0..*" Booking : has
+Client "1" --o "0..*" Booking : makes
+Lesson "1" --o "0..*" Booking : books
+
+"Users" --|> "Client" : contains
+"Children" --|> "Child" : contains
+"Locations" --|> "Location" : contains
+"Lessons" --|> "Lesson" : contains
+"Bookings" --|> "Booking" : contains
+@enduml

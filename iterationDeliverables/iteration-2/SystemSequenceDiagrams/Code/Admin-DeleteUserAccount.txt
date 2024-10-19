@@ -1,0 +1,33 @@
+@startuml
+actor "<u>:Admin" as Admin
+entity "<u>:System" as System
+
+Admin -> System: requestUserList()
+activate System
+
+System --> Admin: presentAllUsers
+deactivate System
+
+Admin -> System: selectUserToDelete(user)
+activate System
+
+System --> Admin: presentConfirmation
+deactivate System
+
+Admin -> System: confirmDeletion()
+activate System
+
+System -> System: deleteUserFromDatabase(user)
+
+alt Database Operation Success
+    alt Deletion Success
+        System --> Admin: displaySuccessMessage
+    else Deletion Failure
+        System --> Admin: displayFailureMessage
+    end
+else Database Operation Failure
+    System --> Admin: displayDbFailureMessage
+end
+
+deactivate System
+@enduml

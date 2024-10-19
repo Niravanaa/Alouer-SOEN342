@@ -1,0 +1,34 @@
+@startuml
+actor "<u>:Admin" as Admin
+entity "<u>:System" as System
+
+Admin -> System: pressCreateLesson()
+activate System
+
+System --> Admin: displayAllLocations
+deactivate System
+
+Admin -> System: selectLocation(location)
+activate System
+
+System --> Admin: lessonCreationForm
+deactivate System
+
+Admin -> System: enterLessonDetails(title, lessonType, startTime, endTime)
+activate System
+
+System -> System: validateInformation()
+
+alt Validation Success
+    System -> System: dbCreateLesson()
+    alt Creation Success
+        System --> Admin: displaySuccessMessage
+    else Creation Failure
+        System --> Admin: displayFailureMessage
+    end
+else Validation Failure
+    System --> Admin: displayErrorMessage
+end
+
+deactivate System
+@enduml

@@ -1,0 +1,35 @@
+@startuml
+skinparam sequenceMessageAlign center 
+
+actor "<u>:Instructor" as Instructor
+entity "<u>:System" as System
+
+Instructor -> System: requestLessons() 
+activate System
+System --> Instructor: displayAllLessons() 
+deactivate System
+
+opt filterLessons
+    Instructor -> System: filterLessons(date, keyword, location, timeRange) 
+    activate System
+    System -> System: adjustLessonList() 
+    System --> Instructor: displayFilteredLessons
+    deactivate System
+end
+
+Instructor -> System: selectLesson() 
+activate System
+System -> System: validateChoice()
+
+alt validChoice
+    System -> System: dbAssignLessonToInstructor() 
+    alt assignSuccess
+        System --> Instructor: returnSuccessMessage
+    else assignFailure
+        System --> Instructor: returnFailureMessage
+    end
+else invalidChoice 
+    System --> Instructor: returnFailureMessage
+end 
+deactivate System
+@enduml

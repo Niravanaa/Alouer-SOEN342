@@ -27,14 +27,7 @@ const handle: Handle = async ({ event, resolve }) => {
         throw new Error("User not found");
       }
 
-      const sessionUser = {
-        id: user.id.toString(),
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-      };
-
-      event.locals.user = sessionUser;
+      event.locals.user = user;
     } catch (error) {
       console.error(error);
     }

@@ -1,0 +1,72 @@
+@startuml
+actor "<u>:Admin" as Admin
+entity "<u>:AdminDashboardView" as UI
+entity "<u>:AdminController" as System
+database "<u>:Database" as Database
+collections "<u>:Users" as Users
+
+Admin -> UI: requestUserList()
+activate UI
+
+UI -> System: getUserList()
+activate System
+
+System -> Database: fetchUserList()
+activate Database
+
+Database -> Users: queryAllUsers()
+activate Users
+
+Users -> Database: returnUserList
+deactivate Users
+
+Database -> System: returnUserList
+deactivate Database
+
+System -> UI: presentUserList(users)
+deactivate System
+
+UI -> Admin: displayUserList
+deactivate UI
+
+Admin -> UI: selectUserToDelete(user)
+activate UI
+
+UI -> Admin: presentConfirmation
+deactivate UI
+
+Admin -> UI: confirmDeletion()
+activate UI
+
+UI -> System: deleteUser(user)
+activate System
+
+System -> Database: deleteUser(user)
+activate Database
+
+Database -> Users: deleteUserById(user.id)
+activate Users
+
+alt User Found
+    Users -> Database: idFound
+
+    Database -> System: successResponse
+
+    System -> UI: displaySuccessMessage
+
+    UI -> Admin: showSuccessMessage
+
+else User Not Found
+    Users -> Database: idNotFound
+    deactivate Users
+
+    Database -> System: failureResponse
+    deactivate Database
+
+    System -> UI: displayFailureMessage
+    deactivate System
+
+    UI -> Admin: showFailureMessage
+    deactivate UI
+end
+@enduml

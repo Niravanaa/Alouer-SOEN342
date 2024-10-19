@@ -1,0 +1,75 @@
+@startuml
+skinparam sequenceMessageAlign center
+
+actor "<u>:Instructor" as Instructor
+entity "<u>:InstructorDashboardView" as DashboardView
+entity "<u>:InstructorController" as Controller
+entity "<u>:Database" as Database
+collections "<u>:Lessons" as Lessons
+participant "<u>lesson:Lesson" as Lesson
+
+Instructor -> DashboardView: requestLessons() 
+activate DashboardView
+DashboardView -> Controller: getLessons()
+activate Controller
+Controller -> Database: fetchAllLessons()
+activate Database
+Database -> Lessons: getAllLessons()
+Lessons --> Database: returnLessonsCollection
+Database --> Controller: returnLessons
+deactivate Lessons
+deactivate Database
+Controller --> DashboardView: displayAllLessons
+deactivate Controller
+DashboardView --> Instructor: displayAllLessons
+deactivate DashboardView
+
+opt filterLessons
+    Instructor -> DashboardView: filterLessons(date, keyword, location, timeRange) 
+    activate DashboardView
+    DashboardView -> Controller: filterLessons(date, keyword, location, timeRange)
+    activate Controller
+    Controller -> Database: filterLessons(date, keyword, location, timeRange)
+    Database -> Lessons: filterLessons(date, keyword, location, timeRange)
+    Lessons --> Database: returnFilteredLessons
+    deactivate Lessons
+    Database --> Controller: returnFilteredLessons
+    deactivate Database
+    Controller --> DashboardView: updateLessonList
+    deactivate Controller
+    DashboardView --> Instructor: displayFilteredLessons
+    deactivate DashboardView
+end
+
+Instructor -> DashboardView: selectLesson(lessonId)
+activate DashboardView
+DashboardView -> Controller: selectLesson(lessonId)
+activate Controller
+Controller -> Database: getLesson(lessonId)
+activate Database
+Database -> Lessons: fetchSpecificLesson(lessonId)
+Lessons --> Database: returnLessonInstance(lesson)
+Database --> Controller: returnLesson(lesson)
+deactivate Lessons
+deactivate Database
+Controller -> Controller: validateChoice(lesson)
+
+alt validChoice
+    Controller -> Database: assignLessonToInstructor(lesson, instructor)
+    Database -> Lesson: assignInstructor(instructor)
+    alt assignSuccess
+        Lesson --> Database: returnSuccess
+        Database --> Controller: returnSuccessMessage
+        Controller --> DashboardView: displaySuccessMessage
+    else assignFailure
+        Lesson --> Database: returnFailure
+        Database --> Controller: returnFailureMessage
+        Controller --> DashboardView: displayFailureMessage
+    end
+else invalidChoice 
+    Controller --> DashboardView: returnFailureMessage
+end 
+deactivate Controller
+DashboardView --> Instructor: displayResult
+deactivate DashboardView
+@enduml

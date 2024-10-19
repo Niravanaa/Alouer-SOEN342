@@ -1,0 +1,77 @@
+@startuml
+actor "<u>:Admin" as Admin
+entity "<u>:AdminDashboardView" as UI
+entity "<u>:AdminController" as System
+database "<u>:Database" as Database
+collections "<u>:Lessons" as Lessons
+collections "<u>:Locations" as Locations
+
+Admin -> UI: pressCreateLesson()
+activate UI
+
+UI -> System: requestAllLocations()
+activate System
+
+System -> Database: fetchLocations()
+activate Database
+
+Database -> Locations: getAllLocations()
+activate Locations
+
+Locations -> Database: returnLocationList
+deactivate Locations
+
+Database -> System: returnLocations
+deactivate Database
+
+System -> UI: displayAllLocations
+deactivate System
+
+UI -> Admin: presentLocations
+deactivate UI
+
+Admin -> UI: selectLocation(location)
+activate UI
+
+UI -> System: lessonCreationForm()
+activate System
+
+System -> UI: displayLessonForm
+deactivate System
+
+UI -> Admin: displayLessonForm
+deactivate UI
+
+Admin -> UI: enterLessonDetails(title, lessonType, startTime, endTime)
+activate UI
+
+UI -> System: validateLessonDetails(title, lessonType, startTime, endTime)
+activate System
+
+alt Validation Success
+    System -> Database: submitInformationToDatabase()
+    activate Database
+
+    Database -> Lessons: add(new Lesson(title, lessonType, startTime, endTime))
+    activate Lessons
+
+    Lessons -> Database: lessonAddedConfirmation
+    deactivate Lessons
+
+    Database -> System: successResponse
+    deactivate Database
+
+    System -> UI: displaySuccessMessage
+    deactivate System
+
+    UI -> Admin: showSuccessMessage
+    deactivate UI
+
+else Validation Failure
+    System -> UI: displayErrorMessage
+    deactivate System
+
+    UI -> Admin: showErrorMessage
+    deactivate UI
+end
+@enduml

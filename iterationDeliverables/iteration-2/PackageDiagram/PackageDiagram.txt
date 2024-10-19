@@ -1,0 +1,51 @@
+@startuml
+package "Admin" {
+    package "Models" {
+        class "Administrator" <<Singleton>>
+    }
+
+    package "Views" {
+        class "AdminDashboardView" <<view>>
+    }
+
+    package "Controllers" {
+        class "AdminController" <<controller>>
+    }
+}
+
+package "Instructor" {
+    package "Models" {
+        class "Instructor"
+    }
+
+    package "Views" {
+        class "InstructorDashboardView" <<view>>
+    }
+
+    package "Controllers" {
+        class "InstructorController" <<controller>>
+    }
+}
+
+package "SharedModels" {
+    class "Location" {}
+    class "Lesson" {}
+    class "Client" {}
+    class "Booking" {}
+    class "Child" {}
+
+    enum Role {
+        INSTRUCTOR
+        CLIENT
+        ADMINISTRATOR
+    }
+
+    enum LessonType {
+        GROUP
+        PRIVATE
+    }
+}
+
+"Admin" --> "SharedModels" : accesses
+"Instructor" --> "SharedModels" : accesses
+@enduml
