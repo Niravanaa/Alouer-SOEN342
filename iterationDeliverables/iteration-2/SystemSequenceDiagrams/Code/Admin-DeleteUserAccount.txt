@@ -1,0 +1,54 @@
+@startuml
+actor "<u>:Admin" as Admin
+participant "<u>:System" as System
+
+Admin -> System: requestUserDeletion()
+activate System
+activate Admin
+
+System --> Admin: requestUserTypeToDelete
+deactivate System
+deactivate Admin
+
+Admin -> System: specifyUserType(userType)
+activate Admin
+activate System
+
+alt Instructor
+    System --> Admin : displayInstructors
+else Client
+    System --> Admin : displayInstructors
+end
+
+deactivate Admin
+deactivate System
+
+Admin -> System: inputId(id)
+activate System
+activate Admin
+
+System --> Admin: requestConfirmation
+deactivate System
+deactivate Admin
+
+Admin -> System: confirmDeletion()
+activate System
+activate Admin
+
+System -> System: validateId(user)
+
+alt Validation Success
+    System -> System: deleteUserFromDatabase()
+    alt Successful Database Operation
+        System --> Admin: success
+    else Failed Database Operation
+        System --> Admin: failure
+    end
+    
+else Validation Failure
+    System --> Admin: validationFailure
+end
+
+deactivate System
+deactivate Admin
+@enduml
