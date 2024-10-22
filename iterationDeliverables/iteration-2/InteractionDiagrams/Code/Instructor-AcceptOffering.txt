@@ -1,0 +1,69 @@
+@startuml
+actor "<u>:Instructor" as instructor
+participant "<u>:Terminal" as terminal
+participant "<u>:LessonCollection" as lessonCollection
+participant "<u>:LocationCollection" as locationCollection
+collections "<u>:Lesson" as lessons
+collections "<u>:Location" as locations
+participant "<u>lesson: Lesson" as lessonObj
+
+instructor -> terminal : requestLessonAccepting()
+activate instructor
+activate terminal
+terminal -> locationCollection : getLocations()
+activate locationCollection
+locationCollection -> locations : getAll()
+activate locations
+locations -> locationCollection : locations
+deactivate locations
+locationCollection -> terminal : locations
+deactivate locationCollection
+terminal --> instructor: displayLocations
+deactivate instructor
+deactivate terminal
+
+instructor -> terminal : selectLocation(locationId)
+activate instructor
+activate terminal
+terminal -> lessonCollection : getLessonsForLocation(locationId)
+activate lessonCollection
+lessonCollection -> lessons : getLessons(locationId)
+activate lessons
+lessons -> lessonCollection : lessons
+deactivate lessons
+lessonCollection -> terminal : lessons
+deactivate lessonCollection
+terminal --> instructor: displayLocationLessons
+deactivate terminal
+deactivate instructor
+
+instructor -> terminal : selectLesson(lessonId)
+activate terminal
+activate instructor
+terminal -> lessonCollection : assignInstructorToLesson(lessonId, instructorId)
+activate lessonCollection
+
+lessonCollection -> lessons : findLessonById(lessonId)
+activate lessons
+alt Lesson Found
+    lessons -> lessonCollection : lessonObj
+    lessonCollection -> lessonObj : setInstructorId(instructorId)
+    activate lessonObj
+    alt Assignment Successful
+        lessonObj -> lessonCollection : success
+        lessonCollection -> terminal : success
+    else Assignment Failed
+        lessonObj -> lessonCollection : failure
+        lessonCollection -> terminal : failure
+    deactivate lessonObj
+    end
+else Lesson Not Found
+    lessons -> lessonCollection : failure
+    lessonCollection -> terminal : failure
+deactivate lessons
+end
+deactivate lessonCollection
+terminal --> instructor : response
+deactivate terminal
+deactivate instructor
+@enduml

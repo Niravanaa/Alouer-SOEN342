@@ -1,0 +1,38 @@
+@startuml
+skinparam sequenceMessageAlign center 
+
+actor "<u>:Instructor" as Instructor
+participant "<u>:System" as System
+
+Instructor -> System: requestLessonAccepting()
+activate Instructor
+activate System
+System --> Instructor: displayLocations
+deactivate Instructor
+deactivate System
+
+Instructor -> System: selectLocation(locationId)
+activate Instructor
+activate System
+System --> Instructor: displayLocationLessons
+deactivate Instructor
+deactivate System
+
+Instructor -> System: selectLesson(lessonId)
+activate System
+activate Instructor
+System -> System: validateChoice()
+
+alt Validated ID
+    System -> System: dbAssignLessonToInstructor()
+    alt Successful Database Operation
+        System --> Instructor: dbSuccess
+    else Database Operation Failure
+        System --> Instructor: dbFailure
+    end
+else Invalid ID
+    System --> Instructor: validationFailure
+end
+deactivate Instructor
+deactivate System
+@enduml
