@@ -1,0 +1,114 @@
+-- Enum for LessonType
+CREATE TABLE IF NOT EXISTS LessonType (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type TEXT NOT NULL
+);
+
+INSERT INTO LessonType (type) VALUES ('GROUP'), ('PRIVATE');
+
+-- Enum for UserType
+CREATE TABLE IF NOT EXISTS UserType (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type TEXT NOT NULL
+);
+
+INSERT INTO UserType (type) VALUES ('CLIENT'), ('INSTRUCTOR');
+
+-- Enum for DayOfWeek
+CREATE TABLE IF NOT EXISTS DayOfWeek (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    day TEXT NOT NULL
+);
+
+INSERT INTO DayOfWeek (day) VALUES 
+('MONDAY'), 
+('TUESDAY'), 
+('WEDNESDAY'), 
+('THURSDAY'), 
+('FRIDAY'), 
+('SATURDAY'), 
+('SUNDAY');
+
+-- Administrator table (inherits from Client)
+CREATE TABLE IF NOT EXISTS Administrator (
+    id INTEGER PRIMARY KEY,
+    firstName TEXT,
+    lastName TEXT,
+    email TEXT,
+    password TEXT,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id) REFERENCES Client(id)
+);
+
+-- Client table
+CREATE TABLE IF NOT EXISTS Client (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    firstName TEXT NOT NULL,
+    lastName TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    role TEXT CHECK(role IN ('CLIENT', 'INSTRUCTOR')),
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Child table
+CREATE TABLE IF NOT EXISTS Child (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    firstName TEXT NOT NULL,
+    lastName TEXT NOT NULL,
+    dateOfBirth DATETIME NOT NULL,
+    parentId INTEGER,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (parentId) REFERENCES Client(id)
+);
+
+-- Location table
+CREATE TABLE IF NOT EXISTS Location (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    address TEXT NOT NULL,
+    city TEXT NOT NULL,
+    province TEXT NOT NULL,
+    postalCode TEXT NOT NULL
+);
+
+-- Lesson table
+CREATE TABLE IF NOT EXISTS Lesson (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type INTEGER,
+    title TEXT NOT NULL,
+    locationId INTEGER,
+    isAvailable BOOLEAN NOT NULL DEFAULT 1,
+    startTime DATETIME NOT NULL,
+    endTime DATETIME NOT NULL,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (type) REFERENCES LessonType(id),
+    FOREIGN KEY (locationId) REFERENCES Location(id)
+);
+
+-- Booking table
+CREATE TABLE IF NOT EXISTS Booking (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    clientId INTEGER,
+    lessonId INTEGER,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (clientId) REFERENCES Client(id),
+    FOREIGN KEY (lessonId) REFERENCES Lesson(id)
+);
+
+-- Instructor table (inherits from Client)
+CREATE TABLE IF NOT EXISTS Instructor (
+    id INTEGER PRIMARY KEY,
+    firstName TEXT,
+    lastName TEXT,
+    email TEXT,
+    password TEXT,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id) REFERENCES Client(id)
+);
