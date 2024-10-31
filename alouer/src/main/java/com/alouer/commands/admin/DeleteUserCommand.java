@@ -1,6 +1,7 @@
-package admin;
+package com.alouer.commands.admin;
 
-import alouer.models.Administrator;
+import com.alouer.models.Administrator;
+import com.alouer.commands.Command;
 
 public class DeleteUserCommand implements Command {
     private Administrator admin;

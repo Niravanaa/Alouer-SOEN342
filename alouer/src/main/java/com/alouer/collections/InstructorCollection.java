@@ -1,6 +1,8 @@
+package com.alouer.collections;
+
 import java.util.ArrayList;
 import java.util.List;
-import com.alouer.models.instructor;
+import com.alouer.models.Instructor;
 
 public class InstructorCollection {
     private static List<Instructor> instructors = new ArrayList<>();
@@ -11,7 +13,7 @@ public class InstructorCollection {
     }
 
     public static Instructor find(int id) {
-        if (id < 0 || id >= clients.size()) {
+        if (id < 0 || id >= instructors.size()) {
             return null;
         }
         return instructors.get(id);
@@ -19,7 +21,7 @@ public class InstructorCollection {
 
     public static boolean add(Instructor instructor) {
         instructor.setId(nextId);
-        instructors.add(client);
+        instructors.add(instructor);
         nextId++;
         return true;
     }

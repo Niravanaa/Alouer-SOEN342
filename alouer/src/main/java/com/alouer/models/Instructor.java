@@ -1,6 +1,10 @@
+package com.alouer.models;
+
 import java.util.ArrayList;
+import com.alouer.enums.UserType;
 
 public class Instructor {
+    private int id;
     private String firstName;
     private String lastName;
     private String email;
@@ -47,6 +51,10 @@ public class Instructor {
         return isConnected;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -74,9 +82,5 @@ public class Instructor {
 
     public void removeLesson(int lessonId) {
         this.lessons.remove(Integer.valueOf(lessonId));
-    }
-
-    public void updateAvailability(boolean availability) {
-        this.isAvailable = availability;
     }
 }

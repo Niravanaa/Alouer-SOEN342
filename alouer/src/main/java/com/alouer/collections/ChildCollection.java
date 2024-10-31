@@ -1,20 +1,22 @@
+package com.alouer.collections;
+
 import java.util.ArrayList;
 import java.util.List;
-import com.alouer.models.child;
+import com.alouer.models.Child;
 
 public class ChildCollection {
     private static List<Child> children = new ArrayList<>();
     private static int nextId = 0;
 
     public static List<Child> getChildren() {
-        return bookings;
+        return children;
     }
 
     public static Child find(int id) {
         if (id < 1 || id > children.size()) {
             return null;
         }
-        return bookings.get(id - 1);
+        return children.get(id - 1);
     }
 
     public static boolean add(Child child) {

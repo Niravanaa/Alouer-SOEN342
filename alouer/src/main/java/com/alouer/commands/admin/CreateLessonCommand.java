@@ -1,7 +1,7 @@
-package admin;
+package com.alouer.commands.admin;
 
-import alouer.models.Administrator;
-import commands.Command;
+import com.alouer.models.Administrator;
+import com.alouer.commands.Command;
 
 public class CreateLessonCommand implements Command {
     private Administrator admin;

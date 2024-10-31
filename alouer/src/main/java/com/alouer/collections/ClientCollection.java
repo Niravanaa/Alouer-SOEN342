@@ -1,6 +1,8 @@
+package com.alouer.collections;
+
 import java.util.ArrayList;
 import java.util.List;
-import com.alouer.models.client;
+import com.alouer.models.Client;
 
 public class ClientCollection {
     private static List<Client> clients = new ArrayList<>();

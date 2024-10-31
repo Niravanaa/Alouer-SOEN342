@@ -1,6 +1,8 @@
+package com.alouer.collections;
+
 import java.util.ArrayList;
 import java.util.List;
-import com.alouer.lessonManagement.booking;
+import com.alouer.lessonManagement.Booking;
 
 public class BookingCollection {
     private static List<Booking> bookings = new ArrayList<>();

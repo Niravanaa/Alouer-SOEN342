@@ -1,3 +1,5 @@
+package com.alouer.models;
+
 import java.util.ArrayList;
 
 public class Location {
@@ -25,6 +27,10 @@ public class Location {
 
     public String getName() {
         return name;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setName(String name) {

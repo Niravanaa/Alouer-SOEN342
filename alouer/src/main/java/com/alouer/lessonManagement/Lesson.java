@@ -1,6 +1,9 @@
-import java.time.*;
+package com.alouer.lessonManagement;
+
+import java.util.*;
 import java.util.ArrayList;
-import java.util.Random;
+import com.alouer.enums.LessonType;
+import com.alouer.enums.DayOfWeek;
 
 public class Lesson {
     private int id;
@@ -8,15 +11,13 @@ public class Lesson {
     private String title;
     private int locationId;
     private boolean isAvailable;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private Date startTime;
+    private Date endTime;
     private ArrayList<DayOfWeek> schedule;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private Booking booking; // set to null?
+    private Booking booking;
 
     public Lesson(LessonType type, String title, int locationId,
-            LocalTime startTime, LocalTime endTime, ArrayList<DayOfWeek> schedule) {
+            Date startTime, Date endTime, ArrayList<DayOfWeek> schedule) {
         this.type = type;
         this.title = title;
         this.locationId = locationId;
@@ -24,8 +25,6 @@ public class Lesson {
         this.startTime = startTime;
         this.endTime = endTime;
         this.schedule = schedule; // TODO implement deep copy
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
     }
 
     public int getId() {
@@ -34,6 +33,10 @@ public class Lesson {
 
     public LessonType getType() {
         return type;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setType(LessonType type) {
@@ -64,36 +67,24 @@ public class Lesson {
         this.isAvailable = isAvailable;
     }
 
-    public LocalTime getStartTime() {
+    public Date getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(LocalTime startTime) {
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
-    public LocalTime getEndTime() {
+    public Date getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(LocalTime endTime) {
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 
     public ArrayList<DayOfWeek> getSchedule() {
         return schedule;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public Booking getBooking() {

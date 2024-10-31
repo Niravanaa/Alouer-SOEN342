@@ -1,3 +1,5 @@
+package com.alouer.collections;
+
 import java.util.ArrayList;
 import java.util.List;
 import com.alouer.lessonManagement.Lesson;
@@ -11,7 +13,7 @@ public class LessonCollection {
     }
 
     public static Lesson find(int id) {
-        if (id < 0 || id >= clients.size()) {
+        if (id < 0 || id >= lessons.size()) {
             return null;
         }
         return lessons.get(id);
@@ -19,7 +21,7 @@ public class LessonCollection {
 
     public static boolean add(Lesson lesson) {
         lesson.setId(nextId);
-        lessons.add(client);
+        lessons.add(lesson);
         nextId++;
         return true;
     }

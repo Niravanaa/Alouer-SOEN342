@@ -1,3 +1,5 @@
+package com.alouer.lessonManagement;
+
 import java.time.LocalDateTime;
 import java.util.Random;
 
@@ -17,6 +19,10 @@ public class Booking {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getClientId() {

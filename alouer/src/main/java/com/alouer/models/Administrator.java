@@ -1,13 +1,15 @@
+package com.alouer.models;
+
 public class Administrator {
     private String firstName = "Admin";
     private String lastName = "User";
     private String email = "admin@example.com";
     private String password = "password123";
+    private boolean isConnected = false;
 
     private static Administrator instance = null;
 
     private Administrator() {
-        // Constructor remains empty; values are initialized directly
     }
 
     public static Administrator getInstance() {
@@ -17,7 +19,6 @@ public class Administrator {
         return instance;
     }
 
-    // Getters for the fields
     public String getFirstName() {
         return firstName;
     }
@@ -32,5 +33,13 @@ public class Administrator {
 
     public String getPassword() {
         return password;
+    }
+
+    public void setConnected(boolean connectionStatus) {
+        this.isConnected = connectionStatus;
+    }
+
+    public boolean isConnected() {
+        return this.isConnected;
     }
 }

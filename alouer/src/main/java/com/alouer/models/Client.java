@@ -1,6 +1,9 @@
+package com.alouer.models;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
+import com.alouer.enums.UserType;
 
 public class Client {
     private int id;
@@ -9,8 +12,6 @@ public class Client {
     private String email;
     private String password;
     private UserType role;
-    private Date createdAt;
-    private Date updatedAt;
     private boolean isConnected;
     private List<Integer> children;
     private List<Integer> bookings;
@@ -21,8 +22,6 @@ public class Client {
         this.email = email;
         this.password = password;
         this.role = UserType.CLIENT;
-        this.createdAt = new Date();
-        this.updatedAt = new Date();
         this.isConnected = false;
         this.children = new ArrayList<>();
         this.bookings = new ArrayList<>();
@@ -52,14 +51,6 @@ public class Client {
         return role;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
     public boolean isConnected() {
         return isConnected;
     }
@@ -70,6 +61,10 @@ public class Client {
 
     public List<Integer> getBookings() {
         return bookings;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setFirstName(String firstName) {
@@ -88,8 +83,8 @@ public class Client {
         this.password = password;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setConnected(boolean setConnected) {
+        this.isConnected = setConnected;
     }
 
     public void addChild(int childId) {

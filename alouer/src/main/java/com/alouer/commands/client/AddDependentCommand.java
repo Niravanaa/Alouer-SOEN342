@@ -1,3 +1,8 @@
+package com.alouer.commands.client;
+
+import com.alouer.commands.Command;
+import com.alouer.models.Client;
+
 public class AddDependentCommand implements Command {
     private Client client;
 

@@ -1,3 +1,5 @@
+package com.alouer.models;
+
 import java.util.Date;
 
 public class Child {
