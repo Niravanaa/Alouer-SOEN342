@@ -1,18 +1,23 @@
 package com.alouer;
 
+import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Scanner;
 
 import com.alouer.collections.ClientCollection;
 import com.alouer.collections.InstructorCollection;
+import com.alouer.collections.LessonCollection;
 import com.alouer.collections.LocationCollection;
 import com.alouer.commands.Command;
 import com.alouer.enums.UserType;
 import com.alouer.factories.CommandFactory;
+import com.alouer.lessonManagement.Lesson;
 import com.alouer.models.Administrator;
 import com.alouer.models.Client;
 import com.alouer.models.Instructor;
 import com.alouer.models.Location;
+import com.alouer.enums.*;
 
 public class Terminal {
     private static boolean loggedIn = false;
@@ -22,6 +27,19 @@ public class Terminal {
     public static void main(String[] args) {
         LocationCollection.add(new Location("Test Location", "123 Avenue Street", "Montreal", "QC", "H3W3B8"));
         LocationCollection.add(new Location("Location  2", "39 Boulevard Gotham", "Gotham", "DC", "123891"));
+
+        /* Accepting Offerings */
+        LessonCollection.add(new Lesson(LessonType.PRIVATE,
+                "How to perform oral sex", 0,
+                LocalTime.now(), LocalTime.now().plusHours(1),
+                Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY)));
+        LessonCollection.add(new Lesson(LessonType.PRIVATE,
+                "Semen Allergy Remedeez", 0,
+                LocalTime.now(), LocalTime.now().plusHours(2),
+                Arrays.asList(DayOfWeek.TUESDAY, DayOfWeek.FRIDAY)));
+        InstructorCollection.add(new Instructor("Test",
+                "Instructor", "instructor@example.com", "instructorPassword"));
+
         run(true);
     }
 

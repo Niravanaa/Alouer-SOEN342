@@ -2,6 +2,8 @@ package com.alouer.collections;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import com.alouer.lessonManagement.Lesson;
 
 public class LessonCollection {
@@ -24,5 +26,9 @@ public class LessonCollection {
         lessons.add(lesson);
         nextId++;
         return true;
+    }
+
+    public static List<Lesson> filterByLocation(int locationId) {
+        return lessons.stream().filter(lesson -> lesson.getLocationId() == locationId).collect(Collectors.toList());
     }
 }
