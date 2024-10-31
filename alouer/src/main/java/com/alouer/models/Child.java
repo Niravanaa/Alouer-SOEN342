@@ -1,25 +1,19 @@
 package com.alouer.models;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Child {
     private int id;
     private String firstName;
     private String lastName;
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
     private int parentId;
-    private Date createdAt;
-    private Date updatedAt;
-    private boolean isConnected;
 
-    public Child(String firstName, String lastName, Date dateOfBirth, int parentId) {
+    public Child(String firstName, String lastName, LocalDate dateOfBirth, int parentId) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
         this.parentId = parentId;
-        this.createdAt = new Date();
-        this.updatedAt = new Date();
-        this.isConnected = false;
     }
 
     public int getId() {
@@ -34,24 +28,12 @@ public class Child {
         return lastName;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
     public int getParentId() {
         return parentId;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public boolean isConnected() {
-        return isConnected;
     }
 
     public void setId(int id) {
@@ -66,23 +48,11 @@ public class Child {
         this.lastName = lastName;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
     public void setParentId(int parentId) {
         this.parentId = parentId;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public void setConnected(boolean isConnected) {
-        this.isConnected = isConnected;
     }
 }

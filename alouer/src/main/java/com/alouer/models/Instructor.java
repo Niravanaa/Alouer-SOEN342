@@ -23,6 +23,10 @@ public class Instructor {
         this.lessons = new ArrayList<>();
     }
 
+    public int getId() {
+        return this.id;
+    }
+
     public String getFirstName() {
         return firstName;
     }

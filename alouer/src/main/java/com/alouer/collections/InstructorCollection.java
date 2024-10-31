@@ -2,6 +2,8 @@ package com.alouer.collections;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.alouer.models.Client;
 import com.alouer.models.Instructor;
 
 public class InstructorCollection {
@@ -13,10 +15,12 @@ public class InstructorCollection {
     }
 
     public static Instructor find(int id) {
-        if (id < 0 || id >= instructors.size()) {
-            return null;
+        for (Instructor instructor : instructors) {
+            if (instructor.getId() == id) {
+                return instructor;
+            }
         }
-        return instructors.get(id);
+        return null;
     }
 
     public static boolean add(Instructor instructor) {
@@ -28,11 +32,22 @@ public class InstructorCollection {
 
     public static Instructor validateCredentials(String email, String password) {
         for (Instructor instructor : instructors) {
+            System.out.println(instructor.getPassword());
             if (instructor.getEmail().equals(email) && instructor.getPassword().equals(password)) {
                 instructor.setConnected(true);
                 return instructor;
             }
         }
         return null;
+    }
+
+    public static boolean delete(int id) {
+        for (Instructor instructor : instructors) {
+            if (instructor.getId() == id) {
+                instructors.remove(instructor);
+                return true;
+            }
+        }
+        return false;
     }
 }

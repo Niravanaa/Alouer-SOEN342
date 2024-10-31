@@ -1,30 +1,32 @@
 package com.alouer.lessonManagement;
 
+import java.time.LocalTime;
 import java.util.*;
-import java.util.ArrayList;
+
 import com.alouer.enums.LessonType;
 import com.alouer.enums.DayOfWeek;
 
 public class Lesson {
-    private int id;
+    private Integer id;
     private LessonType type;
     private String title;
-    private int locationId;
-    private boolean isAvailable;
-    private Date startTime;
-    private Date endTime;
-    private ArrayList<DayOfWeek> schedule;
+    private Integer locationId;
+    private Integer assignedInstructorId;
+    private Boolean isAvailable;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private List<DayOfWeek> schedule;
     private Booking booking;
 
     public Lesson(LessonType type, String title, int locationId,
-            Date startTime, Date endTime, ArrayList<DayOfWeek> schedule) {
+            LocalTime startTime, LocalTime endTime, List<DayOfWeek> list) {
         this.type = type;
         this.title = title;
         this.locationId = locationId;
-        isAvailable = true;
+        this.isAvailable = true;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.schedule = schedule; // TODO implement deep copy
+        this.schedule = list;
     }
 
     public int getId() {
@@ -55,6 +57,10 @@ public class Lesson {
         return locationId;
     }
 
+    public Integer getAssignedInstructorId() {
+        return this.assignedInstructorId;
+    }
+
     public void setLocationId(int locationId) {
         this.locationId = locationId;
     }
@@ -67,23 +73,27 @@ public class Lesson {
         this.isAvailable = isAvailable;
     }
 
-    public Date getStartTime() {
+    public void setAssignedInstructorId(int assignedInstructorId) {
+        this.assignedInstructorId = assignedInstructorId;
+    }
+
+    public LocalTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
+    public void setStartTime(LocalTime startTime) {
         this.startTime = startTime;
     }
 
-    public Date getEndTime() {
+    public LocalTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Date endTime) {
+    public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
     }
 
-    public ArrayList<DayOfWeek> getSchedule() {
+    public List<DayOfWeek> getSchedule() {
         return schedule;
     }
 

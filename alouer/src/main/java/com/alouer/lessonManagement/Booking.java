@@ -1,12 +1,11 @@
 package com.alouer.lessonManagement;
 
 import java.time.LocalDateTime;
-import java.util.Random;
 
 public class Booking {
-    private int id;
-    private int clientId;
-    private int lessonId;
+    private Integer id;
+    private Integer clientId;
+    private Integer lessonId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

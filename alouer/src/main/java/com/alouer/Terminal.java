@@ -1,18 +1,23 @@
 package com.alouer;
 
+import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Scanner;
 
 import com.alouer.collections.ClientCollection;
 import com.alouer.collections.InstructorCollection;
+import com.alouer.collections.LessonCollection;
 import com.alouer.collections.LocationCollection;
 import com.alouer.commands.Command;
-import com.alouer.enums.UserType;
+import com.alouer.enums.*;
 import com.alouer.factories.CommandFactory;
+import com.alouer.lessonManagement.Lesson;
 import com.alouer.models.Administrator;
 import com.alouer.models.Client;
 import com.alouer.models.Instructor;
 import com.alouer.models.Location;
+import com.alouer.utils.ConsoleUtils;
 
 public class Terminal {
     private static boolean loggedIn = false;
@@ -22,6 +27,10 @@ public class Terminal {
     public static void main(String[] args) {
         LocationCollection.add(new Location("Test Location", "123 Avenue Street", "Montreal", "QC", "H3W3B8"));
         LocationCollection.add(new Location("Location  2", "39 Boulevard Gotham", "Gotham", "DC", "123891"));
+        LessonCollection.add(new Lesson(LessonType.GROUP, "First Lesson", 0, LocalTime.of(9, 0), LocalTime.of(12, 0),
+                Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY)));
+        ClientCollection.add(new Client("Bob", "Builder", "bob@example.com", "bob123"));
+        InstructorCollection.add(new Instructor("Test", "Instructor", "instructor@example.com", "instructorPassword"));
         run(true);
     }
 
@@ -34,7 +43,7 @@ public class Terminal {
 
         while (!loggedIn) {
             if (!debugMode) {
-                clearConsole();
+                ConsoleUtils.clearConsole();
             }
 
             System.out.print("Enter user type (CLIENT, INSTRUCTOR, ADMINISTRATOR), or EXIT to quit the program: ");
@@ -98,7 +107,7 @@ public class Terminal {
     private static void commandLoop(UserType userType, Scanner scanner) {
         while (true) {
             if (!debugMode) {
-                clearConsole();
+                ConsoleUtils.clearConsole();
             }
 
             Map<String, Command> commands = CommandFactory.getCommands(userType, user);
@@ -122,10 +131,5 @@ public class Terminal {
                 System.out.println("Invalid command.");
             }
         }
-    }
-
-    public static void clearConsole() {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
     }
 }

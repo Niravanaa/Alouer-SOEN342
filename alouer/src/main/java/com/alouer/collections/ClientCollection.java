@@ -13,10 +13,12 @@ public class ClientCollection {
     }
 
     public static Client find(int id) {
-        if (id < 0 || id >= clients.size()) {
-            return null;
+        for (Client client : clients) {
+            if (client.getId() == id) {
+                return client;
+            }
         }
-        return clients.get(id);
+        return null;
     }
 
     public static boolean add(Client client) {
@@ -34,5 +36,15 @@ public class ClientCollection {
             }
         }
         return null;
+    }
+
+    public static boolean delete(int id) {
+        for (Client client : clients) {
+            if (client.getId() == id) {
+                clients.remove(client);
+                return true;
+            }
+        }
+        return false;
     }
 }

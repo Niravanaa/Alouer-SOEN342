@@ -13,10 +13,12 @@ public class LocationCollection {
     }
 
     public static Location find(int id) {
-        if (id < 0 || id >= locations.size()) {
-            return null;
+        for (Location location : locations) {
+            if (location.getId() == id) {
+                return location;
+            }
         }
-        return locations.get(id);
+        return null;
     }
 
     public static boolean add(Location location) {
