@@ -94,6 +94,7 @@ public class Terminal {
                     System.out.println("Invalid admin credentials. Please try again.");
                 }
             }
+            System.out.println();
 
             if (loggedIn) {
                 commandLoop(userType, scanner);
@@ -122,14 +123,16 @@ public class Terminal {
             Command command = commands.get(commandInput);
 
             if (command != null) {
+                System.out.println();
                 command.execute();
 
                 if ("logOut".equalsIgnoreCase(commandInput)) {
                     break;
                 }
             } else {
-                System.out.println("Invalid command.");
+                System.out.println("Invalid command");
             }
+            System.out.println();
         }
     }
 }
