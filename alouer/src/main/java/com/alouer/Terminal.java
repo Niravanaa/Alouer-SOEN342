@@ -5,12 +5,14 @@ import java.util.Scanner;
 
 import com.alouer.collections.ClientCollection;
 import com.alouer.collections.InstructorCollection;
+import com.alouer.collections.LocationCollection;
 import com.alouer.commands.Command;
 import com.alouer.enums.UserType;
 import com.alouer.factories.CommandFactory;
 import com.alouer.models.Administrator;
 import com.alouer.models.Client;
 import com.alouer.models.Instructor;
+import com.alouer.models.Location;
 
 public class Terminal {
     private static boolean loggedIn = false;
@@ -18,7 +20,9 @@ public class Terminal {
     private static boolean debugMode = false;
 
     public static void main(String[] args) {
-        run(false);
+        LocationCollection.add(new Location("Test Location", "123 Avenue Street", "Montreal", "QC", "H3W3B8"));
+        LocationCollection.add(new Location("Location  2", "39 Boulevard Gotham", "Gotham", "DC", "123891"));
+        run(true);
     }
 
     public static void run(boolean isDebugMode) {
