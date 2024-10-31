@@ -1,5 +1,6 @@
 package com.alouer.models;
 
+import java.util.List;
 import java.util.ArrayList;
 
 public class Location {
@@ -9,7 +10,7 @@ public class Location {
     private String city;
     private String province;
     private String postalCode;
-    private ArrayList<Integer> lessons;
+    private List<Integer> lessons;
 
     public Location(String name, String address, String city, String province,
             String postalCode) {
@@ -69,7 +70,7 @@ public class Location {
         this.postalCode = postalCode;
     }
 
-    public ArrayList<Integer> getLessons() {
+    public List<Integer> getLessons() {
         return lessons;
     }
 }

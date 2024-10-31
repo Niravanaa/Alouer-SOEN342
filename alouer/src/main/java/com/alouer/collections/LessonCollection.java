@@ -2,15 +2,14 @@ package com.alouer.collections;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.alouer.enums.DayOfWeek;
 import com.alouer.enums.LessonType;
+
 import com.alouer.lessonManagement.Lesson;
 import com.alouer.utils.BackendUtils;
 
@@ -89,5 +88,9 @@ public class LessonCollection {
                 .filter(lesson -> lesson.getType() == LessonType.GROUP ||
                         (lesson.getType() == LessonType.PRIVATE && lesson.isAvailable()))
                 .collect(Collectors.toList());
+    }
+
+    public static List<Lesson> filterByLocation(int locationId) {
+        return lessons.stream().filter(lesson -> lesson.getLocationId() == locationId).collect(Collectors.toList());
     }
 }

@@ -3,6 +3,7 @@ package com.alouer.lessonManagement;
 import java.time.LocalTime;
 import java.util.*;
 
+import java.util.List;
 import com.alouer.enums.LessonType;
 import com.alouer.enums.DayOfWeek;
 
@@ -19,14 +20,13 @@ public class Lesson {
     private Booking booking;
 
     public Lesson(LessonType type, String title, int locationId,
-            LocalTime startTime, LocalTime endTime, List<DayOfWeek> list) {
+            LocalTime startTime, LocalTime endTime, List<DayOfWeek> schedule) {
         this.type = type;
         this.title = title;
         this.locationId = locationId;
-        this.isAvailable = true;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.schedule = list;
+        this.schedule = schedule;
     }
 
     public int getId() {
@@ -53,7 +53,7 @@ public class Lesson {
         this.title = title;
     }
 
-    public int getLocationId() {
+    public Integer getLocationId() {
         return locationId;
     }
 
@@ -61,20 +61,20 @@ public class Lesson {
         return this.assignedInstructorId;
     }
 
-    public void setLocationId(int locationId) {
+    public void setLocationId(Integer locationId) {
         this.locationId = locationId;
     }
 
-    public boolean isAvailable() {
-        return isAvailable;
+    public void setAvailable(Boolean available) {
+        this.isAvailable = available;
     }
 
-    public void setAvailable(boolean isAvailable) {
-        this.isAvailable = isAvailable;
-    }
-
-    public void setAssignedInstructorId(int assignedInstructorId) {
+    public void setAssignedInstructorId(Integer assignedInstructorId) {
         this.assignedInstructorId = assignedInstructorId;
+    }
+
+    public boolean isAvailable() {
+        return this.isAvailable;
     }
 
     public LocalTime getStartTime() {
