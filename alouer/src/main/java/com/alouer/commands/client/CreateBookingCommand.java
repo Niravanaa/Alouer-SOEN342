@@ -90,7 +90,7 @@ public class CreateBookingCommand implements Command {
             try {
                 int selection = scanner.nextInt();
 
-                if (selection < 0 || selection >= lessons.size()) {
+                if (selection < 0 || selection >= lessons.size() + 1) {
                     System.out.println("Invalid selection.");
                 } else {
                     selectedLesson = lessons.get(selection);

@@ -12,7 +12,6 @@ public class Instructor {
     private String email;
     private String password;
     private UserType role;
-    private boolean isConnected;
     private List<Integer> lessons;
 
     public Instructor(String firstName, String lastName, String email, String password) {
@@ -21,7 +20,6 @@ public class Instructor {
         this.email = email;
         this.password = password;
         this.role = UserType.INSTRUCTOR;
-        this.isConnected = false;
         this.lessons = new ArrayList<>();
     }
 
@@ -53,10 +51,6 @@ public class Instructor {
         return lessons;
     }
 
-    public boolean isConnected() {
-        return isConnected;
-    }
-
     public void setId(Integer id) {
         this.id = id;
     }
@@ -75,10 +69,6 @@ public class Instructor {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public void setConnected(boolean isConnected) {
-        this.isConnected = isConnected;
     }
 
     public void addLesson(Integer lessonId) {

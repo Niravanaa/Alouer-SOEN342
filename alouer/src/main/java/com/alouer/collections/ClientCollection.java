@@ -28,7 +28,6 @@ public class ClientCollection {
                         resultSet.getString("email"),
                         resultSet.getString("password"));
                 client.setId(resultSet.getInt("id"));
-                client.setConnected(resultSet.getBoolean("connected"));
                 clients.add(client);
             }
         } catch (SQLException e) {
@@ -52,7 +51,6 @@ public class ClientCollection {
                             resultSet.getString("email"),
                             resultSet.getString("password"));
                     client.setId(resultSet.getInt("id"));
-                    client.setConnected(resultSet.getBoolean("connected"));
                 }
             }
         } catch (SQLException e) {
@@ -68,7 +66,6 @@ public class ClientCollection {
 
             statement.setString(1, client.getEmail());
             statement.setString(2, client.getPassword());
-            statement.setBoolean(3, client.isConnected());
 
             int rowsInserted = statement.executeUpdate();
             if (rowsInserted > 0) {
@@ -100,7 +97,6 @@ public class ClientCollection {
                             resultSet.getString("email"),
                             resultSet.getString("password"));
                     client.setId(resultSet.getInt("id"));
-                    client.setConnected(true); // Set client as connected
                     return client;
                 }
             }

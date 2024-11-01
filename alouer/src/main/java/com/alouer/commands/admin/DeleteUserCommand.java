@@ -36,7 +36,7 @@ public class DeleteUserCommand implements Command {
             }
 
             ConsoleUtils.printTable(clients,
-                    Arrays.asList("Id", "Password", "Role", "IsConnected", "Children", "Booking"));
+                    Arrays.asList("Id", "Password", "Role", "Children", "Booking"));
             int userId = requestUserId(scanner, clients);
             if (userId == -1)
                 return;
@@ -53,7 +53,7 @@ public class DeleteUserCommand implements Command {
                 System.out.println("No instructors available to delete.");
                 return;
             }
-            ConsoleUtils.printTable(instructors, Arrays.asList("Password", "Role", "IsConnected", "Lessons"));
+            ConsoleUtils.printTable(instructors, Arrays.asList("Password", "Role", "Lessons"));
             int userId = requestUserId(scanner, instructors);
             if (userId == -1)
                 return;

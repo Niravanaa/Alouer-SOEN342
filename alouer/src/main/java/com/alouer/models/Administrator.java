@@ -5,7 +5,6 @@ public class Administrator {
     private String lastName = "User";
     private String email = "admin@example.com";
     private String password = "password123";
-    private boolean isConnected = false;
 
     private static Administrator instance = null;
 
@@ -33,13 +32,5 @@ public class Administrator {
 
     public String getPassword() {
         return password;
-    }
-
-    public void setConnected(boolean connectionStatus) {
-        this.isConnected = connectionStatus;
-    }
-
-    public boolean isConnected() {
-        return this.isConnected;
     }
 }

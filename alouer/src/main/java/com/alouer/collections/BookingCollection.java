@@ -68,7 +68,11 @@ public class BookingCollection {
 
             statement.setInt(1, booking.getClientId());
             statement.setInt(2, booking.getLessonId());
-            statement.setInt(3, booking.getChildId());
+            if (booking.getChildId() != null) {
+                statement.setInt(3, booking.getChildId());
+            } else {
+                statement.setNull(3, java.sql.Types.INTEGER);
+            }
 
             int rowsInserted = statement.executeUpdate();
             if (rowsInserted > 0) {

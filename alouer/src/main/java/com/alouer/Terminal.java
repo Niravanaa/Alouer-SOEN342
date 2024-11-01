@@ -64,7 +64,7 @@ public class Terminal {
                     System.out.print("Exiting, have a nice day!");
                     scanner.close();
                     System.exit(0);
-                } else if (userTypeIndex < 0 || userTypeIndex >= userTypes.length) {
+                } else if (userTypeIndex < 0 || userTypeIndex >= userTypes.length + 1) {
                     System.out.println("Invalid selection. Please try again.");
                     continue;
                 }
@@ -100,7 +100,6 @@ public class Terminal {
             } else if (userType == UserType.ADMINISTRATOR) {
                 Administrator admin = Administrator.getInstance();
                 if (email.equals(admin.getEmail()) && password.equals(admin.getPassword())) {
-                    admin.setConnected(true);
                     user = admin;
                     loggedIn = true;
                 } else {

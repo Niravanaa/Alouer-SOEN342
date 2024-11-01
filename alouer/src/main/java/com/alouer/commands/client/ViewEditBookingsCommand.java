@@ -84,6 +84,7 @@ public class ViewEditBookingsCommand implements Command {
             if (userAction.equals("d") && BookingCollection.delete(bookingId)) {
                 keepViewing = true;
                 client.removeBooking(bookingId);
+                System.out.println("Successfully deleted the booking.");
             } else if (!userAction.equals("b")) {
                 System.out.println("Invalid selection. Please try again.");
             }

@@ -24,7 +24,7 @@ public class Booking {
         return this.id;
     }
 
-    public int getChildId() {
+    public Integer getChildId() {
         return this.childId;
     }
 

@@ -13,8 +13,7 @@ CREATE TABLE IF NOT EXISTS administrator (
     firstName TEXT NOT NULL DEFAULT 'Admin',
     lastName TEXT NOT NULL DEFAULT 'User',
     email TEXT NOT NULL DEFAULT 'admin@example.com',
-    password TEXT NOT NULL DEFAULT 'password123',
-    isConnected BOOLEAN NOT NULL DEFAULT FALSE
+    password TEXT NOT NULL DEFAULT 'password123'
 );
 
 CREATE TABLE IF NOT EXISTS child (
@@ -32,8 +31,7 @@ CREATE TABLE IF NOT EXISTS client (
     lastName TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
-    role TEXT NOT NULL CHECK (role IN ('CLIENT')),
-    isConnected BOOLEAN NOT NULL DEFAULT FALSE
+    role TEXT NOT NULL CHECK (role IN ('CLIENT'))
 );
 
 CREATE TABLE IF NOT EXISTS instructor (
@@ -42,8 +40,7 @@ CREATE TABLE IF NOT EXISTS instructor (
     lastName TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
-    role TEXT NOT NULL CHECK (role IN ('INSTRUCTOR')),
-    isConnected BOOLEAN NOT NULL DEFAULT FALSE
+    role TEXT NOT NULL CHECK (role IN ('INSTRUCTOR'))
 );
 
 CREATE TABLE IF NOT EXISTS location (

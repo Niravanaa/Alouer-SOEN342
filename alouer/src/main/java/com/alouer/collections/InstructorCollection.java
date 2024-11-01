@@ -28,7 +28,6 @@ public class InstructorCollection {
                         resultSet.getString("email"),
                         resultSet.getString("password"));
                 instructor.setId(resultSet.getInt("id"));
-                instructor.setConnected(resultSet.getBoolean("connected"));
                 instructors.add(instructor);
             }
         } catch (SQLException e) {
@@ -37,7 +36,7 @@ public class InstructorCollection {
         return instructors;
     }
 
-    public static Instructor find(int id) {
+    public static Instructor getById(int id) {
         Instructor instructor = null;
 
         try (Connection connection = DatabaseManager.getConnection();
@@ -52,7 +51,6 @@ public class InstructorCollection {
                             resultSet.getString("email"),
                             resultSet.getString("password"));
                     instructor.setId(resultSet.getInt("id"));
-                    instructor.setConnected(resultSet.getBoolean("connected"));
                 }
             }
         } catch (SQLException e) {
@@ -68,7 +66,6 @@ public class InstructorCollection {
 
             statement.setString(1, instructor.getEmail());
             statement.setString(2, instructor.getPassword());
-            statement.setBoolean(3, instructor.isConnected());
 
             int rowsInserted = statement.executeUpdate();
             if (rowsInserted > 0) {
@@ -100,7 +97,6 @@ public class InstructorCollection {
                             resultSet.getString("email"),
                             resultSet.getString("password"));
                     instructor.setId(resultSet.getInt("id"));
-                    instructor.setConnected(true); // Set instructor as connected
                     return instructor;
                 }
             }
@@ -121,9 +117,5 @@ public class InstructorCollection {
             e.printStackTrace(); // Handle exceptions appropriately
         }
         return false;
-    }
-
-    public static Instructor getById(Integer id) {
-        return find(id); // This can reuse the find method
     }
 }
