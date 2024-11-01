@@ -1,52 +1,142 @@
 package com.alouer.collections;
 
+import java.sql.*;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+
 import com.alouer.models.Child;
+import com.alouer.utils.DatabaseManager;
 
 public class ChildCollection {
-    private static List<Child> children = new ArrayList<>();
-    private static int nextId = 0;
+    private static final String INSERT_CHILD_SQL = "INSERT INTO child (firstName, lastName, dateOfBirth, parentId) VALUES (?, ?, ?, ?)";
+    private static final String SELECT_CHILD_BY_ID_SQL = "SELECT * FROM child WHERE id = ?";
+    private static final String SELECT_CHILDREN_BY_CLIENT_ID_SQL = "SELECT * FROM child WHERE parentId = ?";
+    private static final String VALIDATE_CHILD_SQL = "SELECT * FROM child WHERE parentId = ? AND firstName = ? AND lastName = ? AND dateOfBirth = ?";
+    private static final String SELECT_ALL_CHILDREN_SQL = "SELECT * FROM child";
 
     public static List<Child> getChildren() {
+        List<Child> children = new ArrayList<>();
+
+        try (Connection connection = DatabaseManager.getConnection();
+                PreparedStatement statement = connection.prepareStatement(SELECT_ALL_CHILDREN_SQL);
+                ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                Child child = new Child(
+                        resultSet.getString("firstName"),
+                        resultSet.getString("lastName"),
+                        resultSet.getDate("dateOfBirth").toLocalDate(),
+                        resultSet.getInt("parentId"));
+                child.setId(resultSet.getInt("id")); // Assuming your Child class has setId method
+                children.add(child);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle exceptions appropriately
+        }
         return children;
     }
 
     public static Child find(int id) {
-        for (Child child : children) {
-            if (child.getId() == id) {
-                return child;
+        Child child = null;
+
+        try (Connection connection = DatabaseManager.getConnection();
+                PreparedStatement statement = connection.prepareStatement(SELECT_CHILD_BY_ID_SQL)) {
+
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    child = new Child(
+                            resultSet.getString("firstName"),
+                            resultSet.getString("lastName"),
+                            resultSet.getDate("dateOfBirth").toLocalDate(),
+                            resultSet.getInt("parentId"));
+                    child.setId(resultSet.getInt("id"));
+                }
             }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle exceptions appropriately
         }
-        return null;
+        return child;
     }
 
     public static boolean add(Child child) {
-        child.setId(nextId);
-        children.add(child);
-        nextId++;
-        return true;
-    }
+        try (Connection connection = DatabaseManager.getConnection();
+                PreparedStatement statement = connection.prepareStatement(INSERT_CHILD_SQL,
+                        Statement.RETURN_GENERATED_KEYS)) {
 
-    public static boolean validateChild(int clientId, String firstName, String lastName, LocalDate dateOfBirth) {
-        for (Child child : children) {
-            if (child.getParentId() == clientId &&
-                    child.getFirstName().equalsIgnoreCase(firstName) &&
-                    child.getLastName().equalsIgnoreCase(lastName) &&
-                    child.getDateOfBirth().equals(dateOfBirth)) {
+            statement.setString(1, child.getFirstName());
+            statement.setString(2, child.getLastName());
+            statement.setDate(3, Date.valueOf(child.getDateOfBirth()));
+            statement.setInt(4, child.getParentId());
+
+            int rowsInserted = statement.executeUpdate();
+            if (rowsInserted > 0) {
+                try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        child.setId(generatedKeys.getInt(1)); // Set generated ID
+                    }
+                }
                 return true;
             }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle exceptions appropriately
         }
         return false;
     }
 
-    public static boolean createChild(int clientId, String firstName, String lastName, LocalDate dateOfBirth) {
+    public static boolean validateChild(int clientId, String firstName, String lastName, LocalDate dateOfBirth) {
+        try (Connection connection = DatabaseManager.getConnection();
+                PreparedStatement statement = connection.prepareStatement(VALIDATE_CHILD_SQL)) {
+
+            statement.setInt(1, clientId);
+            statement.setString(2, firstName);
+            statement.setString(3, lastName);
+            statement.setDate(4, Date.valueOf(dateOfBirth));
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next(); // Returns true if a child matching the criteria exists
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle exceptions appropriately
+        }
+        return false;
+    }
+
+    public static Integer createChild(int clientId, String firstName, String lastName, LocalDate dateOfBirth) {
         Child newChild = new Child(firstName, lastName, dateOfBirth, clientId);
 
-        add(newChild);
+        if (add(newChild)) {
+            return newChild.getId();
+        }
+        return null;
+    }
 
-        return true;
+    public static List<Child> getChildrenByClientId(int clientId) {
+        List<Child> children = new ArrayList<>();
+
+        try (Connection connection = DatabaseManager.getConnection();
+                PreparedStatement statement = connection.prepareStatement(SELECT_CHILDREN_BY_CLIENT_ID_SQL)) {
+
+            statement.setInt(1, clientId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Child child = new Child(
+                            resultSet.getString("firstName"),
+                            resultSet.getString("lastName"),
+                            resultSet.getDate("dateOfBirth").toLocalDate(),
+                            resultSet.getInt("parentId"));
+                    child.setId(resultSet.getInt("id"));
+                    children.add(child);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle exceptions appropriately
+        }
+        return children;
+    }
+
+    public static Child getById(Integer id) {
+        return find(id);
     }
 }

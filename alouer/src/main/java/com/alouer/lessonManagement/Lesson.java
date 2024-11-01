@@ -17,7 +17,7 @@ public class Lesson {
     private LocalTime startTime;
     private LocalTime endTime;
     private List<DayOfWeek> schedule;
-    private Booking booking;
+    private Integer bookingId;
 
     public Lesson(LessonType type, String title, int locationId,
             LocalTime startTime, LocalTime endTime, List<DayOfWeek> schedule) {
@@ -27,6 +27,7 @@ public class Lesson {
         this.startTime = startTime;
         this.endTime = endTime;
         this.schedule = schedule;
+        this.isAvailable = false;
     }
 
     public int getId() {
@@ -71,6 +72,7 @@ public class Lesson {
 
     public void setAssignedInstructorId(Integer assignedInstructorId) {
         this.assignedInstructorId = assignedInstructorId;
+        this.isAvailable = true;
     }
 
     public boolean isAvailable() {
@@ -97,11 +99,11 @@ public class Lesson {
         return schedule;
     }
 
-    public Booking getBooking() {
-        return booking;
+    public Integer getBooking() {
+        return bookingId;
     }
 
-    public void setBooking(Booking booking) {
-        this.booking = booking;
+    public void setBooking(Integer bookingId) {
+        this.bookingId = bookingId;
     }
 }

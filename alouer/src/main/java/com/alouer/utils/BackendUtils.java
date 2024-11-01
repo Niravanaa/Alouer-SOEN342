@@ -5,10 +5,17 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.alouer.enums.DayOfWeek;
 
 public class BackendUtils {
+    public static String convertDaysToSchedule(List<DayOfWeek> days) {
+        return days.stream()
+                .map(DayOfWeek::name)
+                .collect(Collectors.joining(","));
+    }
+
     public static int convertTimeToMinutes(String time) {
         String[] parts = time.split(":");
         int hours = Integer.parseInt(parts[0]);
@@ -40,6 +47,7 @@ public class BackendUtils {
     }
 
     public static List<DayOfWeek> parseSchedule(String schedule) {
+        System.out.println(schedule);
         List<DayOfWeek> dayOfWeeks = new ArrayList<>();
         String[] days = schedule.split("-");
         for (String day : days) {

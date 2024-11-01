@@ -9,8 +9,8 @@ import com.alouer.collections.LessonCollection;
 import com.alouer.utils.ConsoleUtils;
 
 import java.util.Arrays;
+import java.util.InputMismatchException;
 import java.util.List;
-
 import java.util.Scanner;
 
 public class AcceptOfferingCommand implements Command {
@@ -22,17 +22,85 @@ public class AcceptOfferingCommand implements Command {
 
     @Override
     public void execute() {
+        Scanner scanner = new Scanner(System.in);
+
         List<Location> locations = LocationCollection.getLocations();
-        List<String> excludedProperties = Arrays.asList("Lessons");
-        ConsoleUtils.printTable(locations, excludedProperties);
-        System.out.println();
+        ConsoleUtils.printTable(locations, Arrays.asList("Lessons"));
 
         System.out.print("Select a location by entering its ID: ");
-        Scanner scanner = new Scanner(System.in);
-        int locationId = scanner.nextInt();
+        int locationId = getValidLocationId(scanner, locations);
 
-        List<Lesson> lessons = LessonCollection.filterByLocation(locationId);
-        List<String> excludedProperties2 = Arrays.asList("LocationId", "Booking");
-        ConsoleUtils.printTable(lessons, excludedProperties2);
+        List<Lesson> availableLessons = LessonCollection.getAvailableLessonsByLocationId(locationId);
+        ConsoleUtils.printTable(availableLessons,
+                Arrays.asList("Location Id", "Is Available", "Booking", "Assigned Instructor Id", "Id"));
+
+        if (availableLessons.isEmpty()) {
+            System.out.println("No available lessons found for the selected location.");
+            return;
+        }
+
+        Lesson selectedLesson = selectLesson(scanner, availableLessons);
+        if (selectedLesson == null) {
+            System.out.println("Invalid lesson selection. Assignment process aborted.");
+            return;
+        }
+
+        if (selectedLesson.getAssignedInstructorId() == null) {
+            selectedLesson.setAssignedInstructorId(instructor.getId());
+            selectedLesson.setAvailable(true);
+            instructor.addLesson(selectedLesson.getId());
+            System.out.println("Lesson successfully assigned to you!");
+        } else {
+            System.out.println("Lesson is already assigned to another instructor.");
+        }
+    }
+
+    private static int getValidLocationId(Scanner scanner, List<Location> locations) {
+        int locationId = -1;
+        boolean validInput = false;
+
+        while (!validInput) {
+            System.out.print("Please enter a valid location ID (integer): ");
+            try {
+                locationId = scanner.nextInt();
+                if (locationId < 0 || locationId >= locations.size()) {
+                    System.out.println("Location ID does not exist. Please enter a valid location ID.");
+                } else {
+                    validInput = true;
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter an integer.");
+                scanner.next();
+            }
+        }
+        return locationId;
+    }
+
+    private Lesson selectLesson(Scanner scanner, List<Lesson> lessons) {
+        Lesson selectedLesson = null;
+        boolean validSelection = false;
+
+        while (!validSelection) {
+            System.out.print("Select a lesson by ID: ");
+            try {
+                int selection = scanner.nextInt();
+
+                for (Lesson lesson : lessons) {
+                    if (lesson.getId() == selection) {
+                        selectedLesson = lesson;
+                        validSelection = true;
+                        break;
+                    }
+                }
+
+                if (!validSelection) {
+                    System.out.println("Invalid lesson ID. Please enter a valid lesson ID.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter an integer.");
+                scanner.next();
+            }
+        }
+        return selectedLesson;
     }
 }

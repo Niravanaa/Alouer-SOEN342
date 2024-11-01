@@ -1,7 +1,9 @@
 package com.alouer;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -18,6 +20,7 @@ import com.alouer.models.Client;
 import com.alouer.models.Instructor;
 import com.alouer.models.Location;
 import com.alouer.utils.ConsoleUtils;
+import com.alouer.utils.DatabaseManager;
 
 public class Terminal {
     private static boolean loggedIn = false;
@@ -25,19 +28,16 @@ public class Terminal {
     private static boolean debugMode = false;
 
     public static void main(String[] args) {
-        LocationCollection.add(new Location("Test Location", "123 Avenue Street", "Montreal", "QC", "H3W3B8"));
-        LocationCollection.add(new Location("Location  2", "39 Boulevard Gotham", "Gotham", "DC", "123891"));
-        LessonCollection.add(new Lesson(LessonType.GROUP, "First Lesson", 0, LocalTime.of(9, 0), LocalTime.of(12, 0),
-                Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY)));
-        ClientCollection.add(new Client("Bob", "Builder", "bob@example.com", "bob123"));
-        InstructorCollection.add(new Instructor("Test", "Instructor", "instructor@example.com", "instructorPassword"));
         run(true);
     }
 
     public static void run(boolean isDebugMode) {
+        DatabaseManager.initializeDatabase();
+
         debugMode = isDebugMode;
 
         Scanner scanner = new Scanner(System.in);
+        scanner.useDelimiter("\n");
 
         System.out.println("Welcome to the System. Please log in.");
 
@@ -46,22 +46,35 @@ public class Terminal {
                 ConsoleUtils.clearConsole();
             }
 
-            System.out.print("Enter user type (CLIENT, INSTRUCTOR, ADMINISTRATOR), or EXIT to quit the program: ");
-            String userTypeInput = scanner.nextLine().toUpperCase();
-            UserType userType;
+            System.out.println("Enter user type, or 4 to EXIT:");
+            UserType[] userTypes = UserType.values();
+            for (int i = 0; i < userTypes.length; i++) {
+                System.out.println((i + 1) + ". " + userTypes[i]);
+            }
+            System.out.println("4. EXIT");
+
+            System.out.print("Select a number: ");
+            String userTypeInput = scanner.nextLine();
+
+            int userTypeIndex;
+
             try {
-                userType = UserType.valueOf(userTypeInput);
-            } catch (IllegalArgumentException e) {
-                if (userTypeInput.toUpperCase().equals("EXIT")) {
-                    System.out.println("Exiting, have a nice day!");
+                userTypeIndex = Integer.parseInt(userTypeInput) - 1;
+                if (userTypeIndex == 3) { // Exit option
+                    System.out.print("Exiting, have a nice day!");
                     scanner.close();
                     System.exit(0);
+                } else if (userTypeIndex < 0 || userTypeIndex >= userTypes.length) {
+                    System.out.println("Invalid selection. Please try again.");
+                    continue;
                 }
-                System.out.println("Invalid user type. Please try again.");
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
                 continue;
             }
 
-            // Prompt for credentials
+            UserType userType = userTypes[userTypeIndex];
+
             System.out.print("Enter email: ");
             String email = scanner.nextLine();
 
@@ -94,7 +107,6 @@ public class Terminal {
                     System.out.println("Invalid admin credentials. Please try again.");
                 }
             }
-            System.out.println();
 
             if (loggedIn) {
                 commandLoop(userType, scanner);
@@ -111,28 +123,39 @@ public class Terminal {
                 ConsoleUtils.clearConsole();
             }
 
-            Map<String, Command> commands = CommandFactory.getCommands(userType, user);
+            Map<String, Command> commandsMap = CommandFactory.getCommands(userType, user);
+            List<Command> commands = new ArrayList<>(commandsMap.values());
+            List<String> commandNames = new ArrayList<>(commandsMap.keySet());
 
             System.out.println("Available commands:");
-            for (String commandName : commands.keySet()) {
-                System.out.println("- " + commandName);
+            for (int i = 0; i < commandNames.size(); i++) {
+                System.out.println((i + 1) + ". " + commandNames.get(i));
             }
 
-            System.out.print("Enter a command: ");
-            String commandInput = scanner.nextLine();
-            Command command = commands.get(commandInput);
+            System.out.print("Enter a command number: ");
+            String input = scanner.nextLine();
 
-            if (command != null) {
-                System.out.println();
-                command.execute();
+            try {
+                int commandIndex = Integer.parseInt(input) - 1;
 
-                if ("logOut".equalsIgnoreCase(commandInput)) {
-                    break;
+                if (commandIndex >= 0 && commandIndex < commands.size()) {
+                    Command command = commands.get(commandIndex);
+                    if (!debugMode) {
+                        ConsoleUtils.clearConsole();
+                    }
+                    command.execute();
+
+                    if ("logOut".equalsIgnoreCase(commandNames.get(commandIndex))) {
+                        break;
+                    }
+                } else {
+                    System.out.println("Invalid command number. Please try again.");
                 }
-            } else {
-                System.out.println("Invalid command");
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
             }
             System.out.println();
         }
     }
+
 }

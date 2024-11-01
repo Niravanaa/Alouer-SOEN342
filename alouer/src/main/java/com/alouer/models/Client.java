@@ -94,4 +94,8 @@ public class Client {
     public void addBooking(int bookingId) {
         this.bookings.add(bookingId);
     }
+
+    public void removeBooking(int bookingId) {
+        this.bookings.remove(bookingId);
+    }
 }

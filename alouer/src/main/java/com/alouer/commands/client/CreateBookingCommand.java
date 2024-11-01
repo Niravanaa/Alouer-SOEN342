@@ -2,8 +2,10 @@ package com.alouer.commands.client;
 
 import com.alouer.commands.Command;
 import com.alouer.models.Client;
+import com.alouer.models.Child;
 import com.alouer.lessonManagement.Lesson;
 import com.alouer.collections.BookingCollection;
+import com.alouer.collections.ChildCollection;
 import com.alouer.models.Location;
 import com.alouer.utils.ConsoleUtils;
 
@@ -26,7 +28,6 @@ public class CreateBookingCommand implements Command {
         Scanner scanner = new Scanner(System.in);
 
         List<Location> locations = LocationCollection.getLocations();
-
         ConsoleUtils.printTable(locations, Arrays.asList("Lessons"));
 
         System.out.print("Enter the location ID you wish to view available lessons for: ");
@@ -42,16 +43,38 @@ public class CreateBookingCommand implements Command {
         }
 
         Lesson selectedLesson = selectLesson(scanner, availableLessons);
-
         if (selectedLesson == null) {
             System.out.println("Invalid selection. Booking process aborted.");
             return;
         }
 
-        boolean isValid = BookingCollection.validateBooking(selectedLesson, client);
+        List<Child> children = ChildCollection.getChildrenByClientId(client.getId());
+        Integer childId = null;
 
+        if (children != null) {
+            System.out.print("Is this booking for an underage dependent? (yes/no): ");
+            String response = scanner.next().trim().toLowerCase();
+
+            if (response.equals("yes")) {
+                if (children.isEmpty()) {
+                    System.out.println("No children found for this client.");
+                    return;
+                }
+
+                ConsoleUtils.printTable(children, Arrays.asList("Id", "Parent Id"));
+                System.out.print("Enter the child ID you wish to book for: ");
+                childId = getValidChildId(scanner, children);
+                if (childId == null) {
+                    System.out.println("Invalid child ID. Booking process aborted.");
+                    return;
+                }
+            }
+        }
+
+        boolean isValid = BookingCollection.validateBooking(selectedLesson, client);
         if (isValid) {
-            BookingCollection.createBooking(client.getId(), selectedLesson.getId());
+            int newBookingId = BookingCollection.createBooking(client.getId(), selectedLesson.getId(), childId);
+            client.addBooking(newBookingId);
             System.out.println("Booking created successfully!");
         } else {
             System.out.println("Booking validation failed.");
@@ -78,7 +101,6 @@ public class CreateBookingCommand implements Command {
                 scanner.next();
             }
         }
-
         return selectedLesson;
     }
 
@@ -90,7 +112,6 @@ public class CreateBookingCommand implements Command {
             System.out.print("Please enter a valid location ID (integer): ");
             try {
                 locationId = scanner.nextInt();
-
                 if (locationId < 0 || locationId >= locations.size()) {
                     System.out.println("Location ID does not exist. Please enter a valid location ID.");
                 } else {
@@ -104,4 +125,28 @@ public class CreateBookingCommand implements Command {
         return locationId;
     }
 
+    private static Integer getValidChildId(Scanner scanner, List<Child> children) {
+        Integer childId = null;
+        boolean validInput = false;
+
+        while (!validInput) {
+            try {
+                int enteredId = scanner.nextInt();
+                for (Child child : children) {
+                    if (child.getId() == enteredId) {
+                        childId = enteredId;
+                        validInput = true;
+                        break;
+                    }
+                }
+                if (!validInput) {
+                    System.out.print("Invalid child ID. Please enter a valid child ID: ");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter an integer.");
+                scanner.next();
+            }
+        }
+        return childId;
+    }
 }
