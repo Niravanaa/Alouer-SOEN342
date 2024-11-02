@@ -36,7 +36,7 @@ public class InstructorCollection {
         return instructors;
     }
 
-    public static Instructor getById(int id) {
+    public static Instructor getById(Integer id) {
         Instructor instructor = null;
 
         try (Connection connection = DatabaseManager.getConnection();
@@ -106,7 +106,7 @@ public class InstructorCollection {
         return null;
     }
 
-    public static boolean delete(int id) {
+    public static boolean delete(Integer id) {
         try (Connection connection = DatabaseManager.getConnection();
                 PreparedStatement statement = connection.prepareStatement(DELETE_INSTRUCTOR_SQL)) {
 

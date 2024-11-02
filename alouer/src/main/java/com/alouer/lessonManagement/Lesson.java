@@ -19,7 +19,7 @@ public class Lesson {
     private List<DayOfWeek> schedule;
     private Integer bookingId;
 
-    public Lesson(LessonType type, String title, int locationId,
+    public Lesson(LessonType type, String title, Integer locationId,
             LocalTime startTime, LocalTime endTime, List<DayOfWeek> schedule) {
         this.type = type;
         this.title = title;
@@ -30,7 +30,7 @@ public class Lesson {
         this.isAvailable = false;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -38,7 +38,7 @@ public class Lesson {
         return type;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

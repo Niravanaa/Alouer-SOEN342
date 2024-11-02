@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Location {
-    private int id;
+    private Integer id;
     private String name;
     private String address;
     private String city;
@@ -22,7 +22,7 @@ public class Location {
         lessons = new ArrayList<>();
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -30,7 +30,7 @@ public class Location {
         return name;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

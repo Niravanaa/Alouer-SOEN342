@@ -6,7 +6,7 @@ import java.util.List;
 import com.alouer.enums.UserType;
 
 public class Instructor {
-    private int id;
+    private Integer id;
     private String firstName;
     private String lastName;
     private String email;
@@ -23,7 +23,7 @@ public class Instructor {
         this.lessons = new ArrayList<>();
     }
 
-    public int getId() {
+    public Integer getId() {
         return this.id;
     }
 

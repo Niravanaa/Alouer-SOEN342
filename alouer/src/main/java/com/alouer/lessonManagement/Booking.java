@@ -20,7 +20,7 @@ public class Booking {
         updatedAt = LocalDateTime.now();
     }
 
-    public int getId() {
+    public Integer getId() {
         return this.id;
     }
 
@@ -28,27 +28,27 @@ public class Booking {
         return this.childId;
     }
 
-    public int getClientId() {
+    public Integer getClientId() {
         return this.clientId;
     }
 
-    public int getLessonId() {
+    public Integer getLessonId() {
         return lessonId;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public void setClientId(int clientId) {
+    public void setClientId(Integer clientId) {
         this.clientId = clientId;
     }
 
-    public void setChildId(int childId) {
+    public void setChildId(Integer childId) {
         this.childId = childId;
     }
 
-    public void setLessonId(int lessonId) {
+    public void setLessonId(Integer lessonId) {
         this.lessonId = lessonId;
     }
 

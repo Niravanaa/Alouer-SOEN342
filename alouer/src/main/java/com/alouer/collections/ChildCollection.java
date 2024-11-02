@@ -37,7 +37,7 @@ public class ChildCollection {
         return children;
     }
 
-    public static Child find(int id) {
+    public static Child find(Integer id) {
         Child child = null;
 
         try (Connection connection = DatabaseManager.getConnection();
@@ -85,7 +85,7 @@ public class ChildCollection {
         return false;
     }
 
-    public static boolean validateChild(int clientId, String firstName, String lastName, LocalDate dateOfBirth) {
+    public static boolean validateChild(Integer clientId, String firstName, String lastName, LocalDate dateOfBirth) {
         try (Connection connection = DatabaseManager.getConnection();
                 PreparedStatement statement = connection.prepareStatement(VALIDATE_CHILD_SQL)) {
 
@@ -103,7 +103,7 @@ public class ChildCollection {
         return false;
     }
 
-    public static Integer createChild(int clientId, String firstName, String lastName, LocalDate dateOfBirth) {
+    public static Integer createChild(Integer clientId, String firstName, String lastName, LocalDate dateOfBirth) {
         Child newChild = new Child(firstName, lastName, dateOfBirth, clientId);
 
         if (add(newChild)) {
@@ -112,7 +112,7 @@ public class ChildCollection {
         return null;
     }
 
-    public static List<Child> getChildrenByClientId(int clientId) {
+    public static List<Child> getChildrenByClientId(Integer clientId) {
         List<Child> children = new ArrayList<>();
 
         try (Connection connection = DatabaseManager.getConnection();

@@ -36,7 +36,7 @@ public class ClientCollection {
         return clients;
     }
 
-    public static Client getById(int id) {
+    public static Client getById(Integer id) {
         Client client = null;
 
         try (Connection connection = DatabaseManager.getConnection();
@@ -106,7 +106,7 @@ public class ClientCollection {
         return null;
     }
 
-    public static boolean delete(int id) {
+    public static boolean delete(Integer id) {
         try (Connection connection = DatabaseManager.getConnection();
                 PreparedStatement statement = connection.prepareStatement(DELETE_CLIENT_SQL)) {
 
