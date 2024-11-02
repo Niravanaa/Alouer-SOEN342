@@ -131,11 +131,11 @@ public class ConsoleUtils {
                                                                                                                // letter
     }
 
-    private static int getId(Object obj) throws Exception {
+    private static Integer getId(Object obj) throws Exception {
         Method[] methods = obj.getClass().getDeclaredMethods();
         for (Method method : methods) {
-            if (method.getName().equals("getId") && method.getReturnType() == int.class) {
-                return (int) method.invoke(obj);
+            if (method.getName().equals("getId") && method.getReturnType() == Integer.class) {
+                return (Integer) method.invoke(obj);
             }
         }
         throw new IllegalArgumentException("No valid getId method found.");

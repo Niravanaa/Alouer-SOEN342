@@ -89,17 +89,19 @@ public class BookingCollection {
         return false;
     }
 
-    public static boolean validateBooking(Lesson selectedLesson, Client client) {
+    public static boolean validateBooking(Integer selectedLessonId) {
+        Lesson selectedLesson = LessonCollection.getById(selectedLessonId);
+
+        if (selectedLesson == null) {
+            return false;
+        }
+
         if (!selectedLesson.isAvailable() || selectedLesson.getAssignedInstructorId() == null) {
             return false;
         }
 
-        if (selectedLesson.getType() != LessonType.GROUP && selectedLesson.getType() != LessonType.PRIVATE) {
-            return false;
-        }
-
         Booking existingBooking = getByLessonId(selectedLesson.getId());
-        return existingBooking == null; // True if no existing booking found
+        return existingBooking == null;
     }
 
     public static Integer createBooking(Integer clientId, Integer lessonId, Integer childId) {

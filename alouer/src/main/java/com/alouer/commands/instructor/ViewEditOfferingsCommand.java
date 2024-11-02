@@ -97,7 +97,7 @@ public class ViewEditOfferingsCommand implements Command {
         System.out.println();
     }
 
-    private int getLessonSelection(Scanner scanner) {
+    private Integer getLessonSelection(Scanner scanner) {
         int lessonId = -1;
         try {
             lessonId = scanner.nextInt();

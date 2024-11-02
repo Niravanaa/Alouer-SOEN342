@@ -1,74 +1,80 @@
 @startuml
 actor "<u>:Admin" as admin
 participant "<u>:Terminal" as terminal
-participant "<u>:LessonCollection" as lessonCollection
-participant "<u>:LocationCollection" as locationCollection
-collections "<u>:Lesson" as lessons
-collections "<u>:Location" as locations
+participant "<u>:CreateLessonCommand" as command
+participant "ConsoleUtils" as consoleUtils
+participant "LocationCollection" as locationCollection
+participant "LessonCollection" as lessonCollection
+participant "DatabaseManager" as databaseManager
+participant "BackendUtils" as backendUtils
 participant "<u>lesson:Lesson" as lessonObj
+collections "<u>:Lesson" as lessons
 
-admin -> terminal : requestCreateLesson()
-activate admin
-activate terminal
-terminal -> locationCollection : getLocations()
-activate locationCollection
-locationCollection -> locations : getAll()
-activate locations
-locations -> locationCollection : locations
-deactivate locations
-locationCollection -> terminal : locations
-deactivate locationCollection
-terminal --> admin : displayLocations
-deactivate terminal
-deactivate admin
-
-admin -> terminal : selectLocation(locationId)
-activate admin
-activate terminal
-terminal -> admin : requestLessonDetails
-deactivate terminal
-deactivate admin
-
-admin -> terminal : inputLessonDetails(title, lessonType, startTime, endTime, schedule)
-activate admin
-activate terminal
-terminal -> lessonCollection : validateLesson(locationId, startTime, endTime, schedule)
-activate lessonCollection
-lessonCollection -> lessons : checkForConflictingLesson(locationId, startTime, endTime, schedule)
-activate lessons
-
-alt No Conflicts
-    lessons -> lessonCollection : noConflict
-    lessonCollection -> terminal : success
-    
-    terminal -> locationCollection : createLesson(locationId, title, lessonType, startTime, endTime, schedule)
-    activate locationCollection
-    locationCollection -> lessonObj ** : create(locationId, title, lessonType, startTime, endTime, schedule)
-    activate lessonObj
-    lessonObj -> locationCollection : lesson
-    deactivate lessonObj
-
-    alt Lesson Created Successfully
-        locationCollection -> locations : add(location)
-        activate locationCollection
-        activate locations
-        locations --> locationCollection : success
-        deactivate locationCollection
-        deactivate locations
-        locationCollection -> terminal : success
-        terminal -> admin : successMessage
-    else Lesson Creation Failed
-        locationCollection -> terminal : failure
-        terminal -> admin : failureMessage
+admin -> terminal : createLessonCommandID
+terminal -> command : execute()
+command -> locationCollection : getLocations()
+locationCollection -> databaseManager : getConnection()
+databaseManager --> locationCollection : connection
+locationCollection --> command : locations
+command -> consoleUtils : printTable(locations, nonDisplayProperties)
+command -> command : requestLocationId(s, locations)
+admin -> terminal : locationId
+terminal -> command : locationId
+command -> command : requestLessonTypeInput()
+admin -> terminal : lessonType
+terminal -> command : lessonType
+command -> command : requestTimeInput("start time")
+admin -> terminal : startTime
+terminal -> command : startTime
+command -> command : requestTimeInput("end time")
+admin -> terminal : endTime
+terminal -> command : endTime
+command -> command : isEndTimeGreaterThanStartTime(startTime, endTime)
+command -> command : requestTitle()
+admin -> terminal : title
+terminal -> command : title
+command -> command : requestScheduleInput()
+admin -> terminal : schedule
+terminal -> command : schedule
+command -> command : requestConfirmation()
+admin -> terminal : schedule
+terminal -> command : schedule
+command -> lessonCollection : validateLesson(locationId, startTime, endTime, schedule)
+lessonCollection -> backendUtils : convertTimeToMinutes(startTime)
+backendUtils --> lessonCollection : startMinutes
+lessonCollection -> backendUtils : convertTimeToMinutes(endTime)
+backendUtils --> lessonCollection : endMinutes
+lessonCollection -> backendUtils : convertScheduleToDays(schedule)
+loop for each Lesson in getLessons()
+    lessonCollection -> lessons : getLocationId()
+    lessons --> lessonCollection : fetchedLocationId
+    alt locationId == fetchedLocationId
+        lessonCollection -> lessons : getSchedule()
+        lessons --> lessonCollection : existingSchedule
+        
+        alt schedule and existingSchedule overlaps
+            lessonCollection -> backendUtils: convertTimeToMinutes(existingLesson.getStartTime())
+            backendUtils--> lessonCollection : existingStartMinutes
+            lessonCollection -> backendUtils: convertTimeToMinutes(existingLesson.getEndTime())
+            backendUtils --> lessonCollection : existingEndMinutes
+            
+            alt time overlaps
+                lessonCollection --> command : False
+            end
+        end
     end
-    deactivate locationCollection
-else Conflicts Found
-    lessons -> lessonCollection : conflict
-    deactivate lessons
-    lessonCollection -> terminal : failure
-    terminal -> admin : failureMessage
-    deactivate lessonCollection
 end
-deactivate admin
-deactivate terminal
+lessonCollection --> command : True
+command -> lessonCollection : createLesson(locationId, title, lessonType, startTime, endTime, schedule)
+lessonCollection -> backendUtils : parseSchedule(schedule)
+lessonCollection -> lessonObj ** : new Lesson(lessonType, title, locationId, start, end, dayOfWeeks)
+lessonObj --> lessonCollection : lesson
+lessonCollection -> lessonCollection : add(lesson)
+lessonCollection -> databaseManager : getConnection()
+databaseManager --> lessonCollection : connection
+alt successful creation
+    lessonCollection --> command : True
+else creation failure
+    lessonCollection --> command : False
+end
 @enduml

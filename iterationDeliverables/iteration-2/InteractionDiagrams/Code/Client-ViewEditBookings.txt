@@ -1,0 +1,53 @@
+@startuml
+actor "<u>:Client" as client
+participant "<u>:Terminal" as terminal
+participant "<u>:ViewEditBookingsCommand" as command
+participant "ConsoleUtils" as consoleUtils
+participant "<u>:LocationCollection" as locationCollection
+participant "<u>:ChildCollection" as childCollection
+participant "<u>:BookingCollection" as bookingCollection
+participant "<u>:LessonCollection" as lessonCollection
+participant "<u>:InstructorCollection" as instructorCollection
+participant "DatabaseManager" as databaseManager
+
+command -> bookingCollection : getByClientId(clientId)
+bookingCollection -> databaseManager : getConnection()
+databaseManager --> bookingCollection : connection
+bookingCollection --> command : bookings
+
+loop while keepViewing == true
+   command -> bookingCollection : getByClientId(clientId)
+   bookingCollection -> databaseManager : getConnection()
+   databaseManager --> bookingCollection : connection
+   bookingCollection --> command : bookings
+
+   command -> consoleUtils : printTable(bookings, nonDisplayProperties)
+   command -> command : requestBookingId(bookings)
+   client -> terminal : bookingId
+   terminal -> command : bookingId
+   command -> bookingCollection : get(bookingId)
+   bookingCollection --> command : booking
+   command -> lessonCollection : getById(booking.getLessonId())
+   lessonCollection --> command : lesson
+   command -> locationCollection : getById(lesson.getLocationId())
+   locationCollection --> command : location
+   command -> instructorCollection : getById(lesson.getAssignedInstructorId())
+   instructorCollection --> command : instructor
+   command -> childCollection : getById(booking.getChildId())
+   childCollection --> command : child
+   command -> command : displayLessonDetails(selectedLesson, location, instructor, child)
+   client -> terminal : response
+   alt client deletes the booking
+       command -> bookingCollection : delete(bookingId)
+       bookingCollection -> databaseManager : getConnection()
+       databaseManager --> bookingCollection : connection
+       alt successful deletion
+           bookingCollection --> command : True
+           command -> command : keepViewing := False
+           command -> client : removeBooking(bookingId)
+       else deletion failure
+           bookingCollection --> command : False
+       end
+end
+
+@enduml

@@ -51,20 +51,12 @@ public class ViewEditBookingsCommand implements Command {
                     Arrays.asList("Id", "Client Id", "Lesson Id", "Child Id"));
 
             System.out.print("Enter the ID of a lesson to view details or type -1 to exit: ");
-            int bookingId = getLessonSelection(scanner);
-
-            if (bookingId <= -1 || bookingId > clientBookings.size()) {
+            int bookingId = requestBookingId(scanner, clientBookings);
+            if (bookingId == -1) {
                 keepViewing = false;
-                continue;
             }
 
-            Booking selectedBooking = null;
-
-            for (Booking booking : clientBookings) {
-                if (booking.getId() == bookingId) {
-                    selectedBooking = booking;
-                }
-            }
+            Booking selectedBooking = BookingCollection.get(bookingId);
 
             if (selectedBooking == null) {
                 System.out.println("The selected booking does not exist. Please try again");
@@ -102,14 +94,32 @@ public class ViewEditBookingsCommand implements Command {
         System.out.println();
     }
 
-    private int getLessonSelection(Scanner scanner) {
-        int lessonId = -1;
+    private Integer requestBookingId(Scanner scanner, List<Booking> clientBookings) {
+        int bookingId = -1;
+        boolean keepViewing = false;
+
         try {
-            lessonId = scanner.nextInt();
+            while (!keepViewing) {
+                System.out.print("Enter a booking ID (or -1 to cancel): ");
+                bookingId = scanner.nextInt();
+
+                int maxBookingId = clientBookings.stream()
+                        .mapToInt(Booking::getId)
+                        .max()
+                        .orElse(-1);
+
+                if ((bookingId >= 0 && bookingId <= maxBookingId && BookingCollection.get(bookingId) != null)
+                        || bookingId == -1) {
+                    keepViewing = true;
+                } else {
+                    System.out.println("Invalid booking ID. Please try again.");
+                }
+            }
         } catch (InputMismatchException e) {
             System.out.println("Invalid input. Please enter a valid integer.");
             scanner.next();
         }
-        return lessonId;
+        return bookingId;
     }
+
 }

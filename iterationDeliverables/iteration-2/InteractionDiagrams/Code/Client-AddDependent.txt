@@ -1,0 +1,37 @@
+@startuml
+actor "<u>:Client" as client
+participant "<u>:Terminal" as terminal
+participant "<u>:AddDependentCommand" as command
+participant "<u>:ChildCollection" as childCollection
+participant "DatabaseManager" as databaseManager
+participant "<u>child:Child" as childObj
+
+command -> command : requestFirstName()
+client -> terminal : firstName
+terminal -> command : firstName
+command -> command : requestLastName()
+client -> terminal : lastName
+terminal -> command : lastName
+command -> command : requestDateOfBirth()
+client -> terminal : dateOfBirth
+terminal -> command : dateOfBirth
+command -> childCollection : validateChild(clientId, firstName, lastName, dateOfBirth)
+childCollection -> databaseManager : getConnection()
+databaseManager --> childCollection : connection
+alt child exists
+    childCollection --> command : childExistsError
+else child does not exist
+    command -> childCollection : createChild(clientId, firstName, lastName, dateOfBirth)
+    childCollection -> childObj ** : new Child(firstName, lastName, dateOfBirth, clientId)
+    childObj --> childCollection : newChild
+    childCollection -> childCollection : add(newChild)
+    childCollection -> databaseManager : getConnection()
+    databaseManager --> childCollection : connection
+    alt successful creation
+        childCollection --> command : childId
+        childCollection -> client : addChild(childId)
+    else creation failed
+        childCollection --> command : null
+    end
+end
+@enduml

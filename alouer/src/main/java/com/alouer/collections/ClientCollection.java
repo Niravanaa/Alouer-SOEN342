@@ -101,7 +101,7 @@ public class ClientCollection {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return null;
     }
@@ -112,9 +112,9 @@ public class ClientCollection {
 
             statement.setInt(1, id);
             int rowsDeleted = statement.executeUpdate();
-            return rowsDeleted > 0; // Returns true if a client was deleted
+            return rowsDeleted > 0;
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return false;
     }

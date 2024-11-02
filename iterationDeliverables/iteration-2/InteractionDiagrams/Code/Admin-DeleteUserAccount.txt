@@ -1,87 +1,60 @@
 @startuml
 actor "<u>:Admin" as admin
+participant "<u>s:Scanner" as scanner
 participant "<u>:Terminal" as terminal
-participant "<u>:InstructorCollection" as instructorCollection
-participant "<u>:ClientCollection" as clientCollection
-collections "<u>:Instructor" as instructors
-collections "<u>:Client" as clients
+participant "<u>:DeleteUserCommand" as command
+participant "ConsoleUtils" as consoleUtils
+participant "InstructorCollection" as instructorCollection
+participant "ClientCollection" as clientCollection
+participant "DatabaseManager" as databaseManager
 
-admin -> terminal : requestToDeleteUser()
-activate terminal
-activate admin
-terminal --> admin : requestUserTypeToDelete
-deactivate terminal
-deactivate admin
-
-admin -> terminal : specifyUserType(userType)
-activate terminal
-activate admin
-alt Instructor
-    terminal -> instructorCollection : getInstructors()
-    activate terminal
-    activate instructorCollection
-    instructorCollection -> instructors : getAll()
-    instructors -> instructorCollection : instructors
-    instructorCollection -> terminal : instructors
-    deactivate terminal
-    deactivate instructorCollection
-else Client
-    terminal -> clientCollection : getClients()
-    activate terminal
-    activate clientCollection
-    clientCollection -> clients : getAll()
-    clients -> clientCollection : clients
-    clientCollection -> terminal : clients
-    deactivate terminal
-    deactivate clientCollection
-end
-terminal --> admin : displayUsers
-deactivate terminal
-deactivate admin
-
-admin -> terminal : inputId(id)
-activate admin
-activate terminal
-
-terminal -> admin : requestConfirmation
-deactivate admin
-deactivate terminal
-
-admin -> terminal : confirmDeletion()
-activate admin
-activate terminal
-
-alt Instructor
-    terminal -> instructorCollection : removeInstructor(id)
-    activate terminal
-    activate instructorCollection
-    instructorCollection -> instructors : remove(id)
-    alt Successful Database Operation
-        instructors -> instructorCollection : success
-        instructorCollection --> terminal : success
-    else Failed Database Operation
-        instructors -> instructorCollection : failure
-        instructorCollection --> terminal : failure
-    deactivate instructorCollection
-    deactivate terminal
+admin -> scanner: Enters ID corresponding to Delete User Account Command
+terminal -> scanner : readLine()
+scanner --> terminal : deleteUserAccountCommandID
+terminal -> command : execute()
+command -> command : requestUserType(s)
+admin -> scanner : userType
+command -> scanner : readLine()
+scanner --> command : userType
+alt userType == UserType.CLIENT
+    command -> clientCollection : getClients()
+    clientCollection -> databaseManager : getConnection()
+    databaseManager --> clientCollection : connection
+    clientCollection --> command : clients
+    command -> consoleUtils : printTable(clients, nonDisplayProperties)
+    command -> command : requestUserId(s)
+    admin -> scanner : Enters User ID to delete
+    command -> scanner : readLine()
+    scanner --> command : userId
+    command -> command : confirmDeletion(s)
+    admin -> scanner : Confirms Deletion
+    command -> clientCollection : delete(userId)
+    clientCollection -> databaseManager : getConnection()
+    databaseManager --> clientCollection : connection
+    alt successful deletion 
+        clientCollection --> command : True
+    else deletion failure
+        clientCollection --> command : False
     end
-else Client
-    terminal -> clientCollection : removeClient(id)
-    activate terminal
-    activate clientCollection
-    clientCollection -> clients : remove(id)
-    alt Successful Database Operation
-        clients -> clientCollection : success
-        clientCollection --> terminal : success
-    else Failed Database Operation
-        clients -> clientCollection : failure
-        clientCollection --> terminal : failure
-    deactivate terminal
-    deactivate clientCollection
+else userType == UserType.INSTRUCTOR
+    command -> instructorCollection : getInstructors()
+    instructorCollection -> databaseManager : getConnection()
+    databaseManager --> instructorCollection : connection
+    instructorCollection --> command : instructors
+    command -> consoleUtils : printTable(instructors, nonDisplayProperties)
+    command -> command : requestUserId(s)
+    admin -> scanner : Enters User ID to delete
+    command -> scanner : readLine()
+    scanner --> command : userId
+    command -> command : confirmDeletion(s)
+    admin -> scanner : Confirms Deletion
+    command -> instructorCollection : delete(userId)
+    instructorCollection -> databaseManager : getConnection()
+    databaseManager --> instructorCollection : connection
+    alt successful deletion 
+        instructorCollection --> command : True
+    else deletion failure
+        instructorCollection --> command : False
     end
 end
-
-terminal --> admin : response
-deactivate admin
-deactivate terminal
 @enduml

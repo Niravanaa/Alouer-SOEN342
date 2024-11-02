@@ -1,24 +1,18 @@
 package com.alouer;
 
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 import com.alouer.collections.ClientCollection;
 import com.alouer.collections.InstructorCollection;
-import com.alouer.collections.LessonCollection;
-import com.alouer.collections.LocationCollection;
 import com.alouer.commands.Command;
 import com.alouer.enums.*;
 import com.alouer.factories.CommandFactory;
-import com.alouer.lessonManagement.Lesson;
 import com.alouer.models.Administrator;
 import com.alouer.models.Client;
 import com.alouer.models.Instructor;
-import com.alouer.models.Location;
 import com.alouer.utils.ConsoleUtils;
 import com.alouer.utils.DatabaseManager;
 

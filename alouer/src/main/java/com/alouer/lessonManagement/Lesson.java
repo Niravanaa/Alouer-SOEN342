@@ -1,9 +1,8 @@
 package com.alouer.lessonManagement;
 
 import java.time.LocalTime;
-import java.util.*;
+import java.util.Set;
 
-import java.util.List;
 import com.alouer.enums.LessonType;
 import com.alouer.enums.DayOfWeek;
 
@@ -16,11 +15,11 @@ public class Lesson {
     private Boolean isAvailable;
     private LocalTime startTime;
     private LocalTime endTime;
-    private List<DayOfWeek> schedule;
+    private Set<DayOfWeek> schedule;
     private Integer bookingId;
 
     public Lesson(LessonType type, String title, int locationId,
-            LocalTime startTime, LocalTime endTime, List<DayOfWeek> schedule) {
+            LocalTime startTime, LocalTime endTime, Set<DayOfWeek> schedule) {
         this.type = type;
         this.title = title;
         this.locationId = locationId;
@@ -30,7 +29,7 @@ public class Lesson {
         this.isAvailable = false;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -38,20 +37,8 @@ public class Lesson {
         return type;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setType(LessonType type) {
-        this.type = type;
-    }
-
     public String getTitle() {
         return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public Integer getLocationId() {
@@ -60,6 +47,38 @@ public class Lesson {
 
     public Integer getAssignedInstructorId() {
         return this.assignedInstructorId;
+    }
+
+    public Set<DayOfWeek> getSchedule() {
+        return schedule;
+    }
+
+    public Integer getBooking() {
+        return bookingId;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public boolean isAvailable() {
+        return this.isAvailable;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setType(LessonType type) {
+        this.type = type;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public void setLocationId(Integer locationId) {
@@ -75,35 +94,15 @@ public class Lesson {
         this.isAvailable = true;
     }
 
-    public boolean isAvailable() {
-        return this.isAvailable;
-    }
-
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
     public void setStartTime(LocalTime startTime) {
         this.startTime = startTime;
-    }
-
-    public LocalTime getEndTime() {
-        return endTime;
     }
 
     public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
     }
 
-    public List<DayOfWeek> getSchedule() {
-        return schedule;
-    }
-
-    public Integer getBooking() {
-        return bookingId;
-    }
-
-    public void setBooking(Integer bookingId) {
+    public void setBookingId(Integer bookingId) {
         this.bookingId = bookingId;
     }
 }

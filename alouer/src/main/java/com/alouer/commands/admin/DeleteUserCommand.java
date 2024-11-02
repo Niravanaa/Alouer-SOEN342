@@ -84,7 +84,7 @@ public class DeleteUserCommand implements Command {
         }
     }
 
-    private int requestUserId(Scanner scanner, List<?> users) {
+    private Integer requestUserId(Scanner scanner, List<?> users) {
         System.out.println("Please enter the ID of the user you wish to delete: ");
         while (true) {
             try {

@@ -5,7 +5,7 @@ import java.util.List;
 import com.alouer.enums.UserType;
 
 public class Client {
-    private int id;
+    private Integer id;
     private String firstName;
     private String lastName;
     private String email;
@@ -24,7 +24,7 @@ public class Client {
         this.bookings = new ArrayList<>();
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

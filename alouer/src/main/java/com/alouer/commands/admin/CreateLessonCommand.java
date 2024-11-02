@@ -30,21 +30,8 @@ public class CreateLessonCommand implements Command {
 
         System.out.println("\nEnter a location ID to view its corresponding lessons: ");
 
-        int locationId = -1;
-        while (true) {
-            try {
-                String input = scanner.nextLine();
-                locationId = Integer.parseInt(input);
-
-                if (locationId - 1 >= -1 && locationId - 1 < locations.size()) {
-                    break;
-                } else {
-                    System.out.println("Invalid ID. Please enter a valid location ID: ");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a numeric ID: ");
-            }
-        }
+        // Request Location ID
+        int locationId = requestLocationId(scanner, locations);
 
         // Request lesson type
         LessonType lessonType = requestLessonTypeInput(scanner);
@@ -66,7 +53,19 @@ public class CreateLessonCommand implements Command {
         // Request schedule
         String schedule = requestScheduleInput(scanner);
 
-        // Confirmation
+        // Request confirmation
+        String confirmation = requestConfirmation(scanner, locationId, startTime, endTime, schedule);
+
+        if ("yes".equals(confirmation) && LessonCollection.validateLesson(locationId, startTime, endTime, schedule)
+                && LessonCollection.createLesson(locationId, title, lessonType, startTime, endTime, schedule)) {
+            System.out.println("Successfully created a new lesson.");
+        } else {
+            System.out.println("There was an error creating the lesson");
+        }
+    }
+
+    private String requestConfirmation(Scanner scanner, Integer locationId, String startTime, String endTime,
+            String schedule) {
         System.out.println("\nPlease confirm the details:");
         System.out.println("Location ID: " + locationId);
         System.out.println("Start Time: " + startTime);
@@ -74,12 +73,24 @@ public class CreateLessonCommand implements Command {
         System.out.println("Schedule: " + schedule);
         System.out.println("Is this correct? (yes/no)");
 
-        String confirmation = scanner.nextLine().trim().toLowerCase();
-        if ("yes".equals(confirmation) && LessonCollection.validateLesson(locationId, startTime, endTime, schedule)
-                && LessonCollection.createLesson(locationId, title, lessonType, startTime, endTime, schedule)) {
-            System.out.println("Successfully created a new lesson.");
-        } else {
-            System.out.println("There was an error creating the lesson");
+        return scanner.nextLine().trim().toLowerCase();
+    }
+
+    private Integer requestLocationId(Scanner scanner, List<Location> locations) {
+        int locationId = -1;
+        while (true) {
+            try {
+                String input = scanner.nextLine();
+                locationId = Integer.parseInt(input);
+
+                if (locationId - 1 >= -1 && locationId - 1 < locations.size()) {
+                    return locationId;
+                } else {
+                    System.out.println("Invalid ID. Please enter a valid location ID: ");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a numeric ID: ");
+            }
         }
     }
 
@@ -111,7 +122,6 @@ public class CreateLessonCommand implements Command {
         }
     }
 
-    // Helper method to check if endTime is greater than startTime
     private boolean isEndTimeGreaterThanStartTime(String startTime, String endTime) {
         String[] startParts = startTime.split(":");
         String[] endParts = endTime.split(":");
@@ -124,7 +134,6 @@ public class CreateLessonCommand implements Command {
         return (endHours > startHours) || (endHours == startHours && endMinutes > startMinutes);
     }
 
-    // Helper method to request schedule input
     private String requestScheduleInput(Scanner scanner) {
         String schedule;
         String[] validDays = { "M", "Tu", "W", "Th", "F", "Sa", "Su" };

@@ -28,16 +28,16 @@ public class ChildCollection {
                         resultSet.getString("lastName"),
                         resultSet.getDate("dateOfBirth").toLocalDate(),
                         resultSet.getInt("parentId"));
-                child.setId(resultSet.getInt("id")); // Assuming your Child class has setId method
+                child.setId(resultSet.getInt("id"));
                 children.add(child);
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return children;
     }
 
-    public static Child find(int id) {
+    public static Child getById(int id) {
         Child child = null;
 
         try (Connection connection = DatabaseManager.getConnection();
@@ -55,7 +55,7 @@ public class ChildCollection {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return child;
     }
@@ -74,13 +74,13 @@ public class ChildCollection {
             if (rowsInserted > 0) {
                 try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        child.setId(generatedKeys.getInt(1)); // Set generated ID
+                        child.setId(generatedKeys.getInt(1));
                     }
                 }
                 return true;
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return false;
     }
@@ -95,10 +95,10 @@ public class ChildCollection {
             statement.setDate(4, Date.valueOf(dateOfBirth));
 
             try (ResultSet resultSet = statement.executeQuery()) {
-                return resultSet.next(); // Returns true if a child matching the criteria exists
+                return resultSet.next();
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return false;
     }
@@ -131,12 +131,8 @@ public class ChildCollection {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return children;
-    }
-
-    public static Child getById(Integer id) {
-        return find(id);
     }
 }

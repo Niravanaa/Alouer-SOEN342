@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Location {
-    private int id;
+    private Integer id;
     private String name;
     private String address;
     private String city;
@@ -22,12 +22,32 @@ public class Location {
         lessons = new ArrayList<>();
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
     public String getName() {
         return name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public List<Integer> getLessons() {
+        return lessons;
     }
 
     public void setId(int id) {
@@ -38,39 +58,19 @@ public class Location {
         this.name = name;
     }
 
-    public String getAddress() {
-        return address;
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public void setAddress(String address) {
         this.address = address;
     }
 
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getProvince() {
-        return province;
-    }
-
     public void setProvince(String province) {
         this.province = province;
     }
 
-    public String getPostalCode() {
-        return postalCode;
-    }
-
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
-    }
-
-    public List<Integer> getLessons() {
-        return lessons;
     }
 }

@@ -3,18 +3,18 @@ package com.alouer.commands.client;
 import com.alouer.commands.Command;
 import com.alouer.models.Client;
 import com.alouer.models.Child;
+import com.alouer.models.Location;
 import com.alouer.lessonManagement.Lesson;
 import com.alouer.collections.BookingCollection;
 import com.alouer.collections.ChildCollection;
-import com.alouer.models.Location;
+import com.alouer.collections.LessonCollection;
+import com.alouer.collections.LocationCollection;
 import com.alouer.utils.ConsoleUtils;
 
 import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
-import com.alouer.collections.LessonCollection;
-import com.alouer.collections.LocationCollection;
 
 public class CreateBookingCommand implements Command {
     private Client client;
@@ -33,7 +33,7 @@ public class CreateBookingCommand implements Command {
         System.out.print("Enter the location ID you wish to view available lessons for: ");
         int locationId = getValidLocationId(scanner, locations);
 
-        List<Lesson> availableLessons = LessonCollection.getAvailableLessonsByLocationId(locationId);
+        List<Lesson> availableLessons = LessonCollection.getAvailableLessons(locationId);
         ConsoleUtils.printTable(availableLessons,
                 Arrays.asList("Location Id", "Is Available", "Booking", "Assigned Instructor Id", "Id"));
 
@@ -42,8 +42,8 @@ public class CreateBookingCommand implements Command {
             return;
         }
 
-        Lesson selectedLesson = selectLesson(scanner, availableLessons);
-        if (selectedLesson == null) {
+        Integer lessonId = selectLesson(scanner, availableLessons);
+        if (lessonId == null) {
             System.out.println("Invalid selection. Booking process aborted.");
             return;
         }
@@ -71,9 +71,9 @@ public class CreateBookingCommand implements Command {
             }
         }
 
-        boolean isValid = BookingCollection.validateBooking(selectedLesson, client);
+        boolean isValid = BookingCollection.validateBooking(lessonId);
         if (isValid) {
-            int newBookingId = BookingCollection.createBooking(client.getId(), selectedLesson.getId(), childId);
+            int newBookingId = BookingCollection.createBooking(client.getId(), lessonId, childId);
             client.addBooking(newBookingId);
             System.out.println("Booking created successfully!");
         } else {
@@ -81,41 +81,56 @@ public class CreateBookingCommand implements Command {
         }
     }
 
-    private Lesson selectLesson(Scanner scanner, List<Lesson> lessons) {
-        Lesson selectedLesson = null;
+    private Integer selectLesson(Scanner scanner, List<Lesson> lessons) {
         boolean validSelection = false;
+
+        int maxId = lessons.stream()
+                .mapToInt(Lesson::getId)
+                .max()
+                .orElse(-1);
+
+        Integer selection = null;
 
         while (!validSelection) {
             System.out.print("Select a lesson by ID: ");
             try {
-                int selection = scanner.nextInt();
+                selection = scanner.nextInt();
 
-                if (selection < 0 || selection >= lessons.size() + 1) {
+                if (selection < 0 || selection > maxId) {
                     System.out.println("Invalid selection.");
-                } else {
-                    selectedLesson = lessons.get(selection);
+                } else if (LessonCollection.getById(selection) != null) {
                     validSelection = true;
+                } else {
+                    System.out.println("No lesson found with that ID.");
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Invalid input. Please enter an integer.");
                 scanner.next();
             }
         }
-        return selectedLesson;
+        return selection;
     }
 
     private static int getValidLocationId(Scanner scanner, List<Location> locations) {
         int locationId = -1;
         boolean validInput = false;
 
+        int maxId = locations.stream()
+                .mapToInt(Location::getId)
+                .max()
+                .orElse(-1);
+
         while (!validInput) {
             System.out.print("Please enter a valid location ID (integer): ");
             try {
                 locationId = scanner.nextInt();
-                if (locationId < 0 || locationId >= locations.size()) {
+
+                if (locationId < 0 || locationId > maxId) {
                     System.out.println("Location ID does not exist. Please enter a valid location ID.");
-                } else {
+                } else if (LocationCollection.getById(locationId) != null) {
                     validInput = true;
+                } else {
+                    System.out.println("Location ID does not exist. Please enter a valid location ID.");
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Invalid input. Please enter an integer.");

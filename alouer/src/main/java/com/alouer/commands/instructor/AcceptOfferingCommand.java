@@ -30,7 +30,7 @@ public class AcceptOfferingCommand implements Command {
         System.out.print("Select a location by entering its ID: ");
         int locationId = getValidLocationId(scanner, locations);
 
-        List<Lesson> availableLessons = LessonCollection.getAvailableLessonsByLocationId(locationId);
+        List<Lesson> availableLessons = LessonCollection.getUnassignedLessons(locationId);
         ConsoleUtils.printTable(availableLessons,
                 Arrays.asList("Location Id", "Is Available", "Booking", "Assigned Instructor Id", "Id"));
 
@@ -55,7 +55,7 @@ public class AcceptOfferingCommand implements Command {
         }
     }
 
-    private static int getValidLocationId(Scanner scanner, List<Location> locations) {
+    private static Integer getValidLocationId(Scanner scanner, List<Location> locations) {
         int locationId = -1;
         boolean validInput = false;
 

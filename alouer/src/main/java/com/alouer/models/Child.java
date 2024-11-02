@@ -3,7 +3,7 @@ package com.alouer.models;
 import java.time.LocalDate;
 
 public class Child {
-    private int id;
+    private Integer id;
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth;
@@ -16,7 +16,7 @@ public class Child {
         this.parentId = parentId;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

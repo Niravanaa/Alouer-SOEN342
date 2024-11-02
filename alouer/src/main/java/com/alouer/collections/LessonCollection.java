@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,7 +48,7 @@ public class LessonCollection {
         return lessons;
     }
 
-    public static List<DayOfWeek> getScheduleByLessonId(int lessonId) {
+    public static Set<DayOfWeek> getScheduleByLessonId(int lessonId) {
         List<DayOfWeek> schedule = new ArrayList<>();
         try (Connection connection = DatabaseManager.getConnection();
                 PreparedStatement statement = connection.prepareStatement(SELECT_SCHEDULE_BY_LESSON_ID_SQL)) {
@@ -64,7 +65,7 @@ public class LessonCollection {
 
         schedule.sort(Comparator.comparingInt(day -> Arrays.asList(DayOfWeek.values()).indexOf(day)));
 
-        return schedule;
+        return new LinkedHashSet<>(schedule);
     }
 
     public static Lesson getById(int id) {
@@ -188,7 +189,7 @@ public class LessonCollection {
 
         for (Lesson existingLesson : getLessons()) {
             if (existingLesson.getLocationId() == locationId) {
-                List<DayOfWeek> existingDays = existingLesson.getSchedule();
+                Set<DayOfWeek> existingDays = existingLesson.getSchedule();
 
                 if (!requestedDays.isEmpty() && !existingDays.isEmpty()
                         && !Collections.disjoint(requestedDays, existingDays)) {
@@ -210,46 +211,33 @@ public class LessonCollection {
         try {
             LocalTime start = LocalTime.parse(startTime);
             LocalTime end = LocalTime.parse(endTime);
-            List<DayOfWeek> dayOfWeeks = BackendUtils.parseSchedule(schedule);
+            Set<DayOfWeek> dayOfWeeks = BackendUtils.parseSchedule(schedule);
 
             Lesson lesson = new Lesson(lessonType, title, locationId, start, end, dayOfWeeks);
-            return add(lesson); // Using the add method to insert into the database
+            return add(lesson);
         } catch (Exception e) {
             System.out.println("Error creating lesson: " + e.getMessage());
             return false;
         }
     }
 
-    public static List<Lesson> getAvailableLessonsByLocationId(int locationId) {
-        List<Lesson> availableLessons = new ArrayList<>();
-
-        for (Lesson lesson : getLessons()) {
-            if (isLessonAvailable(lesson, locationId)) {
-                availableLessons.add(lesson);
-            }
-        }
-
-        return availableLessons;
+    public static List<Lesson> getUnassignedLessons(int locationId) {
+        return getLessons().stream()
+                .filter(lesson -> lesson.getLocationId() == locationId)
+                .filter(lesson -> lesson.getAssignedInstructorId() == null)
+                .filter(lesson -> BookingCollection.getBookings().stream()
+                        .noneMatch(booking -> booking.getLessonId() == lesson.getId()))
+                .collect(Collectors.toList());
     }
 
-    private static boolean isLessonAvailable(Lesson lesson, Integer locationId) {
-        if (lesson.getLocationId() != locationId) {
-            System.out.println("Lesson '" + lesson.getTitle() + "' failed location check.");
-            return false;
-        }
-        if (lesson.getAssignedInstructorId() == null) {
-            System.out.println("Lesson '" + lesson.getTitle() + "' has no assigned instructor.");
-            return false;
-        }
-        if (lesson.getType() == LessonType.PRIVATE && !lesson.isAvailable()) {
-            System.out.println("Lesson '" + lesson.getTitle() + "' is not available.");
-            return false;
-        }
-        if (BookingCollection.getBookings().stream().anyMatch(booking -> booking.getLessonId() == lesson.getId())) {
-            System.out.println("Lesson '" + lesson.getTitle() + "' is already booked.");
-            return false;
-        }
-        return true;
+    public static List<Lesson> getAvailableLessons(int locationId) {
+        return getLessons().stream()
+                .filter(lesson -> lesson.getLocationId() == locationId)
+                .filter(lesson -> lesson.getAssignedInstructorId() != null)
+                .filter(lesson -> lesson.getType() == LessonType.GROUP ||
+                        (lesson.getType() == LessonType.PRIVATE && lesson.isAvailable()))
+                .filter(lesson -> BookingCollection.getBookings().stream()
+                        .noneMatch(booking -> booking.getLessonId() == lesson.getId()))
+                .collect(Collectors.toList());
     }
-
 }

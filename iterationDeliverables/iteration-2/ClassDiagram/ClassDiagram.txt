@@ -1,14 +1,185 @@
 @startuml
-enum LessonType {
-    GROUP
-    PRIVATE
+scale 2560 width
+scale 1080 height
+top to bottom direction
+
+package com.alouer {
+package collections {
+class BookingCollection {
+    - <u>INSERT_BOOKING_SQL : String {readOnly}
+    - <u>SELECT_BOOKINGS_BY_ID_SQL : String {readOnly}
+    - <u>SELECT_BOOKINGS_BY_CLIENT_ID_SQL : String {readOnly}
+    - <u>SELECT_BOOKING_BY_LESSON_ID_SQL : String {readOnly}
+    - <u>DELETE_BOOKING_SQL : String {readOnly}
+    --
+    + <u>getBookings() : List<Booking>
+    + <u>get(clientId: int) : Booking
+    + <u>add(booking: Booking) : void
+    + <u>validateBooking(lesson: Lesson, client: Client) : boolean
+    + <u>createBooking(clientId: Integer, lessonId: Integer, childId: Integer) : Integer
+    + <u>getByClientId(clientId: Integer) : List<Booking>
+    + <u>getByLessonId(lessonId: Integer) : Booking
+    + <u>delete(id: Integer) : boolean
 }
 
-enum UserType {
-    CLIENT
-    INSTRUCTOR
+class ChildCollection {
+    - <u>INSERT_CHILD_SQL : String {readOnly}
+    - <u>SELECT_CHILD_BY_ID_SQL : String {readOnly}
+    - <u>SELECT_CHILDREN_BY_CLIENT_ID_SQL : String {readOnly}
+    - <u>VALIDATE_CHILD_SQL : String {readOnly}
+    - <u>SELECT_ALL_CHILDREN : String {readOnly}
+    --
+    + <u>getChildren() : List<Child>
+    + <u>find(childId: id) : Child
+    + <u>add(child: Child) : boolean
+    + <u>validateChild(clientId: Integer, firstName: String, lastName: String, dateOfBirth: Date) : boolean
+    + <u>createChild(clientId: Integer, firstName: String, lastName: String, dateOfBirth: Date) : Integer
+    + <u>getChildrenByClientId(clientId: Integer) : List<Child>
+    + <u>getById(childId: Integer) : Child
 }
 
+class ClientCollection {
+    - <u>INSERT_CLIENT_SQL : String {readOnly}
+    - <u>SELECT_CLIENT_BY_ID_SQL : String {readOnly}
+    - <u>SELECT_ALL_CLIENTS_SQL : String {readOnly}
+    - <u>VALIDATE_CREDENTIALS_SQL : String {readOnly}
+    - <u>DELETE_CLIENT_SQL : String {readOnly}
+    --
+    + <u>getClients() : List<Client>
+    + <u>getById(clientId: Integer) : Client
+    + <u>add(client: Client) : boolean
+    + <u>validateCredentials(email: String, password: String) : Client
+    + <u>delete(clientId: Integer) : boolean
+}
+
+class InstructorCollection {
+    - <u>INSERT_INSTRUCTOR_SQL : String {readOnly}
+    - <u>SELECT_INSTRUCTOR_BY_ID_SQL : String {readOnly}
+    - <u>SELECT_ALL_INSTRUCTORS_SQL : String {readOnly}
+    - <u>VALIDATE_CREDENTIALS_SQL : String {readOnly}
+    - <u>DELETE_INSTRUCTOR_SQL : String {readOnly}
+    --
+    + <u>getInstructors() : List<Instructor>
+    + <u>add(instructor: Instructor) : boolean
+    + <u>validateCredentials(email: String, password: String) : Instructor
+    + <u>delete(instructorId: Integer) : boolean
+    + <u>getById(instructorId: Integer) : Instructor
+}
+
+class LessonCollection {
+    - <u>INSERT_LESSON_SQL : String {readOnly}
+    - <u>SELECT_ALL_LESSONS_SQL : String {readOnly}
+    - <u>SELECT_LESSON_BY_ID_SQL : String {readOnly}
+    - <u>SELECT_LESSONS_BY_INSTRUCTOR_ID_SQL : String {readOnly}
+    --
+    + <u>getLessons() : List<Lesson>
+    + <u>getById(lessonId: Integer) : Lesson
+    + <u>getScheduleByLessonId(lessonId: Integer) : List<DayOfWeek>
+    + <u>add(lesson: Lesson) : boolean
+    + <u>getByInstructorId(instructorId: Integer) : List<Lesson>
+    + <u>validateLesson(locationId: Integer, startTime: String, endTime: String, schedule: String) : boolean
+    + <u>createLesson(locationId: Integer, title: String, lessonType: LessonType, startTime: String, endTime: String, schedule: String)
+    + <u>getUnassignedLessons(locationId: Integer) : List<Lesson>
+    + <u>getAvailableLessons(locationId: Integer) : List<Lesson>
+}
+
+class LocationCollection {
+    - <u>INSERT_LOCATION_SQL : String {readOnly}
+    - <u>SELECT_ALL_LOCATIONS_SQL : String {readOnly}
+    - <u>SELECT_LOCATION_BY_ID_SQL : String {readOnly}
+    --
+    + <u>add(location: Location) : boolean
+    + <u>getLocations() : List<Location>
+    + <u>getById(locationId: Integer) : Location 
+}
+}
+package commands {
+package admin {
+class CreateLessonCommand {
+    - admin : Administrator
+    --
+    + CreateLessonCommand(admin: Administrator)
+    + execute() : void
+    - requestLocationId(scanner: Scanner, locations: List<Locations>) : Integer
+    - requestLessonTypeInput(scanner: Scanner) : LessonType
+    - requestTimeInput(scanner: Scanner, timeType: String) : String
+    - isEndTimeGreaterThanStartTime(startTime: String, endTime: String) : boolean
+    - requestScheduleInput(scanner: Scanner) : String
+    - requestTitle(scanner: Scanner) : String
+    - requestConfirmation(scanner : Scanner) : String
+}
+
+class DeleteUserCommand {
+    - admin : Administrator
+    --
+    + DeleteUserCommand(admin: Administrator)
+    + execute() : void
+    - requestUserType(scanner: Scanner) : UserType
+    - requestUserId(scanner: Scanner, users: List<T>) : Integer 
+    - confirmDeletion(scanner: Scanner) : boolean
+}
+}
+package client {
+class AddDependentCommand {
+    - client : Client
+    --
+    + AddDependentCommand(client: Client)
+    + execute() : void
+    - requestFirstName(scanner: Scanner) : String
+    - requestLastName(scanner: Scanner) : String
+    - requestDateOfBirth(scanner: Scanner) : Date
+}
+
+class CreateBookingCommand {
+   - client : Client
+   --
+   + CreateBookingCommand(client: Client)
+   + execute() : void
+   - selectLesson(scanner: Scanner, lessons: List<Lesson>) : Lesson
+   - getValidLocationId(scanner: Scanner, locations: List<Location>) : Location
+   - getValidChildId(scanner: Scanner, children : List<Child>) : Integer
+}
+
+class ViewEditBookingsCommand {
+   - client : Client
+   --
+   + ViewEditBookingsCommand(client: Client)
+   + execute() : void
+   - displayLessonDetails(lesson: Lesson, location: Location, instructor: Instructor) : void
+   - getLessonSelection(scanner: Scanner) : Integer
+}
+}
+package instructor {
+class AcceptOfferingCommand {
+   - instructor : Instructor
+   --
+   + AcceptOfferingCommand(instructor: Instructor)
+   + execute() : void
+   - getValidLocationId(scanner: Scanner, locations: List<Location>) : Integer
+   - selectLesson(scanner: Scanner, lessons: List<Lesson>) : Lesson
+}
+
+class ViewEditOfferingsCommand {
+   - instructor : Instructor
+   --
+   + ViewEditOfferingsCommand(instructor: Instructor)
+   + execute() : void
+   - displayLessonDetails(lesson: Lesson, location: Location, client: Client) : void
+   - getLessonSelection(scanner: Scanner) : Integer
+}
+}
+interface Command {
+   ~ execute() : void
+}
+
+class LogOutCommand {
+    - user : Object
+    --
+    + LogOutCommand(user: Object)
+    + execute() : void
+}
+}
+package enums {
 enum DayOfWeek {
     MONDAY
     TUESDAY
@@ -19,135 +190,242 @@ enum DayOfWeek {
     SUNDAY
 }
 
-class "Administrator" <<Singleton>> {
-    +requestToDeleteUser(): void
-    +specifyUserType(userType: String): void
-    +inputId(id: Int): void
-    +confirmDeletion(): void
+enum LessonType {
+    PRIVATE
+    GROUP
 }
 
-class "Client" {
-    +id: Int
-    +firstName: String
-    +lastName: String
-    +email: String
-    +password: String
-    +role: Role
-    +createdAt: DateTime
-    +updatedAt: DateTime
+enum UserType {
+    CLIENT
+    INSTRUCTOR
+    ADMINISTRATOR
+}
+}
+package factories {
+class CommandFactory {
     --
-    +Client(firstName: String, lastName: String, email: String, password: String)
+    +<u>getCommands(userType: UserType, user: Object)
 }
-
-class "Child" {
-    +id: Int
-    +firstName: String
-    +lastName: String
-    +dateOfBirth: DateTime
-    +parentId: Int
-    +createdAt: DateTime
-    +updatedAt: DateTime
+}
+package lessonManagement {
+class Booking {
+    - id : Integer
+    - clientId : Integer
+    - childId : Integer
+    - lessonId : Integer
+    - createdAt : Date
+    - updatedAt : Date
     --
-    +Child(firstName: String, lastName: String, dateOfBirth: DateTime, parentId: Int)
+    + Booking(clientId: Integer, lessonId: Integer, childId: Integer)
+    + getId() : Integer
+    + getChildId() : Integer
+    + getClientId() : Integer
+    + getCreatedAt() : Date
+    + getUpdatedAt() : Date
+    + setId(id: Integer) : void
+    + setClientId(clientId: Integer) : void
+    + setChildId(childId: Integer) : void
+    + setLessonId(lessonId: Integer) : void
+    + setUpdatedAt(date: Date) : void
 }
 
-class "Location" {
-    +id: Int
-    +name: String
-    +address: String
-    +city: String
-    +province: String
-    +postalCode: String
+class Lesson {
+    - id : Integer
+    - type : LessonType
+    - title : String
+    - locationId : Integer
+    - assignedInstructorId : Integer
+    - isAvailable : boolean
+    - startTime : Date
+    - endTime : Date
+    - schedule : Set<DayOfWeek>
+    - bookingId : Integer
     --
-    +Location(name: String, address: String, city: String, province: String)
+    + Lesson(type: LessonType, title: String, locationId: Integer, startTime: Date, endTime: Date, schedule: Set<DayOfWeek>)
+    + getId() : Integer
+    + getType() : LessonType
+    + getTitle() : String
+    + getLocationId() : Integer
+    + getAssignedInstructorId() : Integer
+    + getStartTime() : Date
+    + getEndTime() : Date
+    + getSchedule() : Set<DayOfWeek>
+    + getBookingId() : Integer
+    + isAvailable() : boolean
+    + setId(id: Integer) : void
+    + setType(type: LessonType) : void
+    + setTitle(title: String) : void
+    + setLocationId(locationId: Integer) : void
+    + setAvailable(available: boolean) : void
+    + setAssignedInstructorId(instructorId: Integer) : void
+    + setStartTime(startTime: Date) : void
+    + setEndTime(endTime: Date) : void
+    + setBookingId(bookingId: Integer) : void
 }
-
-class "Lesson" {
-    +id: Int
-    +type: LessonType
-    +title: String
-    +locationId: Int
-    +isAvailable: Boolean
-    +startTime: DateTime
-    +endTime: DateTime
-    +createdAt: DateTime
-    +updatedAt: DateTime
-    +schedule: List<DayOfWeek>
+}
+package models {
+class Administrator {
+    - firstName : String
+    - lastName : String
+    - email : String
+    - password : String
+    - instance : Administrator
     --
-    +Lesson(type: LessonType, title: String, locationId: Int, startTime: DateTime, endTime: DateTime, schedule: List<DayOfWeek>)
+    - Administrator()
+    + <u>getInstance() : Administrator
+    + getFirstName() : String
+    + getLastName() : String
+    + getEmail() : String
+    + getPassword() : String
 }
 
-class "Booking" {
-    +id: Int
-    +clientId: Int
-    +lessonId: Int
-    +createdAt: DateTime
-    +updatedAt: DateTime
+class Child {
+    - id : Integer
+    - firstName : String
+    - lastName : String
+    - dateOfBirth : Date
+    - parentId : Integer
     --
-    +Booking(clientId: Int, lessonId: Int, bookingTime: DateTime, isAvailable: Boolean)
+    + Child(firstName: String, lastName: String, dateOfBirth: Date, parentId: Integer)
+    + getId() : Integer
+    + getFirstName() : String
+    + getLastName() : String
+    + getDateOfBirth() : Date
+    + getParentId() : Integer
+    + setId(childId: Integer) : void
+    + setFirstName(firstName: String) : void
+    + setLastName(lastName: String) : void
+    + setDateOfBirth(dateOfBirth: Date) : void
+    + setParentId(parentId: Integer) : void
 }
 
-class "Instructor" {
+class Client {
+    - id : Integer
+    - firstName : String
+    - lastName : String
+    - email : String
+    - password : String
+    - role : UserType
+    - children : List<Integer>
+    - bookings : List<Integer>
     --
-    +Instructor(firstName: String, lastName: String, email: String, password: String)
+    + Client(firstName: String, lastName: String, email: String, password: String)
+    + getId() : Integer
+    + getFirstName() : String
+    + getLastName() : String
+    + getEmail() : String
+    + getPassword() : String
+    + getRole() : UserType
+    + getChildren() : List<Integer>
+    + getBookings() : List<Integer>
+    + setId(id: Integer) : void
+    + setFirstName(firstName: String) : void
+    + setLastName(lastName: String) : void
+    + setEmail(email: String) : void
+    + setPassword(password: String) : void
+    + addChild(childId: Integer) : void
+    + addBooking(bookingId: Integer) : void
+    + removeBooking(bookingId: Integer) : void
 }
 
-class "ClientCollection" {
-    +clients: List<Client>
-    +getClients(): List<Client>
-    +removeClient(id: Int): Boolean
+class Instructor {
+    - id : Integer
+    - firstName : String
+    - lastName : String
+    - email : String
+    - password : String
+    - role : UserType
+    - lessons : List<Integer>
+    --
+    + Instructor(firstName: String, lastName: String, email: String, password: String)
+    + getId() : Integer
+    + getFirstName() : String
+    + getLastName() : String
+    + getEmail() : String
+    + getPassword() : String
+    + getRole() : UserType
+    + getLessons() : List<Integer>
+    + setId(id: Integer) : void
+    + setFirstName(firstName: String) : void
+    + setLastName(lastName: String) : void
+    + setEmail(email: String) : void
+    + setPassword(password: String) : void
+    + addLesson(lessonId: Integer) : void
+    + removeLesson(lessonId: Integer) : void
 }
 
-class "InstructorCollection" {
-    +instructors: List<Instructor>
-    +getInstructors(): List<Instructor>
-    +removeInstructor(id: Int): Boolean
-    +assignInstructorToLesson(lessonId: Int, instructorId: Int): Boolean
+class Location {
+    - id : Integer
+    - name : String
+    - address : String
+    - city : String
+    - province : String
+    - postalCode : String
+    - lessons : List<Integer>
+    --
+    + Location(name: String, address: String, city: String, province: String, postalCode: String)
+    + getId() : Integer
+    + getName() : String
+    + getAddress() : String
+    + getCity() : String
+    + getProvince() : String
+    + getPostalCode() : String
+    + getLessons() : List<Integer>
+    + setId(id: Integer) : void
+    + setName(name: String) : void
+    + setCity(city: String) : void
+    + setAddress(address: String) : void
+    + setProvince(province: String) : void
+    + setPostalCode(postalCode: String) : void
+}
+}
+package utils {
+class BackendUtils {
+    --
+    +<u>convertDaysToSchedule(days: List<DayOfWeek>)
+    +<u>convertTimeToMinutes(time: String) : Integer
+    +<u>convertScheduleToDays(schedule: String) : Set<DayOfWeek>
+    +<u>parseSchedule(schedule: String) : Set<DayOfWeek>
 }
 
-class "ChildrenCollection" {
-    +children: List<Child>
+class ConsoleUtils {
+    --
+    +<u>clearConsole() : void
+    +<u>printTable(list: List<T>, excludedProperties: List<String>) : void
+    -<u>formatValue(value: Object) : String
+    -<u>printFormattedRow(row: List<String>, maxWidths: List<Integer>)
+    -<u>isGetter(method: Method) : boolean
+    -<u>getPropertyName(method: Method) : String
+    -<u>getId(object: Object) : Integer
 }
 
-class "LocationsCollection" {
-    +locations: List<Location>
+class DatabaseManager {
+    -<u>DB_URL : String {readOnly}
+    -<u>SCHEMA_FILE : String {readOnly}
+    -<u>SEED_FILE : String {readOnly}
+    --
+    +<u>getConnection() : Connection
+    +<u>initializeDatabase() : void
+    -<u>promptResetAndSeed(conn: Connection) : void
+    -<u>executeSqlFile(conn: Connection, filePath: String) : void
+}
+}
+class Terminal {
+    - loggedIn : boolean
+    - user : Object
+    - debugMode : boolean
+    --
+    +<u>main(args: String[]) : void
+    +<u>run(isDebugMode: boolean) : void
+    -<u>commandLoop(userType: UserType, scanner: Scanner) : void
+}
 }
 
-class "LessonsCollection" {
-    +lessons: List<Lesson>
-    +createLesson(locationId: Int, title: String, lessonType: LessonType, startTime: DateTime, endTime: DateTime, schedule: List<DayOfWeek>): Boolean
-    +validateLesson(locationId: Int, startTime: DateTime, endTime: DateTime, schedule: List<DayOfWeek>): Boolean
-}
-
-class "BookingsCollection" {
-    +bookings: List<Booking>
-}
-
-class "Terminal" {
-    +connect(): void
-    +disconnect(): void
-}
-
-Client <|-- Administrator
-Client <|-- Instructor
-
-Client "1" --o "0..*" Child : has
-Instructor "1" --o "0..*" Lesson : teaches
-Location "1" --o "0..*" Lesson : offers
-Lesson "1" --o "0..1" Booking : has
-Client "1" --o "0..*" Booking : makes
-
-"ClientCollection" *-- "Client" : contains
-"InstructorCollection" *-- "Instructor" : contains
-"ChildrenCollection" *-- "Child" : contains
-"LocationsCollection" *-- "Location" : contains
-"LessonsCollection" *-- "Lesson" : contains
-"BookingsCollection" *-- "Booking" : contains
-
-"Terminal" -- "1" "ClientCollection" : connects to
-"Terminal" -- "1" "InstructorCollection" : connects to
-"Terminal" -- "1" "ChildrenCollection" : connects to
-"Terminal" -- "1" "LocationsCollection" : connects to
-"Terminal" -- "1" "LessonsCollection" : connects to
-"Terminal" -- "1" "BookingsCollection" : connects to
+Terminal -> utils : uses
+Terminal -> factories : uses
+factories -> commands : interfaces
+commands -> collections : uses
+collections -> models : manage
+collections -> lessonManagement : manage
+models -> enums : uses
 @enduml

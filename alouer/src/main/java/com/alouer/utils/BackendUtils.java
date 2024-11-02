@@ -3,6 +3,7 @@ package com.alouer.utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,11 +17,11 @@ public class BackendUtils {
                 .collect(Collectors.joining(","));
     }
 
-    public static int convertTimeToMinutes(String time) {
+    public static Integer convertTimeToMinutes(String time) {
         String[] parts = time.split(":");
         int hours = Integer.parseInt(parts[0]);
         int minutes = Integer.parseInt(parts[1]);
-        return hours * 60 + minutes; // Convert to total minutes
+        return hours * 60 + minutes;
     }
 
     public static Set<DayOfWeek> convertScheduleToDays(String schedule) {
@@ -46,7 +47,7 @@ public class BackendUtils {
         return days;
     }
 
-    public static List<DayOfWeek> parseSchedule(String schedule) {
+    public static Set<DayOfWeek> parseSchedule(String schedule) {
         System.out.println(schedule);
         List<DayOfWeek> dayOfWeeks = new ArrayList<>();
         String[] days = schedule.split("-");
@@ -77,6 +78,6 @@ public class BackendUtils {
                     throw new IllegalArgumentException("Invalid day in schedule: " + day);
             }
         }
-        return dayOfWeeks;
+        return new LinkedHashSet<>(dayOfWeeks);
     }
 }
