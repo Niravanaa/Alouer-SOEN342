@@ -52,7 +52,7 @@ public class LocationCollection {
         return locations;
     }
 
-    public static Location getById(int id) {
+    public static Location getById(Integer id) {
         Location location = null;
         try (Connection connection = DatabaseManager.getConnection();
                 PreparedStatement statement = connection.prepareStatement(SELECT_LOCATION_BY_ID_SQL)) {

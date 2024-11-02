@@ -1,0 +1,54 @@
+@startuml
+
+
+title Accept Offering
+skinparam sequenceMessageAlignment center
+
+
+actor ":<u>Instructor" as instructor
+participant ":<u>Terminal" as terminal
+participant "ConsoleUtils" as cUtil
+participant "LocationCollection" as locationCollection
+participant "LessonCollection" as lessonCollection
+collections "lessonsFromLocation:<u>Lesson" as lessonsFromLocation
+collections "locations:<u>Location" as locations
+participant "selectedLesson:<u>Lesson" as selectedLesson
+
+instructor -> terminal : acceptOffering()
+terminal -> locationCollection : getLocations()
+locationCollection -> locations : get()
+locations --> locationCollection : locations
+locationCollection --> terminal : locations
+terminal -> cUtil : printTable(locations, unwantedPropertiesToDisplay)
+
+instructor -> terminal : selectLocation(locationId)
+terminal -> lessonCollection : getAvailableLessonsByLocationId(locationId)
+lessonCollection -> lessonsFromLocation ** : create()
+lessonCollection -> terminal : lessonsFromLocation
+terminal -> cUtil : printTable(lessonsFromLocation, unwantedPropertiesToDisplay)
+
+instructor -> terminal : selectLesson(lessonId)
+terminal -> lessonsFromLocation : findLessonById(lessonId)
+
+alt Lesson Found
+  lessonsFromLocation --> lessonCollection : selectedLesson
+  lessonCollection -> selectedLesson : setInstructorId(instructorId)
+  
+  alt Assignment Successful
+    selectedLesson --> lessonCollection : success
+    lessonCollection --> terminal : success
+  else Assignment Failed
+    selectedLesson --> lessonCollection : failure
+    lessonCollection --> terminal : failure
+  end
+
+else Lesson Not Found
+  lessonsFromLocation --> lessonCollection : failure
+  lessonCollection --> terminal : failure
+
+end
+
+terminal --> instructor : response
+
+
+@enduml

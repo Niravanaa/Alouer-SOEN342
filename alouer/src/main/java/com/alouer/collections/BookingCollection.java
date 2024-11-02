@@ -39,7 +39,7 @@ public class BookingCollection {
         return bookings;
     }
 
-    public static Booking get(int id) {
+    public static Booking get(Integer id) {
         Booking booking = null;
 
         try (Connection connection = DatabaseManager.getConnection();
@@ -114,7 +114,7 @@ public class BookingCollection {
         return null;
     }
 
-    public static List<Booking> getByClientId(int clientId) {
+    public static List<Booking> getByClientId(Integer clientId) {
         List<Booking> bookings = new ArrayList<>();
 
         try (Connection connection = DatabaseManager.getConnection();
@@ -159,7 +159,7 @@ public class BookingCollection {
         return booking;
     }
 
-    public static boolean delete(int id) {
+    public static boolean delete(Integer id) {
         try (Connection connection = DatabaseManager.getConnection();
                 PreparedStatement statement = connection.prepareStatement(DELETE_BOOKING_SQL)) {
 

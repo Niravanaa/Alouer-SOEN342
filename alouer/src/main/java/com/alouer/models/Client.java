@@ -56,7 +56,7 @@ public class Client {
         return bookings;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -76,15 +76,15 @@ public class Client {
         this.password = password;
     }
 
-    public void addChild(int childId) {
+    public void addChild(Integer childId) {
         this.children.add(childId);
     }
 
-    public void addBooking(int bookingId) {
+    public void addBooking(Integer bookingId) {
         this.bookings.add(bookingId);
     }
 
-    public void removeBooking(int bookingId) {
+    public void removeBooking(Integer bookingId) {
         for (int i = 0; i < this.bookings.size(); i++) {
             if (this.bookings.get(i) == bookingId) {
                 this.bookings.remove(i);

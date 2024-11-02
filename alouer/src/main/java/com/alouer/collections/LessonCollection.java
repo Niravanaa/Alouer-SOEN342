@@ -68,7 +68,7 @@ public class LessonCollection {
         return new LinkedHashSet<>(schedule);
     }
 
-    public static Lesson getById(int id) {
+    public static Lesson getById(Integer id) {
         Lesson lesson = null;
         try (Connection connection = DatabaseManager.getConnection();
                 PreparedStatement statement = connection.prepareStatement(SELECT_LESSON_BY_ID_SQL)) {
@@ -182,7 +182,7 @@ public class LessonCollection {
         return lessons;
     }
 
-    public static boolean validateLesson(int locationId, String startTime, String endTime, String schedule) {
+    public static boolean validateLesson(Integer locationId, String startTime, String endTime, String schedule) {
         int startMinutes = BackendUtils.convertTimeToMinutes(startTime);
         int endMinutes = BackendUtils.convertTimeToMinutes(endTime);
         Set<DayOfWeek> requestedDays = BackendUtils.convertScheduleToDays(schedule);
@@ -206,7 +206,7 @@ public class LessonCollection {
         return true;
     }
 
-    public static boolean createLesson(int locationId, String title, LessonType lessonType, String startTime,
+    public static boolean createLesson(Integer locationId, String title, LessonType lessonType, String startTime,
             String endTime, String schedule) {
         try {
             LocalTime start = LocalTime.parse(startTime);

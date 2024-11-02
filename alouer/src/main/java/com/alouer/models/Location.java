@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class Location {
     private Integer id;
+    private Integer id;
     private String name;
     private String address;
     private String city;
@@ -21,6 +22,8 @@ public class Location {
         this.postalCode = postalCode;
         lessons = new ArrayList<>();
     }
+
+    public Integer getId() {
 
     public Integer getId() {
         return id;

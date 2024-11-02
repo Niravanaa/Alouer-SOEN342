@@ -7,9 +7,9 @@ public class Child {
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth;
-    private int parentId;
+    private Integer parentId;
 
-    public Child(String firstName, String lastName, LocalDate dateOfBirth, int parentId) {
+    public Child(String firstName, String lastName, LocalDate dateOfBirth, Integer parentId) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
@@ -32,11 +32,11 @@ public class Child {
         return dateOfBirth;
     }
 
-    public int getParentId() {
+    public Integer getParentId() {
         return parentId;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -52,7 +52,7 @@ public class Child {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public void setParentId(int parentId) {
+    public void setParentId(Integer parentId) {
         this.parentId = parentId;
     }
 }

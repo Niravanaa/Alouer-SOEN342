@@ -1,0 +1,107 @@
+@startuml
+
+title Alouer Package Diagram
+
+package "com.alouer.collections" {
+  class "BookingCollection"
+  class "ChildCollection"
+  class "ClientCollection"
+  class "InstructorCollection"
+  class "LessonsCollection"
+  class "LocationCollection"
+}
+
+
+package "com.alouer.commands" {
+  package "admin" {
+    class "CreateLessonCommand"
+    class "DeleteUserCommand"
+  }
+  
+  package "client" {
+    class "AddDependentCommand"
+    class "CreateBookingCommand"
+    class "ViewEditBookingsCommand"
+  }
+  
+  package "instructor" {
+    class "AcceptOfferingCommand"
+    class "ViewEditOfferingsCommand"
+  }
+  
+  interface "Command"
+  class "LogOutCommand"
+}
+
+
+package "com.alouer.enums" {
+  enum "DayOfWeek" {
+    MONDAY
+    TUESDAY
+    WEDNESDAY
+    THURSDAY
+    FRIDAY
+    SATURDAY
+    SUNDAY
+  }
+  
+  enum "LessonType" {
+    GROUP
+    PRIVATE
+  }
+  
+  enum "UserType" {
+    CLIENT
+    INSTRUCTOR
+  }
+}
+
+
+package "com.alouer.factories" {
+  class "CommandFactory"
+}
+
+
+package "com.alouer.lessonManagement" {
+  class "Booking" 
+  class "Lesson" 
+}
+
+
+package "com.alouer.models" {
+  class "Administrator" <<Singleton>>
+  class "Child"
+  class "Client"
+  class "Instructor"
+  class "Location"
+}
+
+
+package "com.alouer.utils" {
+  class "BackendUtils"
+  class "ConsoleUtils"
+  class "DatabaseManager"
+}
+
+package "com.alouer" {
+  class "Terminal"
+}
+
+' Associations
+"Terminal" --> "factories" : interacts with
+"Terminal" --> "utils" : uses
+
+"collections" --> "models" : contains
+
+"CommandFactory" --> "Command" : selects
+"Command" <|-- "admin"
+"Command" <|-- "client"
+"Command" <|-- "instructor"
+"Command" <|-- "LogOutCommand"
+
+"models" --> "lessonManagement" : manages
+"models" --> "enums" : uses
+"lessonManagement" --> "enums" : uses
+
+
+@enduml
