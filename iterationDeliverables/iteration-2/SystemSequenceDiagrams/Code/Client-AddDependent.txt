@@ -1,0 +1,28 @@
+@startuml
+actor "<u>:Client" as client
+participant "<u>:System" as system
+
+client -> system : enterAddDependentCommandId()
+
+system --> client : requestFirstName
+
+client -> system : enterFirstName(firstName)
+
+system --> client : requestLastName
+
+client -> system : enterLastName(lastName)
+
+system --> client : requestDateOfBirth
+
+client -> system : enterDateOfBirth(dateOfBirth)
+
+system -> system : child := validateChild(clientId, firstName, lastName, dateOfBirth)
+
+alt if child is not registered (child == null)
+    system -> system : newChild := createChild(clientId, firstName, lastName, dateOfBirth)
+    system -> system : addToDb(newChild)
+    system --> client : displaySuccess
+else if child is already registered
+    system --> client : displayError
+end
+@enduml
