@@ -1,52 +1,38 @@
 @startuml
 actor "User" as user
 participant "<u>:Terminal" as terminal
+participant "<u>:RegisterInstructorCommand" as command
 participant "<u>:InstructorCollection" as instructorCollection
-collections "<u>:Instructor" as instructors
-participant "<u>instructor:Instructor" as instructorObj
+participant "DatabaseManager" as databaseManager
+participant "<u>Instructor:Instructor" as newInstructorObj
 
-user -> terminal : requestRegister()
-activate user
-activate terminal
-terminal -> user : displayRegistrationForm
-deactivate terminal
-deactivate user
-user -> terminal : inputCredentials(firstName, lastName, email, password)
-activate terminal
-activate user
+user -> terminal : enterRegisterInstructorCommandId()
+terminal -> command : execute()
+command -> command : requestFirstName()
+user -> command : enterFirstName(firstName)
+command -> command : requestLastName()
+user -> command : enterLastName(lastName)
+command -> command : requestEmail()
+user -> command : enterEmail(email)
+command -> command : requestPassword()
+user -> command : enterPassword(password)
 
-terminal -> instructorCollection : validateInput(firstName, lastName, email, password)
-activate instructorCollection
+command -> instructorCollection : getByEmail(email)
+instructorCollection -> databaseManager : getConnection()
+databaseManager --> instructorCollection : connection
+instructorCollection --> command : instructor
 
-alt Valid Input
-    instructorCollection -> instructorObj ** : create(firstName, lastName, email, password)
-    activate instructorCollection    
-    activate instructorObj
-
-    alt Instructor Created Successfully
-        instructorObj --> instructorCollection : instructor
-        deactivate instructorCollection
-        instructorCollection -> instructors : add(instructor)
-        activate instructorCollection
-        activate instructors
-        instructors --> instructorCollection : instructorAdded
-        deactivate instructorCollection
-        deactivate instructors
-
-        instructorCollection --> terminal : success
-        terminal --> user : registrationSuccessMessage
-    else Instructor Creation Failed
-        instructorObj --> instructorCollection : creationFailure
-        deactivate instructorObj
-        instructorCollection --> terminal : failure
-        terminal --> user : registrationFailureMessage
+alt no existing instructor found
+    command -> instructorCollection : createInstructor(firstName, lastName, email, password)
+    instructorCollection -> newInstructorObj ** : new Instructor(firstName, lastName, email, password)
+    newInstructorObj --> instructorCollection : newInstructorObj
+    instructorCollection -> instructorCollection : add(newInstructorObj)
+    instructorCollection -> databaseManager : getConnection()
+    databaseManager --> instructorCollection : connection
+    alt successful creation
+        instructorCollection --> command : True
+    else creation failure
+        instructorCollection --> command : False
     end
-
-else Invalid Input
-    instructorCollection --> terminal : inputValidationError
-    deactivate instructorCollection
-    terminal --> user : inputValidationError
-    deactivate user
-    deactivate terminal
 end
 @enduml

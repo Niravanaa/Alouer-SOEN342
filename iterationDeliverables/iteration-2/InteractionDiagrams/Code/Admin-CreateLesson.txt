@@ -10,35 +10,28 @@ participant "BackendUtils" as backendUtils
 participant "<u>lesson:Lesson" as lessonObj
 collections "<u>:Lesson" as lessons
 
-admin -> terminal : createLessonCommandID
+admin -> terminal : enterCreateLessonCommandId()
 terminal -> command : execute()
 command -> locationCollection : getLocations()
 locationCollection -> databaseManager : getConnection()
 databaseManager --> locationCollection : connection
 locationCollection --> command : locations
 command -> consoleUtils : printTable(locations, nonDisplayProperties)
-command -> command : requestLocationId(s, locations)
-admin -> terminal : locationId
-terminal -> command : locationId
+command -> command : requestLocationId(locations)
+admin -> command : enterLocationId(locationId)
 command -> command : requestLessonTypeInput()
-admin -> terminal : lessonType
-terminal -> command : lessonType
+admin -> command : enterLessonType(lessonType)
 command -> command : requestTimeInput("start time")
-admin -> terminal : startTime
-terminal -> command : startTime
+admin -> command : enterStartTime(startTime)
 command -> command : requestTimeInput("end time")
-admin -> terminal : endTime
-terminal -> command : endTime
+admin -> command : enterEndTime(endTime)
 command -> command : isEndTimeGreaterThanStartTime(startTime, endTime)
 command -> command : requestTitle()
-admin -> terminal : title
-terminal -> command : title
+admin -> command : enterTitle(title)
 command -> command : requestScheduleInput()
-admin -> terminal : schedule
-terminal -> command : schedule
+admin -> command : enterSchedule(schedule)
 command -> command : requestConfirmation()
-admin -> terminal : schedule
-terminal -> command : schedule
+admin -> command : enterConfirmation(confirmation)
 command -> lessonCollection : validateLesson(locationId, startTime, endTime, schedule)
 lessonCollection -> backendUtils : convertTimeToMinutes(startTime)
 backendUtils --> lessonCollection : startMinutes

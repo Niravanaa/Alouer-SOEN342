@@ -15,15 +15,14 @@ import com.alouer.enums.LessonType;
 
 public class CreateLessonCommand implements Command {
     private Administrator admin;
+    private Scanner scanner;
 
-    public CreateLessonCommand(Administrator admin) {
+    public CreateLessonCommand(Administrator admin, Scanner scanner) {
         this.admin = admin;
     }
 
     @Override
     public void execute() {
-        Scanner scanner = new Scanner(System.in);
-
         List<Location> locations = LocationCollection.getLocations();
 
         ConsoleUtils.printTable(locations, Arrays.asList("Lessons"));
@@ -31,30 +30,30 @@ public class CreateLessonCommand implements Command {
         System.out.println("\nEnter a location ID to view its corresponding lessons: ");
 
         // Request Location ID
-        int locationId = requestLocationId(scanner, locations);
+        int locationId = requestLocationId(locations);
 
         // Request lesson type
-        LessonType lessonType = requestLessonTypeInput(scanner);
+        LessonType lessonType = requestLessonTypeInput();
 
         // Request startTime and endTime
-        String startTime = requestTimeInput(scanner, "start time (HH:mm)");
-        String endTime = requestTimeInput(scanner, "end time (HH:mm)");
+        String startTime = requestTimeInput("start time (HH:mm)");
+        String endTime = requestTimeInput("end time (HH:mm)");
 
         // Validate that endTime is greater than startTime
         while (!isEndTimeGreaterThanStartTime(startTime, endTime)) {
             System.out.println("End time must be greater than start time. Please enter valid times again.");
-            startTime = requestTimeInput(scanner, "start time (HH:mm)");
-            endTime = requestTimeInput(scanner, "end time (HH:mm)");
+            startTime = requestTimeInput("start time (HH:mm)");
+            endTime = requestTimeInput("end time (HH:mm)");
         }
 
         // Request title of lesson
-        String title = requestTitle(scanner);
+        String title = requestTitle();
 
         // Request schedule
-        String schedule = requestScheduleInput(scanner);
+        String schedule = requestScheduleInput();
 
         // Request confirmation
-        String confirmation = requestConfirmation(scanner, locationId, startTime, endTime, schedule);
+        String confirmation = requestConfirmation(locationId, startTime, endTime, schedule);
 
         if ("yes".equals(confirmation) && LessonCollection.validateLesson(locationId, startTime, endTime, schedule)
                 && LessonCollection.createLesson(locationId, title, lessonType, startTime, endTime, schedule)) {
@@ -64,7 +63,7 @@ public class CreateLessonCommand implements Command {
         }
     }
 
-    private String requestConfirmation(Scanner scanner, Integer locationId, String startTime, String endTime,
+    private String requestConfirmation(Integer locationId, String startTime, String endTime,
             String schedule) {
         System.out.println("\nPlease confirm the details:");
         System.out.println("Location ID: " + locationId);
@@ -76,7 +75,7 @@ public class CreateLessonCommand implements Command {
         return scanner.nextLine().trim().toLowerCase();
     }
 
-    private Integer requestLocationId(Scanner scanner, List<Location> locations) {
+    private Integer requestLocationId(List<Location> locations) {
         int locationId = -1;
         while (true) {
             try {
@@ -94,7 +93,7 @@ public class CreateLessonCommand implements Command {
         }
     }
 
-    private LessonType requestLessonTypeInput(Scanner scanner) {
+    private LessonType requestLessonTypeInput() {
         LessonType lessonType = null;
         while (true) {
             System.out.println("Please enter the lesson type (PRIVATE or GROUP): ");
@@ -109,7 +108,7 @@ public class CreateLessonCommand implements Command {
         }
     }
 
-    private String requestTimeInput(Scanner scanner, String timeType) {
+    private String requestTimeInput(String timeType) {
         String time;
         while (true) {
             System.out.println("Please enter the " + timeType + ": ");
@@ -134,7 +133,7 @@ public class CreateLessonCommand implements Command {
         return (endHours > startHours) || (endHours == startHours && endMinutes > startMinutes);
     }
 
-    private String requestScheduleInput(Scanner scanner) {
+    private String requestScheduleInput() {
         String schedule;
         String[] validDays = { "M", "Tu", "W", "Th", "F", "Sa", "Su" };
         while (true) {
@@ -158,13 +157,12 @@ public class CreateLessonCommand implements Command {
         }
     }
 
-    private String requestTitle(Scanner scanner) {
+    private String requestTitle() {
         String title;
         while (true) {
             System.out.println("Please enter the lesson title: ");
             title = scanner.nextLine().trim();
 
-            // Validate title is not empty and has a reasonable length
             if (!title.isEmpty() && title.length() <= 100) {
                 return title;
             } else if (title.isEmpty()) {

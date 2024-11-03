@@ -6,15 +6,14 @@ participant "<u>:ChildCollection" as childCollection
 participant "DatabaseManager" as databaseManager
 participant "<u>child:Child" as childObj
 
+client -> terminal : enterAddDependentCommandId()
+terminal -> command : execute()
 command -> command : requestFirstName()
-client -> terminal : firstName
-terminal -> command : firstName
+client -> command : enterFirstName(firstName)
 command -> command : requestLastName()
-client -> terminal : lastName
-terminal -> command : lastName
+client -> command : enterLastName(lastName)
 command -> command : requestDateOfBirth()
-client -> terminal : dateOfBirth
-terminal -> command : dateOfBirth
+client -> command : enterDateOfBirth(dateOfBirth)
 command -> childCollection : validateChild(clientId, firstName, lastName, dateOfBirth)
 childCollection -> databaseManager : getConnection()
 databaseManager --> childCollection : connection

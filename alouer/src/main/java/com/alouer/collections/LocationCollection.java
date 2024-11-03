@@ -22,13 +22,13 @@ public class LocationCollection {
             if (rowsInserted > 0) {
                 try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        location.setId(generatedKeys.getInt(1)); // Set generated ID
+                        location.setId(generatedKeys.getInt(1));
                     }
                 }
                 return true;
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return false;
     }
@@ -47,7 +47,7 @@ public class LocationCollection {
                 locations.add(location);
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return locations;
     }
@@ -67,7 +67,7 @@ public class LocationCollection {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return location;
     }

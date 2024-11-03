@@ -15,16 +15,17 @@ import java.util.Scanner;
 
 public class DeleteUserCommand implements Command {
     private Administrator admin;
+    private Scanner scanner;
 
-    public DeleteUserCommand(Administrator admin) {
+    public DeleteUserCommand(Administrator admin, Scanner scanner) {
         this.admin = admin;
+        this.scanner = scanner;
     }
 
     @Override
     public void execute() {
-        Scanner scanner = new Scanner(System.in);
 
-        UserType userType = requestUserType(scanner);
+        UserType userType = requestUserType();
         if (userType == null)
             return;
 
@@ -37,11 +38,11 @@ public class DeleteUserCommand implements Command {
 
             ConsoleUtils.printTable(clients,
                     Arrays.asList("Id", "Password", "Role", "Children", "Booking"));
-            int userId = requestUserId(scanner, clients);
+            int userId = requestUserId(clients);
             if (userId == -1)
                 return;
 
-            if (confirmDeletion(scanner)) {
+            if (confirmDeletion()) {
                 ClientCollection.delete(userId);
                 System.out.println("Client with ID " + userId + " has been deleted.");
             } else {
@@ -54,11 +55,11 @@ public class DeleteUserCommand implements Command {
                 return;
             }
             ConsoleUtils.printTable(instructors, Arrays.asList("Password", "Role", "Lessons"));
-            int userId = requestUserId(scanner, instructors);
+            int userId = requestUserId(instructors);
             if (userId == -1)
                 return;
 
-            if (confirmDeletion(scanner)) {
+            if (confirmDeletion()) {
                 InstructorCollection.delete(userId);
                 System.out.println("Instructor with ID " + userId + " has been deleted.");
             } else {
@@ -67,7 +68,7 @@ public class DeleteUserCommand implements Command {
         }
     }
 
-    private UserType requestUserType(Scanner scanner) {
+    private UserType requestUserType() {
         System.out.println("Would you like to delete a CLIENT or INSTRUCTOR?");
         while (true) {
             String input = scanner.nextLine().trim().toUpperCase();
@@ -84,7 +85,7 @@ public class DeleteUserCommand implements Command {
         }
     }
 
-    private Integer requestUserId(Scanner scanner, List<?> users) {
+    private Integer requestUserId(List<?> users) {
         System.out.println("Please enter the ID of the user you wish to delete: ");
         while (true) {
             try {
@@ -102,7 +103,7 @@ public class DeleteUserCommand implements Command {
         }
     }
 
-    private boolean confirmDeletion(Scanner scanner) {
+    private boolean confirmDeletion() {
         System.out.println("Are you sure you want to delete this user? This action is irreversible. (yes/no)");
         String confirmation = scanner.nextLine().trim().toLowerCase();
         return confirmation.equals("yes");

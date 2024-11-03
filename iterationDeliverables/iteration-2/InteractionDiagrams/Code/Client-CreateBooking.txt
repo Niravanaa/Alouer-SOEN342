@@ -10,14 +10,15 @@ participant "<u>:LessonCollection" as lessonCollection
 participant "<u>booking:Booking" as bookingObj
 participant "DatabaseManager" as databaseManager
 
+client -> terminal : enterCreateBookingCommandId()
+terminal -> command : execute()
 command -> locationCollection : getLocations()
 locationCollection -> databaseManager : getConnection()
 databaseManager --> locationCollection : connection
 locationCollection --> command : locations
 command -> consoleUtils : printTable(locations, nonDisplayProperties)
 command -> command : getValidLocationId()
-client -> terminal : locationId
-terminal -> command : locationId
+client -> command : enterLocationId(locationId)
 command -> lessonCollection : getAvailableLessons(locationId)
 lessonCollection -> lessonCollection : getLessons()
 lessonCollection -> databaseManager : getConnection()
@@ -25,8 +26,7 @@ databaseManager --> lessonCollection : connection
 lessonCollection --> command : availableLessons
 command -> consoleUtils : printTable(availableLessons, nonDisplayProperties)
 command -> command : selectLesson(availableLessons)
-client -> terminal : lessonId
-terminal -> command : lessonId
+client -> command : enterLessonId(lessonId)
 command -> childCollection : getChildrenByClientId(clientId)
 childCollection -> databaseManager : getConnection()
 databaseManager --> childCollection : connection
@@ -34,8 +34,7 @@ childCollection --> command : children
 alt children.size() > 0 and client booking for dependent
     command -> consoleUtils : printTable(children, nonDisplayProperties)
     command -> command : requestChildId(children)
-    client -> terminal : childId
-    terminal -> command : childId
+    client -> command : enterChildId(childId)
 end
 command -> bookingCollection : validateBooking(lessonId)
 bookingCollection -> lessonCollection : getById(lessonId)
@@ -61,6 +60,4 @@ else lesson found
         end
     end
 end
-
-
 @enduml

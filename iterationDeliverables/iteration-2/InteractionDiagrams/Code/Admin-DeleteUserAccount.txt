@@ -1,6 +1,5 @@
 @startuml
 actor "<u>:Admin" as admin
-participant "<u>s:Scanner" as scanner
 participant "<u>:Terminal" as terminal
 participant "<u>:DeleteUserCommand" as command
 participant "ConsoleUtils" as consoleUtils
@@ -8,26 +7,20 @@ participant "InstructorCollection" as instructorCollection
 participant "ClientCollection" as clientCollection
 participant "DatabaseManager" as databaseManager
 
-admin -> scanner: Enters ID corresponding to Delete User Account Command
-terminal -> scanner : readLine()
-scanner --> terminal : deleteUserAccountCommandID
+admin -> terminal : enterDeleteUserAccountCommandId()
 terminal -> command : execute()
 command -> command : requestUserType(s)
-admin -> scanner : userType
-command -> scanner : readLine()
-scanner --> command : userType
+admin -> command : enterUserType(userType)
 alt userType == UserType.CLIENT
     command -> clientCollection : getClients()
     clientCollection -> databaseManager : getConnection()
     databaseManager --> clientCollection : connection
     clientCollection --> command : clients
     command -> consoleUtils : printTable(clients, nonDisplayProperties)
-    command -> command : requestUserId(s)
-    admin -> scanner : Enters User ID to delete
-    command -> scanner : readLine()
-    scanner --> command : userId
-    command -> command : confirmDeletion(s)
-    admin -> scanner : Confirms Deletion
+    command -> command : requestUserId()
+    admin -> command : enterUserId(userId)
+    command -> command : confirmDeletion()
+    admin -> command : confirmDeletion(confirmation)
     command -> clientCollection : delete(userId)
     clientCollection -> databaseManager : getConnection()
     databaseManager --> clientCollection : connection
@@ -42,12 +35,10 @@ else userType == UserType.INSTRUCTOR
     databaseManager --> instructorCollection : connection
     instructorCollection --> command : instructors
     command -> consoleUtils : printTable(instructors, nonDisplayProperties)
-    command -> command : requestUserId(s)
-    admin -> scanner : Enters User ID to delete
-    command -> scanner : readLine()
-    scanner --> command : userId
-    command -> command : confirmDeletion(s)
-    admin -> scanner : Confirms Deletion
+    command -> command : requestUserId()
+    admin -> command : enterUserId(userId)
+    command -> command : confirmDeletion()
+    admin -> command : confirmDeletion(deletion)
     command -> instructorCollection : delete(userId)
     instructorCollection -> databaseManager : getConnection()
     databaseManager --> instructorCollection : connection

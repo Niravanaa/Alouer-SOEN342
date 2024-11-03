@@ -4,10 +4,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.alouer.enums.LessonType;
-import com.alouer.lessonManagement.Booking;
-import com.alouer.lessonManagement.Lesson;
-import com.alouer.models.Client;
+import com.alouer.models.lessonManagement.Booking;
+import com.alouer.models.lessonManagement.Lesson;
 import com.alouer.utils.DatabaseManager;
 
 public class BookingCollection {
@@ -30,11 +28,11 @@ public class BookingCollection {
                         resultSet.getInt("clientId"),
                         resultSet.getInt("lessonId"),
                         resultSet.getInt("childId"));
-                booking.setId(resultSet.getInt("id")); // Assuming your Booking class has setId method
+                booking.setId(resultSet.getInt("id"));
                 bookings.add(booking);
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return bookings;
     }
@@ -56,7 +54,7 @@ public class BookingCollection {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return booking;
     }
@@ -78,13 +76,13 @@ public class BookingCollection {
             if (rowsInserted > 0) {
                 try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        booking.setId(generatedKeys.getInt(1)); // Set generated ID
+                        booking.setId(generatedKeys.getInt(1));
                     }
                 }
                 return true;
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return false;
     }
@@ -132,7 +130,7 @@ public class BookingCollection {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return bookings;
     }
@@ -154,7 +152,7 @@ public class BookingCollection {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return booking;
     }
@@ -165,9 +163,9 @@ public class BookingCollection {
 
             statement.setInt(1, id);
             int rowsDeleted = statement.executeUpdate();
-            return rowsDeleted > 0; // Return true if any row was deleted
+            return rowsDeleted > 0;
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return false;
     }

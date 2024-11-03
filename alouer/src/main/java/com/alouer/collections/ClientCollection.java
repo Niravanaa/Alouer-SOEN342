@@ -8,8 +8,9 @@ import com.alouer.models.Client;
 import com.alouer.utils.DatabaseManager;
 
 public class ClientCollection {
-    private static final String INSERT_CLIENT_SQL = "INSERT INTO client (email, password, connected) VALUES (?, ?, ?)";
+    private static final String INSERT_CLIENT_SQL = "INSERT INTO client (firstName, lastName, email, password, role) VALUES (?, ?, ?, ?, ?)";
     private static final String SELECT_CLIENT_BY_ID_SQL = "SELECT * FROM client WHERE id = ?";
+    private static final String SELECT_CLIENT_BY_EMAIL_SQL = "SELECT * FROM client WHERE email = ?";
     private static final String SELECT_ALL_CLIENTS_SQL = "SELECT * FROM client";
     private static final String VALIDATE_CREDENTIALS_SQL = "SELECT * FROM client WHERE email = ? AND password = ?";
     private static final String DELETE_CLIENT_SQL = "DELETE FROM client WHERE id = ?";
@@ -54,9 +55,37 @@ public class ClientCollection {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return client;
+    }
+
+    public static Client getByEmail(String email) {
+        Client client = null;
+
+        try (Connection connection = DatabaseManager.getConnection();
+                PreparedStatement statement = connection.prepareStatement(SELECT_CLIENT_BY_EMAIL_SQL)) {
+
+            statement.setString(1, email);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    client = new Client(
+                            resultSet.getString("firstName"),
+                            resultSet.getString("lastName"),
+                            resultSet.getString("email"),
+                            resultSet.getString("password"));
+                    client.setId(resultSet.getInt("id"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return client;
+    }
+
+    public static boolean createClient(String firstName, String lastName, String email, String password) {
+        Client newClient = new Client(firstName, lastName, email, password);
+        return add(newClient);
     }
 
     public static boolean add(Client client) {
@@ -64,20 +93,23 @@ public class ClientCollection {
                 PreparedStatement statement = connection.prepareStatement(INSERT_CLIENT_SQL,
                         Statement.RETURN_GENERATED_KEYS)) {
 
-            statement.setString(1, client.getEmail());
-            statement.setString(2, client.getPassword());
+            statement.setString(1, client.getFirstName());
+            statement.setString(2, client.getLastName());
+            statement.setString(3, client.getEmail());
+            statement.setString(4, client.getPassword());
+            statement.setString(5, client.getRole().toString());
 
             int rowsInserted = statement.executeUpdate();
             if (rowsInserted > 0) {
                 try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        client.setId(generatedKeys.getInt(1)); // Set generated ID
+                        client.setId(generatedKeys.getInt(1));
                     }
                 }
                 return true;
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return false;
     }

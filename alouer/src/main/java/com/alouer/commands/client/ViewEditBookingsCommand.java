@@ -9,9 +9,9 @@ import com.alouer.collections.LocationCollection;
 import com.alouer.models.Child;
 import com.alouer.models.Client;
 import com.alouer.models.Instructor;
-import com.alouer.lessonManagement.Booking;
-import com.alouer.lessonManagement.Lesson;
 import com.alouer.models.Location;
+import com.alouer.models.lessonManagement.Booking;
+import com.alouer.models.lessonManagement.Lesson;
 import com.alouer.utils.ConsoleUtils;
 
 import java.util.Arrays;
@@ -21,21 +21,21 @@ import java.util.Scanner;
 
 public class ViewEditBookingsCommand implements Command {
     private Client client;
+    private Scanner scanner;
 
-    public ViewEditBookingsCommand(Client client) {
+    public ViewEditBookingsCommand(Client client, Scanner scanner) {
         this.client = client;
+        this.scanner = scanner;
     }
 
     @Override
     public void execute() {
-        Scanner scanner = new Scanner(System.in);
         boolean keepViewing = true;
 
         List<Booking> clientBookings = BookingCollection.getByClientId(client.getId());
 
         if (clientBookings.isEmpty()) {
             System.out.println("You have no bookings.");
-            scanner.close();
             return;
         }
 
@@ -51,7 +51,7 @@ public class ViewEditBookingsCommand implements Command {
                     Arrays.asList("Id", "Client Id", "Lesson Id", "Child Id"));
 
             System.out.print("Enter the ID of a lesson to view details or type -1 to exit: ");
-            int bookingId = requestBookingId(scanner, clientBookings);
+            int bookingId = requestBookingId(clientBookings);
             if (bookingId == -1) {
                 keepViewing = false;
             }
@@ -94,7 +94,7 @@ public class ViewEditBookingsCommand implements Command {
         System.out.println();
     }
 
-    private Integer requestBookingId(Scanner scanner, List<Booking> clientBookings) {
+    private Integer requestBookingId(List<Booking> clientBookings) {
         int bookingId = -1;
         boolean keepViewing = false;
 

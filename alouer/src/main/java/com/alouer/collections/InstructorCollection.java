@@ -8,8 +8,10 @@ import com.alouer.models.Instructor;
 import com.alouer.utils.DatabaseManager;
 
 public class InstructorCollection {
-    private static final String INSERT_INSTRUCTOR_SQL = "INSERT INTO instructor (email, password, connected) VALUES (?, ?, ?)";
+    private static final String UPDATE_INSTRUCTOR_SQL = "UPDATE instructor SET firstName = ?, lastName = ?, email = ?, password = ? WHERE id = ?";
+    private static final String INSERT_INSTRUCTOR_SQL = "INSERT INTO instructor (firstName, lastName, email, password, role) VALUES (?, ?, ?, ?, ?)";
     private static final String SELECT_INSTRUCTOR_BY_ID_SQL = "SELECT * FROM instructor WHERE id = ?";
+    private static final String SELECT_INSTRUCTOR_BY_EMAIL_SQL = "SELECT * FROM instructor WHERE email = ?";
     private static final String SELECT_ALL_INSTRUCTORS_SQL = "SELECT * FROM instructor";
     private static final String VALIDATE_CREDENTIALS_SQL = "SELECT * FROM instructor WHERE email = ? AND password = ?";
     private static final String DELETE_INSTRUCTOR_SQL = "DELETE FROM instructor WHERE id = ?";
@@ -31,7 +33,7 @@ public class InstructorCollection {
                 instructors.add(instructor);
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return instructors;
     }
@@ -54,9 +56,37 @@ public class InstructorCollection {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return instructor;
+    }
+
+    public static Instructor getByEmail(String email) {
+        Instructor instructor = null;
+
+        try (Connection connection = DatabaseManager.getConnection();
+                PreparedStatement statement = connection.prepareStatement(SELECT_INSTRUCTOR_BY_EMAIL_SQL)) {
+
+            statement.setString(1, email);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    instructor = new Instructor(
+                            resultSet.getString("firstName"),
+                            resultSet.getString("lastName"),
+                            resultSet.getString("email"),
+                            resultSet.getString("password"));
+                    instructor.setId(resultSet.getInt("id"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return instructor;
+    }
+
+    public static boolean createInstructor(String firstName, String lastName, String email, String password) {
+        Instructor newInstructor = new Instructor(firstName, lastName, email, password);
+        return add(newInstructor);
     }
 
     public static boolean add(Instructor instructor) {
@@ -64,20 +94,23 @@ public class InstructorCollection {
                 PreparedStatement statement = connection.prepareStatement(INSERT_INSTRUCTOR_SQL,
                         Statement.RETURN_GENERATED_KEYS)) {
 
-            statement.setString(1, instructor.getEmail());
-            statement.setString(2, instructor.getPassword());
+            statement.setString(1, instructor.getFirstName());
+            statement.setString(2, instructor.getLastName());
+            statement.setString(3, instructor.getEmail());
+            statement.setString(4, instructor.getPassword());
+            statement.setString(5, instructor.getRole().toString());
 
             int rowsInserted = statement.executeUpdate();
             if (rowsInserted > 0) {
                 try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        instructor.setId(generatedKeys.getInt(1)); // Set generated ID
+                        instructor.setId(generatedKeys.getInt(1));
                     }
                 }
                 return true;
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return false;
     }
@@ -101,7 +134,7 @@ public class InstructorCollection {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return null;
     }
@@ -112,9 +145,28 @@ public class InstructorCollection {
 
             statement.setInt(1, id);
             int rowsDeleted = statement.executeUpdate();
-            return rowsDeleted > 0; // Returns true if an instructor was deleted
+            return rowsDeleted > 0;
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static boolean update(Instructor instructor) {
+        try (Connection connection = DatabaseManager.getConnection();
+                PreparedStatement statement = connection.prepareStatement(UPDATE_INSTRUCTOR_SQL)) {
+
+            statement.setString(1, instructor.getFirstName());
+            statement.setString(2, instructor.getLastName());
+            statement.setString(3, instructor.getEmail());
+            statement.setString(4, instructor.getPassword());
+            statement.setInt(5, instructor.getId());
+
+            int rowsUpdated = statement.executeUpdate();
+            return rowsUpdated > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return false;
     }

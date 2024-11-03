@@ -1,8 +1,8 @@
 @startuml
-scale 2560 width
-scale 1080 height
+scale 2500 width
+scale 1000 height
 top to bottom direction
-
+!pragma svginteractive true
 package com.alouer {
 package collections {
 class BookingCollection {
@@ -15,10 +15,11 @@ class BookingCollection {
     + <u>getBookings() : List<Booking>
     + <u>get(clientId: int) : Booking
     + <u>add(booking: Booking) : void
-    + <u>validateBooking(lesson: Lesson, client: Client) : boolean
+    + <u>validateBooking(lessonId: Integer) : boolean
     + <u>createBooking(clientId: Integer, lessonId: Integer, childId: Integer) : Integer
     + <u>getByClientId(clientId: Integer) : List<Booking>
     + <u>getByLessonId(lessonId: Integer) : Booking
+    + <u>updateBooking(booking: Booking) : 
     + <u>delete(id: Integer) : boolean
 }
 
@@ -47,6 +48,8 @@ class ClientCollection {
     --
     + <u>getClients() : List<Client>
     + <u>getById(clientId: Integer) : Client
+    + <u>getByEmail(email: String) : Client
+    + <u>createClient(firstName: String, lastName: String, email: String, password: String) : boolean
     + <u>add(client: Client) : boolean
     + <u>validateCredentials(email: String, password: String) : Client
     + <u>delete(clientId: Integer) : boolean
@@ -135,8 +138,8 @@ class CreateBookingCommand {
    --
    + CreateBookingCommand(client: Client)
    + execute() : void
-   - selectLesson(scanner: Scanner, lessons: List<Lesson>) : Lesson
-   - getValidLocationId(scanner: Scanner, locations: List<Location>) : Location
+   - selectLesson(scanner: Scanner, lessons: List<Lesson>) : Integer
+   - getValidLocationId(scanner: Scanner, locations: List<Location>) : Integer
    - getValidChildId(scanner: Scanner, children : List<Child>) : Integer
 }
 
@@ -148,6 +151,24 @@ class ViewEditBookingsCommand {
    - displayLessonDetails(lesson: Lesson, location: Location, instructor: Instructor) : void
    - getLessonSelection(scanner: Scanner) : Integer
 }
+
+class RegisterClientCommand {
+   --
+   + execute() : void
+   - requestFirstName(scanner: Scanner) : String
+   - requestLastName(scanner: Scanner) : String
+   - requestEmail(scanner: Scanner) : String
+   - requestPassword(scanner: Scanner) : String 
+}
+
+class RegisterInstructorCommand {
+   --
+   + execute() : void
+   - requestFirstName(scanner: Scanner) : String
+   - requestLastName(scanner: Scanner) : String
+   - requestEmail(scanner: Scanner) : String
+   - requestPassword(scanner: Scanner) : String 
+}
 }
 package instructor {
 class AcceptOfferingCommand {
@@ -155,8 +176,8 @@ class AcceptOfferingCommand {
    --
    + AcceptOfferingCommand(instructor: Instructor)
    + execute() : void
-   - getValidLocationId(scanner: Scanner, locations: List<Location>) : Integer
-   - selectLesson(scanner: Scanner, lessons: List<Lesson>) : Lesson
+   - requestLocationId(scanner: Scanner, locations: List<Location>) : Integer
+   - requestLessonId(scanner: Scanner, lessons: List<Lesson>) : Lesson
 }
 
 class ViewEditOfferingsCommand {
@@ -165,7 +186,7 @@ class ViewEditOfferingsCommand {
    + ViewEditOfferingsCommand(instructor: Instructor)
    + execute() : void
    - displayLessonDetails(lesson: Lesson, location: Location, client: Client) : void
-   - getLessonSelection(scanner: Scanner) : Integer
+   - requestLessonId(scanner: Scanner, lessons: List<Lesson>) : Integer
 }
 }
 interface Command {
@@ -206,7 +227,13 @@ class CommandFactory {
     --
     +<u>getCommands(userType: UserType, user: Object)
 }
+class RegistrationFactory {
+    --
+    +<u>getRegistrationCommands()
 }
+}
+
+package models {
 package lessonManagement {
 class Booking {
     - id : Integer
@@ -263,7 +290,6 @@ class Lesson {
     + setBookingId(bookingId: Integer) : void
 }
 }
-package models {
 class Administrator {
     - firstName : String
     - lastName : String
@@ -411,21 +437,33 @@ class DatabaseManager {
 }
 }
 class Terminal {
-    - loggedIn : boolean
-    - user : Object
-    - debugMode : boolean
+    - <u>loggedIn : boolean
+    - <u>applicationRunning : boolean
+    - <u>user : Object
+    - <u>debugMode : boolean
     --
     +<u>main(args: String[]) : void
     +<u>run(isDebugMode: boolean) : void
-    -<u>commandLoop(userType: UserType, scanner: Scanner) : void
+    -<u>logIn(scanner: Scanner) : void
+    -<u>runCommandLoop(commandsMap: Map<String, Command>, scanner: Scanner) : void
 }
 }
 
+Command <|-- CreateLessonCommand
+Command <|-- DeleteUserCommand
+Command <|-- AddDependentCommand
+Command <|-- CreateBookingCommand
+Command <|-- ViewEditBookingsCommand
+Command <|-- AcceptOfferingCommand
+Command <|-- ViewEditOfferingsCommand
+Command <|-- RegisterClientCommand
+Command <|-- RegisterInstructorCommand
+Command <|-- LogOutCommand
 Terminal -> utils : uses
 Terminal -> factories : uses
 factories -> commands : interfaces
 commands -> collections : uses
-collections -> models : manage
-collections -> lessonManagement : manage
+collections -> models : manages
+collections -> lessonManagement : manages
 models -> enums : uses
 @enduml

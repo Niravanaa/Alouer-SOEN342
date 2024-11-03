@@ -26,7 +26,7 @@ public class LoginTest {
 
     @Test
     public void testValidClientLogin() {
-        String input = "yes\n1\njohn.doe@example.com\njohn123\n3\n";
+        String input = "yes\n1\n1\njohn.doe@example.com\njohn123\n4\n3\n";
         System.setIn(new ByteArrayInputStream(input.getBytes()));
 
         Terminal.run(true);

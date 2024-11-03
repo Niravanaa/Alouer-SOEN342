@@ -3,7 +3,7 @@ package com.alouer.commands.instructor;
 import com.alouer.commands.Command;
 import com.alouer.models.Instructor;
 import com.alouer.models.Location;
-import com.alouer.lessonManagement.Lesson;
+import com.alouer.models.lessonManagement.Lesson;
 import com.alouer.collections.LocationCollection;
 import com.alouer.collections.LessonCollection;
 import com.alouer.utils.ConsoleUtils;
@@ -15,20 +15,21 @@ import java.util.Scanner;
 
 public class AcceptOfferingCommand implements Command {
     private Instructor instructor;
+    private Scanner scanner;
 
-    public AcceptOfferingCommand(Instructor instructor) {
+    public AcceptOfferingCommand(Instructor instructor, Scanner scanner) {
         this.instructor = instructor;
+        this.scanner = scanner;
     }
 
     @Override
     public void execute() {
-        Scanner scanner = new Scanner(System.in);
 
         List<Location> locations = LocationCollection.getLocations();
         ConsoleUtils.printTable(locations, Arrays.asList("Lessons"));
 
         System.out.print("Select a location by entering its ID: ");
-        int locationId = getValidLocationId(scanner, locations);
+        int locationId = requestLocationId(locations);
 
         List<Lesson> availableLessons = LessonCollection.getUnassignedLessons(locationId);
         ConsoleUtils.printTable(availableLessons,
@@ -39,7 +40,7 @@ public class AcceptOfferingCommand implements Command {
             return;
         }
 
-        Lesson selectedLesson = selectLesson(scanner, availableLessons);
+        Lesson selectedLesson = requestLessonId(availableLessons);
         if (selectedLesson == null) {
             System.out.println("Invalid lesson selection. Assignment process aborted.");
             return;
@@ -55,7 +56,7 @@ public class AcceptOfferingCommand implements Command {
         }
     }
 
-    private static Integer getValidLocationId(Scanner scanner, List<Location> locations) {
+    private Integer requestLocationId(List<Location> locations) {
         int locationId = -1;
         boolean validInput = false;
 
@@ -76,7 +77,7 @@ public class AcceptOfferingCommand implements Command {
         return locationId;
     }
 
-    private Lesson selectLesson(Scanner scanner, List<Lesson> lessons) {
+    private Lesson requestLessonId(List<Lesson> lessons) {
         Lesson selectedLesson = null;
         boolean validSelection = false;
 

@@ -1,4 +1,4 @@
-package com.alouer.lessonManagement;
+package com.alouer.models.lessonManagement;
 
 import java.time.LocalDateTime;
 

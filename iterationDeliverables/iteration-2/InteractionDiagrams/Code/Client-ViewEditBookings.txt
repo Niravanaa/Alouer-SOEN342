@@ -10,6 +10,8 @@ participant "<u>:LessonCollection" as lessonCollection
 participant "<u>:InstructorCollection" as instructorCollection
 participant "DatabaseManager" as databaseManager
 
+client -> terminal : enterViewEditBookingsCommandId()
+terminal -> command : execute()
 command -> bookingCollection : getByClientId(clientId)
 bookingCollection -> databaseManager : getConnection()
 databaseManager --> bookingCollection : connection
@@ -23,8 +25,8 @@ loop while keepViewing == true
 
    command -> consoleUtils : printTable(bookings, nonDisplayProperties)
    command -> command : requestBookingId(bookings)
-   client -> terminal : bookingId
-   terminal -> command : bookingId
+   client -> command : enterBookingId(bookingId)
+
    command -> bookingCollection : get(bookingId)
    bookingCollection --> command : booking
    command -> lessonCollection : getById(booking.getLessonId())
@@ -36,8 +38,8 @@ loop while keepViewing == true
    command -> childCollection : getById(booking.getChildId())
    childCollection --> command : child
    command -> command : displayLessonDetails(selectedLesson, location, instructor, child)
-   client -> terminal : response
-   alt client deletes the booking
+   client -> command : enterResponse(response)
+   alt response == "delete"
        command -> bookingCollection : delete(bookingId)
        bookingCollection -> databaseManager : getConnection()
        databaseManager --> bookingCollection : connection
@@ -49,5 +51,4 @@ loop while keepViewing == true
            bookingCollection --> command : False
        end
 end
-
 @enduml

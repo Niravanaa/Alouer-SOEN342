@@ -1,35 +1,26 @@
 @startuml
 skinparam sequenceMessageAlign center 
 
-actor "<u>:Instructor" as Instructor 
-participant "<u>:System" as System
+actor "User" as user
+participant "<u>:System" as system
 
-Instructor -> System: requestRegister()
-activate System
-activate Instructor
-System --> Instructor: displayRegistrationForm
-deactivate System
-deactivate Instructor
-Instructor -> System: inputCredentials(firstName, lastName, email, password)
-activate System
-activate Instructor
-System -> System: validateInput()
-activate System
-
-alt Valid Input
-    System -> System: dbRegisterInstructor()
-    activate System
-    alt Successful Database Operation
-        System --> Instructor: returnSuccessMessage
-        deactivate System
-    else Failed Database Operation
-        System --> Instructor: returnFailureMessage
-        deactivate System
+user -> system : enterRegisterInstructorCommandId()
+system --> user: requestFirstName
+user-> system : enterFirstName(firstName)
+system --> user: requestLastName
+user-> system : enterLastName(lastName)
+system --> user: requestEmail
+user-> system : enterEmail(email)
+system --> user: requestPassword
+user-> system : enterPassword(password)
+system -> system : instructor := getByEmail(email)
+alt no existing instructor found (instructor == null)
+    system -> system : createInstructor(firstName, lastName, email, password)
+    alt successful creation
+        system --> user : displaySuccess
+    else creation failure
+        system --> user : displayFailure
     end
-else Invalid Input
-    System --> Instructor: returnFailureMessage
-    deactivate System
 end
-deactivate Instructor
-deactivate System
+
 @enduml

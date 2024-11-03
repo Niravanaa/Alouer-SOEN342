@@ -13,11 +13,14 @@ import java.util.stream.Collectors;
 
 import com.alouer.enums.DayOfWeek;
 import com.alouer.enums.LessonType;
-import com.alouer.lessonManagement.Lesson;
+import com.alouer.models.lessonManagement.Lesson;
 import com.alouer.utils.BackendUtils;
 import com.alouer.utils.DatabaseManager;
 
 public class LessonCollection {
+    private static final String UPDATE_LESSON_SQL = "UPDATE lesson SET title = ?, type = ?, locationId = ?, startTime = ?, endTime = ?, assignedInstructorId = ? WHERE id = ?";
+    private static final String DELETE_SCHEDULE_SQL = "DELETE FROM lesson_schedule WHERE lessonId = ?";
+    private static final String INSERT_SCHEDULE_SQL = "INSERT INTO lesson_schedule (lessonId, dayOfWeek) VALUES (?, ?)";
     private static final String INSERT_LESSON_SQL = "INSERT INTO lesson (title, type, locationId, startTime, endTime) VALUES (?, ?, ?, ?, ?)";
     private static final String SELECT_ALL_LESSONS_SQL = "SELECT * FROM lesson";
     private static final String SELECT_LESSON_BY_ID_SQL = "SELECT * FROM lesson WHERE id = ?";
@@ -43,7 +46,7 @@ public class LessonCollection {
                 lessons.add(lesson);
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return lessons;
     }
@@ -60,7 +63,7 @@ public class LessonCollection {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
 
         schedule.sort(Comparator.comparingInt(day -> Arrays.asList(DayOfWeek.values()).indexOf(day)));
@@ -88,7 +91,7 @@ public class LessonCollection {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return lesson;
     }
@@ -100,7 +103,7 @@ public class LessonCollection {
 
         try {
             connection = DatabaseManager.getConnection();
-            connection.setAutoCommit(false); // Start transaction
+            connection.setAutoCommit(false);
 
             // Insert the lesson
             lessonStatement = connection.prepareStatement(INSERT_LESSON_SQL, Statement.RETURN_GENERATED_KEYS);
@@ -114,7 +117,7 @@ public class LessonCollection {
             if (rowsInserted > 0) {
                 try (ResultSet generatedKeys = lessonStatement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        lesson.setId(generatedKeys.getInt(1)); // Set generated ID
+                        lesson.setId(generatedKeys.getInt(1));
                     }
                 }
 
@@ -125,22 +128,22 @@ public class LessonCollection {
                 for (DayOfWeek day : lesson.getSchedule()) {
                     scheduleStatement.setInt(1, lesson.getId());
                     scheduleStatement.setString(2, day.name());
-                    scheduleStatement.addBatch(); // Add to batch
+                    scheduleStatement.addBatch();
                 }
 
-                scheduleStatement.executeBatch(); // Execute all schedule inserts
-                connection.commit(); // Commit transaction
+                scheduleStatement.executeBatch();
+                connection.commit();
                 return true;
             }
         } catch (SQLException e) {
             if (connection != null) {
                 try {
-                    connection.rollback(); // Rollback transaction on error
+                    connection.rollback();
                 } catch (SQLException ex) {
-                    ex.printStackTrace(); // Handle rollback exceptions
+                    ex.printStackTrace();
                 }
             }
-            e.printStackTrace(); // Handle insert exceptions
+            e.printStackTrace();
         } finally {
             try {
                 if (scheduleStatement != null)
@@ -150,7 +153,7 @@ public class LessonCollection {
                 if (connection != null)
                     connection.close();
             } catch (SQLException e) {
-                e.printStackTrace(); // Handle closing exceptions
+                e.printStackTrace();
             }
         }
         return false;
@@ -177,7 +180,7 @@ public class LessonCollection {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return lessons;
     }
@@ -240,4 +243,66 @@ public class LessonCollection {
                         .noneMatch(booking -> booking.getLessonId() == lesson.getId()))
                 .collect(Collectors.toList());
     }
+
+    public static boolean updateLesson(Lesson lesson) {
+        Connection connection = null;
+        PreparedStatement lessonStatement = null;
+        PreparedStatement deleteScheduleStatement = null;
+        PreparedStatement insertScheduleStatement = null;
+
+        try {
+            connection = DatabaseManager.getConnection();
+            connection.setAutoCommit(false);
+
+            lessonStatement = connection.prepareStatement(UPDATE_LESSON_SQL);
+            lessonStatement.setString(1, lesson.getTitle());
+            lessonStatement.setString(2, lesson.getType().name());
+            lessonStatement.setInt(3, lesson.getLocationId());
+            lessonStatement.setString(4, lesson.getStartTime().toString());
+            lessonStatement.setString(5, lesson.getEndTime().toString());
+            lessonStatement.setInt(6, lesson.getAssignedInstructorId());
+            lessonStatement.setInt(7, lesson.getId());
+
+            int rowsUpdated = lessonStatement.executeUpdate();
+
+            deleteScheduleStatement = connection.prepareStatement(DELETE_SCHEDULE_SQL);
+            deleteScheduleStatement.setInt(1, lesson.getId());
+            deleteScheduleStatement.executeUpdate();
+
+            insertScheduleStatement = connection.prepareStatement(INSERT_SCHEDULE_SQL);
+            for (DayOfWeek day : lesson.getSchedule()) {
+                insertScheduleStatement.setInt(1, lesson.getId());
+                insertScheduleStatement.setString(2, day.name());
+                insertScheduleStatement.addBatch();
+            }
+            insertScheduleStatement.executeBatch();
+
+            connection.commit();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            e.printStackTrace();
+        } finally {
+            try {
+                if (insertScheduleStatement != null)
+                    insertScheduleStatement.close();
+                if (deleteScheduleStatement != null)
+                    deleteScheduleStatement.close();
+                if (lessonStatement != null)
+                    lessonStatement.close();
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
 }

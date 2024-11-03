@@ -11,24 +11,24 @@ import java.util.Scanner;
 
 public class AddDependentCommand implements Command {
     private Client client;
+    private Scanner scanner;
 
-    public AddDependentCommand(Client client) {
+    public AddDependentCommand(Client client, Scanner scanner) {
         this.client = client;
+        this.scanner = scanner;
     }
 
     @Override
     public void execute() {
-        Scanner scanner = new Scanner(System.in);
-
-        String firstName = requestFirstName(scanner);
+        String firstName = requestFirstName();
         if (firstName == null)
             return;
 
-        String lastName = requestLastName(scanner);
+        String lastName = requestLastName();
         if (lastName == null)
             return;
 
-        LocalDate dateOfBirth = requestDateOfBirth(scanner);
+        LocalDate dateOfBirth = requestDateOfBirth();
         if (dateOfBirth == null)
             return;
 
@@ -46,7 +46,7 @@ public class AddDependentCommand implements Command {
         }
     }
 
-    private String requestFirstName(Scanner scanner) {
+    private String requestFirstName() {
         System.out.println("Enter dependent's first name:");
         while (true) {
             String input = scanner.nextLine().trim();
@@ -57,7 +57,7 @@ public class AddDependentCommand implements Command {
         }
     }
 
-    private String requestLastName(Scanner scanner) {
+    private String requestLastName() {
         System.out.println("Enter dependent's last name:");
         while (true) {
             String input = scanner.nextLine().trim();
@@ -68,7 +68,7 @@ public class AddDependentCommand implements Command {
         }
     }
 
-    private LocalDate requestDateOfBirth(Scanner scanner) {
+    private LocalDate requestDateOfBirth() {
         System.out.println("Enter dependent's date of birth (e.g., 'Jan 01, 2010' or '01-01-2010'):");
 
         DateTimeFormatter[] formatters = {

@@ -1,4 +1,4 @@
-package com.alouer.lessonManagement;
+package com.alouer.models.lessonManagement;
 
 import java.time.LocalTime;
 import java.util.Set;
@@ -91,7 +91,9 @@ public class Lesson {
 
     public void setAssignedInstructorId(Integer assignedInstructorId) {
         this.assignedInstructorId = assignedInstructorId;
-        this.isAvailable = true;
+        if (assignedInstructorId != null) {
+            this.isAvailable = true;
+        }
     }
 
     public void setStartTime(LocalTime startTime) {

@@ -17,18 +17,17 @@ public class DatabaseManager {
         return DriverManager.getConnection(DB_URL, "", "");
     }
 
-    public static void initializeDatabase() {
+    public static void initializeDatabase(Scanner scanner) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             if (conn != null) {
-                promptResetAndSeed(conn);
+                promptResetAndSeed(conn, scanner);
             }
         } catch (SQLException e) {
             System.err.println("Error initializing database: " + e.getMessage());
         }
     }
 
-    private static void promptResetAndSeed(Connection conn) {
-        Scanner scanner = new Scanner(System.in);
+    private static void promptResetAndSeed(Connection conn, Scanner scanner) {
         System.out.print("Would you like to reset and seed the database? (yes/no): ");
         String response = scanner.nextLine().trim().toLowerCase();
 

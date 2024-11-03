@@ -4,7 +4,7 @@ import com.alouer.commands.Command;
 import com.alouer.models.Client;
 import com.alouer.models.Child;
 import com.alouer.models.Location;
-import com.alouer.lessonManagement.Lesson;
+import com.alouer.models.lessonManagement.Lesson;
 import com.alouer.collections.BookingCollection;
 import com.alouer.collections.ChildCollection;
 import com.alouer.collections.LessonCollection;
@@ -18,20 +18,21 @@ import java.util.Scanner;
 
 public class CreateBookingCommand implements Command {
     private Client client;
+    private Scanner scanner;
 
-    public CreateBookingCommand(Client client) {
+    public CreateBookingCommand(Client client, Scanner scanner) {
         this.client = client;
+        this.scanner = scanner;
     }
 
     @Override
     public void execute() {
-        Scanner scanner = new Scanner(System.in);
 
         List<Location> locations = LocationCollection.getLocations();
         ConsoleUtils.printTable(locations, Arrays.asList("Lessons"));
 
         System.out.print("Enter the location ID you wish to view available lessons for: ");
-        int locationId = getValidLocationId(scanner, locations);
+        int locationId = getValidLocationId(locations);
 
         List<Lesson> availableLessons = LessonCollection.getAvailableLessons(locationId);
         ConsoleUtils.printTable(availableLessons,
@@ -42,7 +43,7 @@ public class CreateBookingCommand implements Command {
             return;
         }
 
-        Integer lessonId = selectLesson(scanner, availableLessons);
+        Integer lessonId = selectLesson(availableLessons);
         if (lessonId == null) {
             System.out.println("Invalid selection. Booking process aborted.");
             return;
@@ -63,7 +64,7 @@ public class CreateBookingCommand implements Command {
 
                 ConsoleUtils.printTable(children, Arrays.asList("Id", "Parent Id"));
                 System.out.print("Enter the child ID you wish to book for: ");
-                childId = getValidChildId(scanner, children);
+                childId = getValidChildId(children);
                 if (childId == null) {
                     System.out.println("Invalid child ID. Booking process aborted.");
                     return;
@@ -81,7 +82,7 @@ public class CreateBookingCommand implements Command {
         }
     }
 
-    private Integer selectLesson(Scanner scanner, List<Lesson> lessons) {
+    private Integer selectLesson(List<Lesson> lessons) {
         boolean validSelection = false;
 
         int maxId = lessons.stream()
@@ -111,7 +112,7 @@ public class CreateBookingCommand implements Command {
         return selection;
     }
 
-    private static int getValidLocationId(Scanner scanner, List<Location> locations) {
+    private int getValidLocationId(List<Location> locations) {
         int locationId = -1;
         boolean validInput = false;
 
@@ -140,7 +141,7 @@ public class CreateBookingCommand implements Command {
         return locationId;
     }
 
-    private static Integer getValidChildId(Scanner scanner, List<Child> children) {
+    private Integer getValidChildId(List<Child> children) {
         Integer childId = null;
         boolean validInput = false;
 
