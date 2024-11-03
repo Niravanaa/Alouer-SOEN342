@@ -1,0 +1,38 @@
+@startuml
+actor "<u>:Client" as client
+participant "<u>:System" as system
+
+client -> system : enterCreateBookingCommandId()
+system -> system : locations := getLocations()
+system -> system : display(locations)
+system --> client : requestLocationId
+client -> system : enterLocationId(locationId)
+system -> system : availableLessons := getAvailableLessons(locationId)
+system -> system : display(locations)
+system --> client : requestLessonId
+client -> system : enterLessonId(lessonId)
+system -> client : getId()
+client --> system : clientId
+system -> system : children := getChildrenByClientId(clientId)
+alt children.size() > 0 and client booking for dependent
+    system -> system : display(children)
+    system --> client : requestChildId
+    client -> system : enterChildId(childId)
+end
+system -> system : validateBooking(lessonId)
+alt lesson found
+    alt lesson is available and assigned
+        system -> system : bookingId := createBooking(clientId, lessonId, childId | null)
+        alt successful creation
+            system -> client : addBooking(bookingId)
+            system -> system : updateDb(client)
+        else creation failure
+            system --> client : displayError
+        end
+    else lesson is not available or not assigned to instructor
+        system --> client : displayError
+    end 
+else lesson not found
+    system --> client : displayError
+end
+@enduml

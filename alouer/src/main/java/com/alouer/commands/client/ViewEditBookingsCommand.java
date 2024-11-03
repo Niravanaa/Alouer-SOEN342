@@ -56,7 +56,7 @@ public class ViewEditBookingsCommand implements Command {
                 keepViewing = false;
             }
 
-            Booking selectedBooking = BookingCollection.get(bookingId);
+            Booking selectedBooking = BookingCollection.getById(bookingId);
 
             if (selectedBooking == null) {
                 System.out.println("The selected booking does not exist. Please try again");
@@ -75,7 +75,6 @@ public class ViewEditBookingsCommand implements Command {
 
             if (userAction.equals("d") && BookingCollection.delete(bookingId)) {
                 keepViewing = true;
-                client.removeBooking(bookingId);
                 System.out.println("Successfully deleted the booking.");
             } else if (!userAction.equals("b")) {
                 System.out.println("Invalid selection. Please try again.");
@@ -108,7 +107,7 @@ public class ViewEditBookingsCommand implements Command {
                         .max()
                         .orElse(-1);
 
-                if ((bookingId >= 0 && bookingId <= maxBookingId && BookingCollection.get(bookingId) != null)
+                if ((bookingId >= 0 && bookingId <= maxBookingId && BookingCollection.getById(bookingId) != null)
                         || bookingId == -1) {
                     keepViewing = true;
                 } else {

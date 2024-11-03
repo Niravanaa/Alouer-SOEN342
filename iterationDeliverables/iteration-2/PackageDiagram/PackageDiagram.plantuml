@@ -11,7 +11,6 @@ package "com.alouer.collections" {
   class "LocationCollection"
 }
 
-
 package "com.alouer.commands" {
   package "admin" {
     class "CreateLessonCommand"
@@ -28,11 +27,15 @@ package "com.alouer.commands" {
     class "AcceptOfferingCommand"
     class "ViewEditOfferingsCommand"
   }
+
+  package "registration" {
+    class "RegisterClientCommand"
+    class "RegisterInstructorCommand"
+  }
   
   interface "Command"
   class "LogOutCommand"
 }
-
 
 package "com.alouer.enums" {
   enum "DayOfWeek" {
@@ -56,17 +59,15 @@ package "com.alouer.enums" {
   }
 }
 
-
 package "com.alouer.factories" {
   class "CommandFactory"
+  class "RegistrationFactory"
 }
 
-
-package "com.alouer.lessonManagement" {
+package "com.alouer.models.lessonManagement" {
   class "Booking" 
   class "Lesson" 
 }
-
 
 package "com.alouer.models" {
   class "Administrator" <<Singleton>>
@@ -75,7 +76,6 @@ package "com.alouer.models" {
   class "Instructor"
   class "Location"
 }
-
 
 package "com.alouer.utils" {
   class "BackendUtils"
@@ -88,20 +88,21 @@ package "com.alouer" {
 }
 
 ' Associations
-"Terminal" --> "factories" : interacts with
-"Terminal" --> "utils" : uses
-
-"collections" --> "models" : contains
-
-"CommandFactory" --> "Command" : selects
-"Command" <|-- "admin"
-"Command" <|-- "client"
-"Command" <|-- "instructor"
-"Command" <|-- "LogOutCommand"
-
-"models" --> "lessonManagement" : manages
-"models" --> "enums" : uses
-"lessonManagement" --> "enums" : uses
-
+Command <|-- CreateLessonCommand
+Command <|-- DeleteUserCommand
+Command <|-- AddDependentCommand
+Command <|-- CreateBookingCommand
+Command <|-- ViewEditBookingsCommand
+Command <|-- AcceptOfferingCommand
+Command <|-- ViewEditOfferingsCommand
+Command <|-- RegisterClientCommand
+Command <|-- RegisterInstructorCommand
+Command <|-- LogOutCommand
+Terminal -> utils : uses
+Terminal -> factories : uses
+factories -> commands : interfaces
+commands -> collections : uses
+collections -> models : manages
+models -> enums : uses
 
 @enduml

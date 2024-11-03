@@ -1,14 +1,10 @@
 package com.alouer.models.lessonManagement;
 
-import java.time.LocalDateTime;
-
 public class Booking {
     private Integer id;
     private Integer clientId;
     private Integer childId;
     private Integer lessonId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     public Booking(Integer clientId, Integer lessonId, Integer childId) {
         this.clientId = clientId;
@@ -16,8 +12,6 @@ public class Booking {
         if (childId != null) {
             this.childId = childId;
         }
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
     }
 
     public Integer getId() {
@@ -36,14 +30,6 @@ public class Booking {
         return lessonId;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
     public void setId(Integer id) {
         this.id = id;
     }
@@ -58,9 +44,5 @@ public class Booking {
 
     public void setLessonId(Integer lessonId) {
         this.lessonId = lessonId;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

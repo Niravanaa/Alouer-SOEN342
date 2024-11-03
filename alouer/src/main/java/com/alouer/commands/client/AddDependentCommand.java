@@ -39,7 +39,6 @@ public class AddDependentCommand implements Command {
 
         Integer newChildId = ChildCollection.createChild(client.getId(), firstName, lastName, dateOfBirth);
         if (newChildId != null) {
-            client.addChild(newChildId);
             System.out.println("Dependent added successfully.");
         } else {
             System.out.println("Failed to add dependent.");

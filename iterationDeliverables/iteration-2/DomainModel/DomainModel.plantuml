@@ -1,8 +1,6 @@
-@startuml
+@startuml Domain Model of the Alouer System
 
-
-title Alouer Domain Model
-
+title Domain Model of the Alouer System
 
 enum LessonType {
   GROUP
@@ -30,6 +28,7 @@ entity "Administrator" <<Singleton>> {
   -lastName: String
   -email: String
   -password: String
+  -instance: Administrator
 }
 
 entity "Child" {
@@ -47,8 +46,6 @@ entity "Client" {
   -email: String
   -password: String
   -role: UserType
-  -children: List<Integer>
-  -bookings: List<Integer>
 }
 
 entity "Instructor" {
@@ -58,7 +55,6 @@ entity "Instructor" {
   -email: String
   -password: String
   -role: UserType
-  -lessons: List<Integer>
 }
 
 entity "Location" {
@@ -68,7 +64,6 @@ entity "Location" {
   -city: String
   -province: String
   -postalCode: String
-  -lessons: List<Integer>
 }
 
 
@@ -77,8 +72,6 @@ entity "Booking" {
   -clientId: Integer
   -childId: Integer
   -lessonId: Integer
-  -createdAt: LocalDateTime
-  -updatedAt: LocalDateTime
 }
 
 entity "Lesson" {
@@ -96,27 +89,27 @@ entity "Lesson" {
 
 
 entity "BookingCollection" {
-  {static} +bookings: List<Booking>
+  +<u>bookings: List<Booking>
 }
 
 entity "ChildCollection" {
-  {static} +children: List<Child>
+  +<u>children: List<Child>
 }
 
 entity "ClientCollection" {
-  {static} +clients: List<Client>
+  +<u>clients: List<Client>
 }
 
 entity "InstructorCollection" {
-  {static} +instructors: List<Instructor>
+  +<u>instructors: List<Instructor>
 }
 
 entity "LessonCollection" {
-  {static} +lessons: List<Lesson>
+  +<u>lessons: List<Lesson>
 }
 
 entity "LocationCollection" {
-  {static} +locations: List<Location>
+  +<u>locations: List<Location>
 }
 
 

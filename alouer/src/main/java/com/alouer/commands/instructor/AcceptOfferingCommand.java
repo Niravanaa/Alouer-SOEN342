@@ -49,7 +49,6 @@ public class AcceptOfferingCommand implements Command {
         if (selectedLesson.getAssignedInstructorId() == null) {
             selectedLesson.setAssignedInstructorId(instructor.getId());
             selectedLesson.setAvailable(true);
-            instructor.addLesson(selectedLesson.getId());
             System.out.println("Lesson successfully assigned to you!");
         } else {
             System.out.println("Lesson is already assigned to another instructor.");

@@ -1,8 +1,5 @@
 package com.alouer.models;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.alouer.enums.UserType;
 
 public class Instructor {
@@ -12,7 +9,6 @@ public class Instructor {
     private String email;
     private String password;
     private UserType role;
-    private List<Integer> lessons;
 
     public Instructor(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
@@ -20,7 +16,6 @@ public class Instructor {
         this.email = email;
         this.password = password;
         this.role = UserType.INSTRUCTOR;
-        this.lessons = new ArrayList<>();
     }
 
     public Integer getId() {
@@ -47,10 +42,6 @@ public class Instructor {
         return role;
     }
 
-    public List<Integer> getLessons() {
-        return lessons;
-    }
-
     public void setId(Integer id) {
         this.id = id;
     }
@@ -69,13 +60,5 @@ public class Instructor {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public void addLesson(Integer lessonId) {
-        this.lessons.add(lessonId);
-    }
-
-    public void removeLesson(Integer lessonId) {
-        this.lessons.remove(lessonId);
     }
 }

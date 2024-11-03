@@ -34,5 +34,6 @@ alt no existing client found
         clientCollection --> command : True
     else creation failure
         clientCollection --> command : False
+    end
 end
 @enduml

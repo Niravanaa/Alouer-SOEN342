@@ -12,12 +12,8 @@ participant "DatabaseManager" as databaseManager
 
 client -> terminal : enterViewEditBookingsCommandId()
 terminal -> command : execute()
-command -> bookingCollection : getByClientId(clientId)
-bookingCollection -> databaseManager : getConnection()
-databaseManager --> bookingCollection : connection
-bookingCollection --> command : bookings
-
-loop while keepViewing == true
+command -> command : keepVieweing := True
+loop while keepViewing == True
    command -> bookingCollection : getByClientId(clientId)
    bookingCollection -> databaseManager : getConnection()
    databaseManager --> bookingCollection : connection
@@ -27,7 +23,7 @@ loop while keepViewing == true
    command -> command : requestBookingId(bookings)
    client -> command : enterBookingId(bookingId)
 
-   command -> bookingCollection : get(bookingId)
+   command -> bookingCollection : getById(bookingId)
    bookingCollection --> command : booking
    command -> lessonCollection : getById(booking.getLessonId())
    lessonCollection --> command : lesson
@@ -50,5 +46,6 @@ loop while keepViewing == true
        else deletion failure
            bookingCollection --> command : False
        end
+    end
 end
 @enduml

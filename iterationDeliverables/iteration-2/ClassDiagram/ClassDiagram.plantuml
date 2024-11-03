@@ -1,25 +1,23 @@
-@startuml
-scale 2500 width
-scale 1000 height
-top to bottom direction
-!pragma svginteractive true
+@startuml Class Diagram of the Alouer System
+
+title Class Diagram of the Alouer System
+
 package com.alouer {
 package collections {
 class BookingCollection {
     - <u>INSERT_BOOKING_SQL : String {readOnly}
-    - <u>SELECT_BOOKINGS_BY_ID_SQL : String {readOnly}
+    - <u>SELECT_BOOKING_BY_ID_SQL : String {readOnly}
     - <u>SELECT_BOOKINGS_BY_CLIENT_ID_SQL : String {readOnly}
     - <u>SELECT_BOOKING_BY_LESSON_ID_SQL : String {readOnly}
     - <u>DELETE_BOOKING_SQL : String {readOnly}
     --
     + <u>getBookings() : List<Booking>
-    + <u>get(clientId: int) : Booking
+    + <u>getById(clientId: int) : Booking
     + <u>add(booking: Booking) : void
     + <u>validateBooking(lessonId: Integer) : boolean
     + <u>createBooking(clientId: Integer, lessonId: Integer, childId: Integer) : Integer
     + <u>getByClientId(clientId: Integer) : List<Booking>
     + <u>getByLessonId(lessonId: Integer) : Booking
-    + <u>updateBooking(booking: Booking) : 
     + <u>delete(id: Integer) : boolean
 }
 
@@ -28,20 +26,20 @@ class ChildCollection {
     - <u>SELECT_CHILD_BY_ID_SQL : String {readOnly}
     - <u>SELECT_CHILDREN_BY_CLIENT_ID_SQL : String {readOnly}
     - <u>VALIDATE_CHILD_SQL : String {readOnly}
-    - <u>SELECT_ALL_CHILDREN : String {readOnly}
+    - <u>SELECT_ALL_CHILDREN_SQL : String {readOnly}
     --
     + <u>getChildren() : List<Child>
-    + <u>find(childId: id) : Child
+    + <u>getById(childId: Integer) : Child
     + <u>add(child: Child) : boolean
     + <u>validateChild(clientId: Integer, firstName: String, lastName: String, dateOfBirth: Date) : boolean
     + <u>createChild(clientId: Integer, firstName: String, lastName: String, dateOfBirth: Date) : Integer
     + <u>getChildrenByClientId(clientId: Integer) : List<Child>
-    + <u>getById(childId: Integer) : Child
 }
 
 class ClientCollection {
     - <u>INSERT_CLIENT_SQL : String {readOnly}
     - <u>SELECT_CLIENT_BY_ID_SQL : String {readOnly}
+    - <u>SELECT_CLIENT_BY_EMAIL_SQL : String {readOnly}
     - <u>SELECT_ALL_CLIENTS_SQL : String {readOnly}
     - <u>VALIDATE_CREDENTIALS_SQL : String {readOnly}
     - <u>DELETE_CLIENT_SQL : String {readOnly}
@@ -56,6 +54,7 @@ class ClientCollection {
 }
 
 class InstructorCollection {
+    - <u>UPDATE_INSTRUCTOR_SQL : String {readOnly}
     - <u>INSERT_INSTRUCTOR_SQL : String {readOnly}
     - <u>SELECT_INSTRUCTOR_BY_ID_SQL : String {readOnly}
     - <u>SELECT_ALL_INSTRUCTORS_SQL : String {readOnly}
@@ -63,27 +62,34 @@ class InstructorCollection {
     - <u>DELETE_INSTRUCTOR_SQL : String {readOnly}
     --
     + <u>getInstructors() : List<Instructor>
-    + <u>add(instructor: Instructor) : boolean
-    + <u>validateCredentials(email: String, password: String) : Instructor
-    + <u>delete(instructorId: Integer) : boolean
     + <u>getById(instructorId: Integer) : Instructor
+    + <u>getByEmail(instructorId: Integer) : Instructor
+    + <u>createInstructor(firstName: String, lastName: String, email: String, password: String) : Boolean
+    + <u>add(instructor: Instructor) : Boolean
+    + <u>validateCredentials(email: String, password: String) : Instructor
+    + <u>delete(instructorId: Integer) : Boolean
 }
 
 class LessonCollection {
+    - <u>UPDATE_LESSON_SQL : String {readOnly}
+    - <u>DELETE_SCHEDULE_SQL : String {readOnly}
+    - <u>INSERT_SCHEDULE_SQL : String {readOnly}
     - <u>INSERT_LESSON_SQL : String {readOnly}
     - <u>SELECT_ALL_LESSONS_SQL : String {readOnly}
     - <u>SELECT_LESSON_BY_ID_SQL : String {readOnly}
     - <u>SELECT_LESSONS_BY_INSTRUCTOR_ID_SQL : String {readOnly}
+    - <u>SELECT_SCHEDULE_BY_LESSON_ID_SQL : String {readOnly}
     --
     + <u>getLessons() : List<Lesson>
     + <u>getById(lessonId: Integer) : Lesson
     + <u>getScheduleByLessonId(lessonId: Integer) : List<DayOfWeek>
-    + <u>add(lesson: Lesson) : boolean
+    + <u>add(lesson: Lesson) : Boolean
     + <u>getByInstructorId(instructorId: Integer) : List<Lesson>
     + <u>validateLesson(locationId: Integer, startTime: String, endTime: String, schedule: String) : boolean
     + <u>createLesson(locationId: Integer, title: String, lessonType: LessonType, startTime: String, endTime: String, schedule: String)
     + <u>getUnassignedLessons(locationId: Integer) : List<Lesson>
     + <u>getAvailableLessons(locationId: Integer) : List<Lesson>
+    + <u>updateLesson(lesson: Lesson) : Boolean
 }
 
 class LocationCollection {
@@ -91,7 +97,7 @@ class LocationCollection {
     - <u>SELECT_ALL_LOCATIONS_SQL : String {readOnly}
     - <u>SELECT_LOCATION_BY_ID_SQL : String {readOnly}
     --
-    + <u>add(location: Location) : boolean
+    + <u>add(location: Location) : Boolean
     + <u>getLocations() : List<Location>
     + <u>getById(locationId: Integer) : Location 
 }
@@ -100,93 +106,106 @@ package commands {
 package admin {
 class CreateLessonCommand {
     - admin : Administrator
+    - scanner : Scanner
     --
-    + CreateLessonCommand(admin: Administrator)
+    + CreateLessonCommand(admin: Administrator, scanner: Scanner)
     + execute() : void
-    - requestLocationId(scanner: Scanner, locations: List<Locations>) : Integer
-    - requestLessonTypeInput(scanner: Scanner) : LessonType
-    - requestTimeInput(scanner: Scanner, timeType: String) : String
+    - requestLocationId(locations: List<Locations>) : Integer
+    - requestLessonTypeInput() : LessonType
+    - requestTimeInput(timeType: String) : String
     - isEndTimeGreaterThanStartTime(startTime: String, endTime: String) : boolean
-    - requestScheduleInput(scanner: Scanner) : String
-    - requestTitle(scanner: Scanner) : String
-    - requestConfirmation(scanner : Scanner) : String
+    - requestScheduleInput() : String
+    - requestTitle() : String
+    - requestConfirmation() : String
 }
 
 class DeleteUserCommand {
     - admin : Administrator
+    - scanner : Scanner
     --
-    + DeleteUserCommand(admin: Administrator)
+    + DeleteUserCommand(admin: Administrator, scanner: Scanner)
     + execute() : void
-    - requestUserType(scanner: Scanner) : UserType
-    - requestUserId(scanner: Scanner, users: List<T>) : Integer 
-    - confirmDeletion(scanner: Scanner) : boolean
+    - requestUserType() : UserType
+    - requestUserId(users: List<T>) : Integer 
+    - confirmDeletion() : boolean
 }
 }
 package client {
 class AddDependentCommand {
     - client : Client
+    - scanner : Scanner
     --
-    + AddDependentCommand(client: Client)
+    + AddDependentCommand(client: Client, scanner: Scanner)
     + execute() : void
-    - requestFirstName(scanner: Scanner) : String
-    - requestLastName(scanner: Scanner) : String
-    - requestDateOfBirth(scanner: Scanner) : Date
+    - requestFirstName() : String
+    - requestLastName() : String
+    - requestDateOfBirth() : Date
 }
 
 class CreateBookingCommand {
-   - client : Client
-   --
-   + CreateBookingCommand(client: Client)
-   + execute() : void
-   - selectLesson(scanner: Scanner, lessons: List<Lesson>) : Integer
-   - getValidLocationId(scanner: Scanner, locations: List<Location>) : Integer
-   - getValidChildId(scanner: Scanner, children : List<Child>) : Integer
+    - client : Client
+    - scanner : Scanner
+    --
+    + CreateBookingCommand(client: Client, scanner: Scanner)
+    + execute() : void
+    - selectLesson(lessons: List<Lesson>) : Integer
+    - getValidLocationId(locations: List<Location>) : Integer
+    - getValidChildId(children : List<Child>) : Integer
 }
 
 class ViewEditBookingsCommand {
-   - client : Client
-   --
-   + ViewEditBookingsCommand(client: Client)
-   + execute() : void
-   - displayLessonDetails(lesson: Lesson, location: Location, instructor: Instructor) : void
-   - getLessonSelection(scanner: Scanner) : Integer
+    - client : Client
+    - scanner : Scanner
+    --
+    + ViewEditBookingsCommand(client: Client, scanner: Scanner)
+    + execute() : void
+    - displayLessonDetails(lesson: Lesson, location: Location, instructor: Instructor) : void
+    - getLessonSelection() : Integer
 }
-
+}
+package registration {
 class RegisterClientCommand {
-   --
-   + execute() : void
-   - requestFirstName(scanner: Scanner) : String
-   - requestLastName(scanner: Scanner) : String
-   - requestEmail(scanner: Scanner) : String
-   - requestPassword(scanner: Scanner) : String 
+    - scanner : Scanner
+    --
+    + RegisterClientCommand(scanner: Scanner)
+    + execute() : void
+    - requestFirstName() : String
+    - requestLastName() : String
+    - requestEmail() : String
+    - requestPassword() : String 
 }
 
 class RegisterInstructorCommand {
-   --
-   + execute() : void
-   - requestFirstName(scanner: Scanner) : String
-   - requestLastName(scanner: Scanner) : String
-   - requestEmail(scanner: Scanner) : String
-   - requestPassword(scanner: Scanner) : String 
+    - scanner : Scanner
+    --
+    + RegisterInstructorCommand(scanner: Scanner)
+    + execute() : void
+    - requestFirstName(scanner: Scanner) : String
+    - requestLastName(scanner: Scanner) : String
+    - requestEmail(scanner: Scanner) : String
+    - requestPassword(scanner: Scanner) : String 
 }
 }
+
 package instructor {
 class AcceptOfferingCommand {
-   - instructor : Instructor
-   --
-   + AcceptOfferingCommand(instructor: Instructor)
-   + execute() : void
-   - requestLocationId(scanner: Scanner, locations: List<Location>) : Integer
-   - requestLessonId(scanner: Scanner, lessons: List<Lesson>) : Lesson
+    - instructor : Instructor
+    - scanner : Scanner
+    --
+    + AcceptOfferingCommand(instructor: Instructor, scanner: Scanner)
+    + execute() : void
+    - requestLocationId(locations: List<Location>) : Integer
+    - requestLessonId(lessons: List<Lesson>) : Lesson
 }
 
 class ViewEditOfferingsCommand {
    - instructor : Instructor
+   - scanner : Scanner
    --
-   + ViewEditOfferingsCommand(instructor: Instructor)
+   + ViewEditOfferingsCommand(instructor: Instructor, scanner: Scanner)
    + execute() : void
    - displayLessonDetails(lesson: Lesson, location: Location, client: Client) : void
-   - requestLessonId(scanner: Scanner, lessons: List<Lesson>) : Integer
+   - requestLessonId(lessons: List<Lesson>) : Integer
 }
 }
 interface Command {
@@ -225,11 +244,11 @@ enum UserType {
 package factories {
 class CommandFactory {
     --
-    +<u>getCommands(userType: UserType, user: Object)
+    +<u>getCommands(userType: UserType, user: Object, scanner: Scanner) : Map<String, Command>
 }
 class RegistrationFactory {
     --
-    +<u>getRegistrationCommands()
+    +<u>getRegistrationCommands(scanner: Scanner) : Map<String, Command>
 }
 }
 
@@ -240,20 +259,16 @@ class Booking {
     - clientId : Integer
     - childId : Integer
     - lessonId : Integer
-    - createdAt : Date
-    - updatedAt : Date
     --
     + Booking(clientId: Integer, lessonId: Integer, childId: Integer)
     + getId() : Integer
     + getChildId() : Integer
     + getClientId() : Integer
-    + getCreatedAt() : Date
-    + getUpdatedAt() : Date
+    + getLessonId() : Integer
     + setId(id: Integer) : void
     + setClientId(clientId: Integer) : void
     + setChildId(childId: Integer) : void
     + setLessonId(lessonId: Integer) : void
-    + setUpdatedAt(date: Date) : void
 }
 
 class Lesson {
@@ -332,8 +347,6 @@ class Client {
     - email : String
     - password : String
     - role : UserType
-    - children : List<Integer>
-    - bookings : List<Integer>
     --
     + Client(firstName: String, lastName: String, email: String, password: String)
     + getId() : Integer
@@ -342,16 +355,11 @@ class Client {
     + getEmail() : String
     + getPassword() : String
     + getRole() : UserType
-    + getChildren() : List<Integer>
-    + getBookings() : List<Integer>
     + setId(id: Integer) : void
     + setFirstName(firstName: String) : void
     + setLastName(lastName: String) : void
     + setEmail(email: String) : void
     + setPassword(password: String) : void
-    + addChild(childId: Integer) : void
-    + addBooking(bookingId: Integer) : void
-    + removeBooking(bookingId: Integer) : void
 }
 
 class Instructor {
@@ -361,7 +369,6 @@ class Instructor {
     - email : String
     - password : String
     - role : UserType
-    - lessons : List<Integer>
     --
     + Instructor(firstName: String, lastName: String, email: String, password: String)
     + getId() : Integer
@@ -370,14 +377,11 @@ class Instructor {
     + getEmail() : String
     + getPassword() : String
     + getRole() : UserType
-    + getLessons() : List<Integer>
     + setId(id: Integer) : void
     + setFirstName(firstName: String) : void
     + setLastName(lastName: String) : void
     + setEmail(email: String) : void
     + setPassword(password: String) : void
-    + addLesson(lessonId: Integer) : void
-    + removeLesson(lessonId: Integer) : void
 }
 
 class Location {
@@ -387,7 +391,6 @@ class Location {
     - city : String
     - province : String
     - postalCode : String
-    - lessons : List<Integer>
     --
     + Location(name: String, address: String, city: String, province: String, postalCode: String)
     + getId() : Integer
@@ -396,7 +399,6 @@ class Location {
     + getCity() : String
     + getProvince() : String
     + getPostalCode() : String
-    + getLessons() : List<Integer>
     + setId(id: Integer) : void
     + setName(name: String) : void
     + setCity(city: String) : void
@@ -433,6 +435,7 @@ class DatabaseManager {
     +<u>getConnection() : Connection
     +<u>initializeDatabase() : void
     -<u>promptResetAndSeed(conn: Connection) : void
+    -<u>resetAndSeedDatabase(conn : Connection) : void
     -<u>executeSqlFile(conn: Connection, filePath: String) : void
 }
 }
@@ -464,6 +467,5 @@ Terminal -> factories : uses
 factories -> commands : interfaces
 commands -> collections : uses
 collections -> models : manages
-collections -> lessonManagement : manages
 models -> enums : uses
 @enduml

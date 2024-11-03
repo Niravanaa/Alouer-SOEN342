@@ -12,7 +12,7 @@ loop keepViewing == True
     system -> system : instructorLessons := getByInstructorId(instructorId)
     system -> system : display(instructorLessons)
     system --> instructor : requestLessonIdOrExit
-    instructor -> system : enter(lessonId)
+    instructor -> system : enterlessonId(lessonId)
     alt lessonId provided
         system -> system : selectedLesson := getLessonDetails(lessonId)
         system -> system : location := getLessonLocation(lessonId)

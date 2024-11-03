@@ -1,8 +1,5 @@
 package com.alouer.models;
 
-import java.util.List;
-import java.util.ArrayList;
-
 public class Location {
     private Integer id;
     private String name;
@@ -10,7 +7,6 @@ public class Location {
     private String city;
     private String province;
     private String postalCode;
-    private List<Integer> lessons;
 
     public Location(String name, String address, String city, String province,
             String postalCode) {
@@ -19,7 +15,6 @@ public class Location {
         this.city = city;
         this.province = province;
         this.postalCode = postalCode;
-        lessons = new ArrayList<>();
     }
 
     public Integer getId() {
@@ -44,10 +39,6 @@ public class Location {
 
     public String getPostalCode() {
         return postalCode;
-    }
-
-    public List<Integer> getLessons() {
-        return lessons;
     }
 
     public void setId(int id) {

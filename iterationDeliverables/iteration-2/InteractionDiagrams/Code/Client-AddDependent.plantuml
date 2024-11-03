@@ -23,11 +23,10 @@ else child does not exist
     command -> childCollection : createChild(clientId, firstName, lastName, dateOfBirth)
     childCollection -> childObj ** : new Child(firstName, lastName, dateOfBirth, clientId)
     childObj --> childCollection : newChild
-    childCollection -> childCollection : add(newChild)
+    childCollection -> childCollection : childId := add(newChild)
     childCollection -> databaseManager : getConnection()
     databaseManager --> childCollection : connection
     alt successful creation
-        childCollection --> command : childId
         childCollection -> client : addChild(childId)
     else creation failed
         childCollection --> command : null

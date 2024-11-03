@@ -25,7 +25,7 @@ lessonCollection -> databaseManager : getConnection()
 databaseManager --> lessonCollection : connection
 lessonCollection --> command : availableLessons
 command -> consoleUtils : printTable(availableLessons, nonDisplayProperties)
-command -> command : selectLesson(availableLessons)
+command -> command : requestLessonId(availableLessons)
 client -> command : enterLessonId(lessonId)
 command -> childCollection : getChildrenByClientId(clientId)
 childCollection -> databaseManager : getConnection()
@@ -40,10 +40,11 @@ command -> bookingCollection : validateBooking(lessonId)
 bookingCollection -> lessonCollection : getById(lessonId)
 lessonCollection -> databaseManager : getConnection()
 databaseManager --> lessonCollection : connection
-alt lesson not found 
+alt lesson not found
     lessonCollection --> bookingCollection : null
     bookingCollection --> command : false
 else lesson found
+    lessonCollection --> bookingCollection : lesson
     alt lesson is not available or not assigned to instructor
        bookingCollection --> command : false
     else

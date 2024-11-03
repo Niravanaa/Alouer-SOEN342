@@ -3,6 +3,8 @@ actor "<u>:Admin" as admin
 participant "<u>:System" as system
 
 admin -> system : enterCreateLessonCommandId()
+system -> system : locations := getLocations()
+system -> system : display(locations)
 system --> admin : requestLocationId
 admin -> system : enterLocationId(locationId)
 system --> admin : requestLessonType

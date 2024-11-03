@@ -74,8 +74,7 @@ public class CreateBookingCommand implements Command {
 
         boolean isValid = BookingCollection.validateBooking(lessonId);
         if (isValid) {
-            int newBookingId = BookingCollection.createBooking(client.getId(), lessonId, childId);
-            client.addBooking(newBookingId);
+            BookingCollection.createBooking(client.getId(), lessonId, childId);
             System.out.println("Booking created successfully!");
         } else {
             System.out.println("Booking validation failed.");

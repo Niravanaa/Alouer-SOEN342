@@ -71,7 +71,6 @@ public class ViewEditOfferingsCommand implements Command {
                 selectedLesson.setAssignedInstructorId(null);
                 LessonCollection.updateLesson(selectedLesson);
 
-                instructor.removeLesson(selectedLesson.getId());
                 InstructorCollection.update(instructor);
 
                 keepViewing = true;

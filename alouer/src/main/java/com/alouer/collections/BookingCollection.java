@@ -37,7 +37,7 @@ public class BookingCollection {
         return bookings;
     }
 
-    public static Booking get(Integer id) {
+    public static Booking getById(Integer id) {
         Booking booking = null;
 
         try (Connection connection = DatabaseManager.getConnection();
