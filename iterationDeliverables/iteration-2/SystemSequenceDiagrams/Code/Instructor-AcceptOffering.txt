@@ -1,0 +1,17 @@
+@startuml
+skinparam sequenceMessageAlign center 
+
+actor "<u>:Instructor" as instructor
+participant "<u>:System" as system
+
+instructor -> system : enterAcceptOfferingCommandId()
+system -> system: locations := getLocations()
+system -> system : display(locations)
+system --> instructor : requestLocationId()
+instructor -> system : enterLocationId(locationId)
+system -> system : availableLessons := getUnassignedLessons(locationId)
+system -> system : display(availableLessons)
+system --> instructor : requestLessonId()
+instructor -> system : enterLessonId(lessonId)
+system --> instructor : response
+@enduml

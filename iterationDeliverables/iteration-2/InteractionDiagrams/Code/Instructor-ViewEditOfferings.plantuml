@@ -1,0 +1,68 @@
+@startuml
+
+title View Edit Offerings
+skinparam sequenceMessageAlignment center
+
+actor ":<u>Instructor" as instructor 
+participant ":<u>Terminal" as terminal
+participant ":<u>ViewEditOfferingsCommand" as command
+participant "ConsoleUtils" as cUtils
+participant "LessonCollection" as lessonCollection
+participant "LocationCollection" as locationCollection
+participant "ClientCollection" as clientCollection
+participant "BookingCollection" as bookingCollection
+participant "InstructorCollection" as instructorCollection
+participant "selectedLesson:<u>Lesson" as selectedLesson
+participant "booking:<u>Booking" as booking
+participant "DatabaseManager" as databaseManager
+
+instructor -> terminal : enterViewEditOfferingsCommandId()
+terminal -> command : execute()
+command -> command : keepViewing := True
+command -> instructor : getId()
+instructor --> command : instructorId
+command -> lessonCollection : getByInstructorId(instructorId)
+lessonCollection -> databaseManager : getConnection()
+databaseManager --> lessonCollection : connection
+lessonCollection --> command : lessons
+loop keepViewing == True
+    command -> lessonCollection : getByInstructorId(instructorId)
+    lessonCollection -> databaseManager : getConnection()
+    databaseManager --> lessonCollection : connection
+    lessonCollection --> command : instructorLessons
+    command -> cUtils : printTable(instructorLessons, nonDisplayProperties)
+    command -> command : selectedLesson := requestLessonId()
+    instructor -> command : enterLessonId(lessonId)
+    command -> selectedLesson : getLocationId()
+    selectedLesson --> command : locationId
+    command -> locationCollection : getById(locationId)
+    locationCollection -> databaseManager : getConnection()
+    databaseManager --> locationCollection : connection
+    locationCollection --> command : location
+    command -> selectedLesson : getId()
+    selectedLesson --> command : lessonId
+    command -> bookingCollection : getByLessonId(lessonId)
+    bookingCollection -> databaseManager : getConnection()
+    databaseManager --> bookingCollection : connection
+    bookingCollection --> command : booking
+    alt booking == null
+        command -> command : client := null
+    else booking exists
+        command -> booking : getClientId()
+        booking --> command : clientId
+        command -> clientCollection: getById(clientId)
+        clientCollection -> databaseManager : getConnection()
+        databaseManager --> clientCollection : connection
+        clientCollection --> command : client
+        command -> command : displayLessonDetails(selectedLesson, location, client)
+        command -> command : requestUnassignOrReturnToList()
+        instructor -> command : enterResponse(response)
+        alt response == "unassign"
+            command -> selectedLesson : setAssignedInstructorId(null)
+            command -> lessonCollection : update(selectedLesson)
+            command -> instructor : removeLesson(lessonId)
+            command -> instructorCollection : update(instructorId)
+        end
+    end
+end
+@enduml

@@ -1,0 +1,471 @@
+@startuml Class Diagram of the Alouer System
+
+title Class Diagram of the Alouer System
+
+package com.alouer {
+package collections {
+class BookingCollection {
+    - <u>INSERT_BOOKING_SQL : String {readOnly}
+    - <u>SELECT_BOOKING_BY_ID_SQL : String {readOnly}
+    - <u>SELECT_BOOKINGS_BY_CLIENT_ID_SQL : String {readOnly}
+    - <u>SELECT_BOOKING_BY_LESSON_ID_SQL : String {readOnly}
+    - <u>DELETE_BOOKING_SQL : String {readOnly}
+    --
+    + <u>getBookings() : List<Booking>
+    + <u>getById(clientId: int) : Booking
+    + <u>add(booking: Booking) : void
+    + <u>validateBooking(lessonId: Integer) : boolean
+    + <u>createBooking(clientId: Integer, lessonId: Integer, childId: Integer) : Integer
+    + <u>getByClientId(clientId: Integer) : List<Booking>
+    + <u>getByLessonId(lessonId: Integer) : Booking
+    + <u>delete(id: Integer) : boolean
+}
+
+class ChildCollection {
+    - <u>INSERT_CHILD_SQL : String {readOnly}
+    - <u>SELECT_CHILD_BY_ID_SQL : String {readOnly}
+    - <u>SELECT_CHILDREN_BY_CLIENT_ID_SQL : String {readOnly}
+    - <u>VALIDATE_CHILD_SQL : String {readOnly}
+    - <u>SELECT_ALL_CHILDREN_SQL : String {readOnly}
+    --
+    + <u>getChildren() : List<Child>
+    + <u>getById(childId: Integer) : Child
+    + <u>add(child: Child) : boolean
+    + <u>validateChild(clientId: Integer, firstName: String, lastName: String, dateOfBirth: Date) : boolean
+    + <u>createChild(clientId: Integer, firstName: String, lastName: String, dateOfBirth: Date) : Integer
+    + <u>getChildrenByClientId(clientId: Integer) : List<Child>
+}
+
+class ClientCollection {
+    - <u>INSERT_CLIENT_SQL : String {readOnly}
+    - <u>SELECT_CLIENT_BY_ID_SQL : String {readOnly}
+    - <u>SELECT_CLIENT_BY_EMAIL_SQL : String {readOnly}
+    - <u>SELECT_ALL_CLIENTS_SQL : String {readOnly}
+    - <u>VALIDATE_CREDENTIALS_SQL : String {readOnly}
+    - <u>DELETE_CLIENT_SQL : String {readOnly}
+    --
+    + <u>getClients() : List<Client>
+    + <u>getById(clientId: Integer) : Client
+    + <u>getByEmail(email: String) : Client
+    + <u>createClient(firstName: String, lastName: String, email: String, password: String) : boolean
+    + <u>add(client: Client) : boolean
+    + <u>validateCredentials(email: String, password: String) : Client
+    + <u>delete(clientId: Integer) : boolean
+}
+
+class InstructorCollection {
+    - <u>UPDATE_INSTRUCTOR_SQL : String {readOnly}
+    - <u>INSERT_INSTRUCTOR_SQL : String {readOnly}
+    - <u>SELECT_INSTRUCTOR_BY_ID_SQL : String {readOnly}
+    - <u>SELECT_ALL_INSTRUCTORS_SQL : String {readOnly}
+    - <u>VALIDATE_CREDENTIALS_SQL : String {readOnly}
+    - <u>DELETE_INSTRUCTOR_SQL : String {readOnly}
+    --
+    + <u>getInstructors() : List<Instructor>
+    + <u>getById(instructorId: Integer) : Instructor
+    + <u>getByEmail(instructorId: Integer) : Instructor
+    + <u>createInstructor(firstName: String, lastName: String, email: String, password: String) : Boolean
+    + <u>add(instructor: Instructor) : Boolean
+    + <u>validateCredentials(email: String, password: String) : Instructor
+    + <u>delete(instructorId: Integer) : Boolean
+}
+
+class LessonCollection {
+    - <u>UPDATE_LESSON_SQL : String {readOnly}
+    - <u>DELETE_SCHEDULE_SQL : String {readOnly}
+    - <u>INSERT_SCHEDULE_SQL : String {readOnly}
+    - <u>INSERT_LESSON_SQL : String {readOnly}
+    - <u>SELECT_ALL_LESSONS_SQL : String {readOnly}
+    - <u>SELECT_LESSON_BY_ID_SQL : String {readOnly}
+    - <u>SELECT_LESSONS_BY_INSTRUCTOR_ID_SQL : String {readOnly}
+    - <u>SELECT_SCHEDULE_BY_LESSON_ID_SQL : String {readOnly}
+    --
+    + <u>getLessons() : List<Lesson>
+    + <u>getById(lessonId: Integer) : Lesson
+    + <u>getScheduleByLessonId(lessonId: Integer) : List<DayOfWeek>
+    + <u>add(lesson: Lesson) : Boolean
+    + <u>getByInstructorId(instructorId: Integer) : List<Lesson>
+    + <u>validateLesson(locationId: Integer, startTime: String, endTime: String, schedule: String) : boolean
+    + <u>createLesson(locationId: Integer, title: String, lessonType: LessonType, startTime: String, endTime: String, schedule: String)
+    + <u>getUnassignedLessons(locationId: Integer) : List<Lesson>
+    + <u>getAvailableLessons(locationId: Integer) : List<Lesson>
+    + <u>updateLesson(lesson: Lesson) : Boolean
+}
+
+class LocationCollection {
+    - <u>INSERT_LOCATION_SQL : String {readOnly}
+    - <u>SELECT_ALL_LOCATIONS_SQL : String {readOnly}
+    - <u>SELECT_LOCATION_BY_ID_SQL : String {readOnly}
+    --
+    + <u>add(location: Location) : Boolean
+    + <u>getLocations() : List<Location>
+    + <u>getById(locationId: Integer) : Location 
+}
+}
+package commands {
+package admin {
+class CreateLessonCommand {
+    - admin : Administrator
+    - scanner : Scanner
+    --
+    + CreateLessonCommand(admin: Administrator, scanner: Scanner)
+    + execute() : void
+    - requestLocationId(locations: List<Locations>) : Integer
+    - requestLessonTypeInput() : LessonType
+    - requestTimeInput(timeType: String) : String
+    - isEndTimeGreaterThanStartTime(startTime: String, endTime: String) : boolean
+    - requestScheduleInput() : String
+    - requestTitle() : String
+    - requestConfirmation() : String
+}
+
+class DeleteUserCommand {
+    - admin : Administrator
+    - scanner : Scanner
+    --
+    + DeleteUserCommand(admin: Administrator, scanner: Scanner)
+    + execute() : void
+    - requestUserType() : UserType
+    - requestUserId(users: List<T>) : Integer 
+    - confirmDeletion() : boolean
+}
+}
+package client {
+class AddDependentCommand {
+    - client : Client
+    - scanner : Scanner
+    --
+    + AddDependentCommand(client: Client, scanner: Scanner)
+    + execute() : void
+    - requestFirstName() : String
+    - requestLastName() : String
+    - requestDateOfBirth() : Date
+}
+
+class CreateBookingCommand {
+    - client : Client
+    - scanner : Scanner
+    --
+    + CreateBookingCommand(client: Client, scanner: Scanner)
+    + execute() : void
+    - selectLesson(lessons: List<Lesson>) : Integer
+    - getValidLocationId(locations: List<Location>) : Integer
+    - getValidChildId(children : List<Child>) : Integer
+}
+
+class ViewEditBookingsCommand {
+    - client : Client
+    - scanner : Scanner
+    --
+    + ViewEditBookingsCommand(client: Client, scanner: Scanner)
+    + execute() : void
+    - displayLessonDetails(lesson: Lesson, location: Location, instructor: Instructor) : void
+    - getLessonSelection() : Integer
+}
+}
+package registration {
+class RegisterClientCommand {
+    - scanner : Scanner
+    --
+    + RegisterClientCommand(scanner: Scanner)
+    + execute() : void
+    - requestFirstName() : String
+    - requestLastName() : String
+    - requestEmail() : String
+    - requestPassword() : String 
+}
+
+class RegisterInstructorCommand {
+    - scanner : Scanner
+    --
+    + RegisterInstructorCommand(scanner: Scanner)
+    + execute() : void
+    - requestFirstName(scanner: Scanner) : String
+    - requestLastName(scanner: Scanner) : String
+    - requestEmail(scanner: Scanner) : String
+    - requestPassword(scanner: Scanner) : String 
+}
+}
+
+package instructor {
+class AcceptOfferingCommand {
+    - instructor : Instructor
+    - scanner : Scanner
+    --
+    + AcceptOfferingCommand(instructor: Instructor, scanner: Scanner)
+    + execute() : void
+    - requestLocationId(locations: List<Location>) : Integer
+    - requestLessonId(lessons: List<Lesson>) : Lesson
+}
+
+class ViewEditOfferingsCommand {
+   - instructor : Instructor
+   - scanner : Scanner
+   --
+   + ViewEditOfferingsCommand(instructor: Instructor, scanner: Scanner)
+   + execute() : void
+   - displayLessonDetails(lesson: Lesson, location: Location, client: Client) : void
+   - requestLessonId(lessons: List<Lesson>) : Integer
+}
+}
+interface Command {
+   ~ execute() : void
+}
+
+class LogOutCommand {
+    - user : Object
+    --
+    + LogOutCommand(user: Object)
+    + execute() : void
+}
+}
+package enums {
+enum DayOfWeek {
+    MONDAY
+    TUESDAY
+    WEDNESDAY
+    THURSDAY
+    FRIDAY
+    SATURDAY
+    SUNDAY
+}
+
+enum LessonType {
+    PRIVATE
+    GROUP
+}
+
+enum UserType {
+    CLIENT
+    INSTRUCTOR
+    ADMINISTRATOR
+}
+}
+package factories {
+class CommandFactory {
+    --
+    +<u>getCommands(userType: UserType, user: Object, scanner: Scanner) : Map<String, Command>
+}
+class RegistrationFactory {
+    --
+    +<u>getRegistrationCommands(scanner: Scanner) : Map<String, Command>
+}
+}
+
+package models {
+package lessonManagement {
+class Booking {
+    - id : Integer
+    - clientId : Integer
+    - childId : Integer
+    - lessonId : Integer
+    --
+    + Booking(clientId: Integer, lessonId: Integer, childId: Integer)
+    + getId() : Integer
+    + getChildId() : Integer
+    + getClientId() : Integer
+    + getLessonId() : Integer
+    + setId(id: Integer) : void
+    + setClientId(clientId: Integer) : void
+    + setChildId(childId: Integer) : void
+    + setLessonId(lessonId: Integer) : void
+}
+
+class Lesson {
+    - id : Integer
+    - type : LessonType
+    - title : String
+    - locationId : Integer
+    - assignedInstructorId : Integer
+    - isAvailable : boolean
+    - startTime : Date
+    - endTime : Date
+    - schedule : Set<DayOfWeek>
+    - bookingId : Integer
+    --
+    + Lesson(type: LessonType, title: String, locationId: Integer, startTime: Date, endTime: Date, schedule: Set<DayOfWeek>)
+    + getId() : Integer
+    + getType() : LessonType
+    + getTitle() : String
+    + getLocationId() : Integer
+    + getAssignedInstructorId() : Integer
+    + getStartTime() : Date
+    + getEndTime() : Date
+    + getSchedule() : Set<DayOfWeek>
+    + getBookingId() : Integer
+    + isAvailable() : boolean
+    + setId(id: Integer) : void
+    + setType(type: LessonType) : void
+    + setTitle(title: String) : void
+    + setLocationId(locationId: Integer) : void
+    + setAvailable(available: boolean) : void
+    + setAssignedInstructorId(instructorId: Integer) : void
+    + setStartTime(startTime: Date) : void
+    + setEndTime(endTime: Date) : void
+    + setBookingId(bookingId: Integer) : void
+}
+}
+class Administrator {
+    - firstName : String
+    - lastName : String
+    - email : String
+    - password : String
+    - instance : Administrator
+    --
+    - Administrator()
+    + <u>getInstance() : Administrator
+    + getFirstName() : String
+    + getLastName() : String
+    + getEmail() : String
+    + getPassword() : String
+}
+
+class Child {
+    - id : Integer
+    - firstName : String
+    - lastName : String
+    - dateOfBirth : Date
+    - parentId : Integer
+    --
+    + Child(firstName: String, lastName: String, dateOfBirth: Date, parentId: Integer)
+    + getId() : Integer
+    + getFirstName() : String
+    + getLastName() : String
+    + getDateOfBirth() : Date
+    + getParentId() : Integer
+    + setId(childId: Integer) : void
+    + setFirstName(firstName: String) : void
+    + setLastName(lastName: String) : void
+    + setDateOfBirth(dateOfBirth: Date) : void
+    + setParentId(parentId: Integer) : void
+}
+
+class Client {
+    - id : Integer
+    - firstName : String
+    - lastName : String
+    - email : String
+    - password : String
+    - role : UserType
+    --
+    + Client(firstName: String, lastName: String, email: String, password: String)
+    + getId() : Integer
+    + getFirstName() : String
+    + getLastName() : String
+    + getEmail() : String
+    + getPassword() : String
+    + getRole() : UserType
+    + setId(id: Integer) : void
+    + setFirstName(firstName: String) : void
+    + setLastName(lastName: String) : void
+    + setEmail(email: String) : void
+    + setPassword(password: String) : void
+}
+
+class Instructor {
+    - id : Integer
+    - firstName : String
+    - lastName : String
+    - email : String
+    - password : String
+    - role : UserType
+    --
+    + Instructor(firstName: String, lastName: String, email: String, password: String)
+    + getId() : Integer
+    + getFirstName() : String
+    + getLastName() : String
+    + getEmail() : String
+    + getPassword() : String
+    + getRole() : UserType
+    + setId(id: Integer) : void
+    + setFirstName(firstName: String) : void
+    + setLastName(lastName: String) : void
+    + setEmail(email: String) : void
+    + setPassword(password: String) : void
+}
+
+class Location {
+    - id : Integer
+    - name : String
+    - address : String
+    - city : String
+    - province : String
+    - postalCode : String
+    --
+    + Location(name: String, address: String, city: String, province: String, postalCode: String)
+    + getId() : Integer
+    + getName() : String
+    + getAddress() : String
+    + getCity() : String
+    + getProvince() : String
+    + getPostalCode() : String
+    + setId(id: Integer) : void
+    + setName(name: String) : void
+    + setCity(city: String) : void
+    + setAddress(address: String) : void
+    + setProvince(province: String) : void
+    + setPostalCode(postalCode: String) : void
+}
+}
+package utils {
+class BackendUtils {
+    --
+    +<u>convertDaysToSchedule(days: List<DayOfWeek>)
+    +<u>convertTimeToMinutes(time: String) : Integer
+    +<u>convertScheduleToDays(schedule: String) : Set<DayOfWeek>
+    +<u>parseSchedule(schedule: String) : Set<DayOfWeek>
+}
+
+class ConsoleUtils {
+    --
+    +<u>clearConsole() : void
+    +<u>printTable(list: List<T>, excludedProperties: List<String>) : void
+    -<u>formatValue(value: Object) : String
+    -<u>printFormattedRow(row: List<String>, maxWidths: List<Integer>)
+    -<u>isGetter(method: Method) : boolean
+    -<u>getPropertyName(method: Method) : String
+    -<u>getId(object: Object) : Integer
+}
+
+class DatabaseManager {
+    -<u>DB_URL : String {readOnly}
+    -<u>SCHEMA_FILE : String {readOnly}
+    -<u>SEED_FILE : String {readOnly}
+    --
+    +<u>getConnection() : Connection
+    +<u>initializeDatabase() : void
+    -<u>promptResetAndSeed(conn: Connection) : void
+    -<u>resetAndSeedDatabase(conn : Connection) : void
+    -<u>executeSqlFile(conn: Connection, filePath: String) : void
+}
+}
+class Terminal {
+    - <u>loggedIn : boolean
+    - <u>applicationRunning : boolean
+    - <u>user : Object
+    - <u>debugMode : boolean
+    --
+    +<u>main(args: String[]) : void
+    +<u>run(isDebugMode: boolean) : void
+    -<u>logIn(scanner: Scanner) : void
+    -<u>runCommandLoop(commandsMap: Map<String, Command>, scanner: Scanner) : void
+}
+}
+
+Command <|-- CreateLessonCommand
+Command <|-- DeleteUserCommand
+Command <|-- AddDependentCommand
+Command <|-- CreateBookingCommand
+Command <|-- ViewEditBookingsCommand
+Command <|-- AcceptOfferingCommand
+Command <|-- ViewEditOfferingsCommand
+Command <|-- RegisterClientCommand
+Command <|-- RegisterInstructorCommand
+Command <|-- LogOutCommand
+Terminal -> utils : uses
+Terminal -> factories : uses
+factories -> commands : interfaces
+commands -> collections : uses
+collections -> models : manages
+models -> enums : uses
+@enduml

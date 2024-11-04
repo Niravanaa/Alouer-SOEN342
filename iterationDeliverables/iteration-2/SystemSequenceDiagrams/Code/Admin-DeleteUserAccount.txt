@@ -1,0 +1,25 @@
+@startuml
+actor "<u>:Admin" as admin
+participant "<u>:System" as system
+
+admin -> system : enterDeleteUserAccountCommandId()
+system --> admin : requestUserType
+admin -> system : sendUserType(userType)
+alt userType == UserType.CLIENT
+    system -> system : clients := getClients()
+    system -> system : display(clients)
+else userType == UserType.INSTRUCTOR
+    system -> system : instructors := getInstructors()
+    system -> system : display(instructors)
+end
+system --> admin : requestUserId
+admin -> system : enterUserId(userId)
+system --> admin : confirmDeletion
+admin -> system : confirmDeletion(true)
+system -> system : delete(userId)
+alt successful deletion
+    system --> admin : displaySuccess
+else deletion failure
+    system --> admin : displayFailure
+end
+@enduml
