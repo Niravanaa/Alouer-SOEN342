@@ -1,14 +1,14 @@
-package com.alouer.commands.registration;
+package com.alouer.commands.account;
 
 import com.alouer.commands.Command;
-import com.alouer.collections.InstructorCollection;
+import com.alouer.collections.ClientCollection;
 
 import java.util.Scanner;
 
-public class RegisterInstructorCommand implements Command {
+public class RegisterClientCommand implements Command {
     private Scanner scanner;
 
-    public RegisterInstructorCommand(Scanner scanner) {
+    public RegisterClientCommand(Scanner scanner) {
         this.scanner = scanner;
     }
 
@@ -23,25 +23,24 @@ public class RegisterInstructorCommand implements Command {
 
         String password = requestPassword();
 
-        if (InstructorCollection.getByEmail(email) != null) {
-            System.out.println("An instructor with this email already exists.");
-            scanner.next();
+        String phoneNumber = requestPhoneNumber();
+
+        if (ClientCollection.getByEmail(email) != null) {
+            System.out.println("\nA client with this email already exists.");
             return;
         }
 
-        boolean result = InstructorCollection.createInstructor(firstName, lastName, email, password);
-
-        if (result) {
-            System.out.println("Instructor registered successfully.");
+        if (ClientCollection.createClient(firstName, lastName, email, password, phoneNumber)) {
+            System.out.println("\nClient registered successfully.");
             return;
         } else {
-            System.out.println("Failed to register instructor.");
+            System.out.println("\nFailed to register client.");
             return;
         }
     }
 
     private String requestFirstName() {
-        System.out.println("Enter instructor's first name:");
+        System.out.print("\nEnter client's first name: ");
         while (true) {
             String input = scanner.nextLine().trim();
             if (input.matches("[A-Za-z]+")) {
@@ -52,7 +51,7 @@ public class RegisterInstructorCommand implements Command {
     }
 
     private String requestLastName() {
-        System.out.println("Enter instructor's last name:");
+        System.out.print("\nEnter client's last name: ");
         while (true) {
             String input = scanner.nextLine().trim();
             if (input.matches("[A-Za-z]+")) {
@@ -63,7 +62,7 @@ public class RegisterInstructorCommand implements Command {
     }
 
     private String requestEmail() {
-        System.out.println("Enter instructor's email:");
+        System.out.print("\nEnter client's email: ");
         while (true) {
             String input = scanner.nextLine().trim();
             if (input.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
@@ -74,7 +73,7 @@ public class RegisterInstructorCommand implements Command {
     }
 
     private String requestPassword() {
-        System.out.println("Enter instructor's password:");
+        System.out.print("\nEnter client's password: ");
         while (true) {
             String input = scanner.nextLine().trim();
             if (input.length() >= 6) {
@@ -83,4 +82,16 @@ public class RegisterInstructorCommand implements Command {
             System.out.println("Password must be at least 6 characters long.");
         }
     }
+
+    private String requestPhoneNumber() {
+        System.out.print("\nEnter client's phone number (format: xxx-xxx-xxxx): ");
+        while (true) {
+            String input = scanner.nextLine().trim();
+            if (input.matches("\\d{3}-\\d{3}-\\d{4}")) {
+                return input;
+            }
+            System.out.println("Phone number must be in the format xxx-xxx-xxxx.");
+        }
+    }
+
 }

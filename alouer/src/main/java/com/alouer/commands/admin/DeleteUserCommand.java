@@ -1,6 +1,5 @@
 package com.alouer.commands.admin;
 
-import com.alouer.models.Administrator;
 import com.alouer.models.Client;
 import com.alouer.models.Instructor;
 import com.alouer.utils.ConsoleUtils;
@@ -14,11 +13,9 @@ import java.util.List;
 import java.util.Scanner;
 
 public class DeleteUserCommand implements Command {
-    private Administrator admin;
     private Scanner scanner;
 
-    public DeleteUserCommand(Administrator admin, Scanner scanner) {
-        this.admin = admin;
+    public DeleteUserCommand(Scanner scanner) {
         this.scanner = scanner;
     }
 

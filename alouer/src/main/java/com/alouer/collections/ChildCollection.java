@@ -37,7 +37,7 @@ public class ChildCollection {
         return children;
     }
 
-    public static Child getById(int id) {
+    public static Child getById(Integer id) {
         Child child = null;
 
         try (Connection connection = DatabaseManager.getConnection();

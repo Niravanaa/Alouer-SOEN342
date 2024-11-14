@@ -1,12 +1,12 @@
-package com.alouer.commands.instructor;
+package com.alouer.commands.admin;
 
 import com.alouer.commands.Command;
+import com.alouer.collections.LessonCollection;
+import com.alouer.collections.LocationCollection;
 import com.alouer.collections.BookingCollection;
 import com.alouer.collections.ChildCollection;
 import com.alouer.collections.ClientCollection;
 import com.alouer.collections.InstructorCollection;
-import com.alouer.collections.LessonCollection;
-import com.alouer.collections.LocationCollection;
 import com.alouer.models.Child;
 import com.alouer.models.Client;
 import com.alouer.models.Instructor;
@@ -20,68 +20,86 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
-public class ViewEditOfferingsCommand implements Command {
-    private Instructor instructor;
+public class ViewDeleteLessonsCommand implements Command {
     private Scanner scanner;
 
-    public ViewEditOfferingsCommand(Instructor instructor, Scanner scanner) {
-        this.instructor = instructor;
+    public ViewDeleteLessonsCommand(Scanner scanner) {
         this.scanner = scanner;
     }
 
     @Override
     public void execute() {
-        List<Lesson> instructorLessons = LessonCollection.getByInstructorId(instructor.getId());
-
-        if (instructorLessons.isEmpty()) {
-            System.out.println("\nYou have no assigned lessons.");
-            scanner.nextLine();
-            return;
-        }
-
         while (true) {
-            instructorLessons = LessonCollection.getByInstructorId(instructor.getId());
+            List<Location> locations = LocationCollection.getLocations();
 
-            if (instructorLessons.isEmpty()) {
-                System.out.println("\nYou have no assigned lessons.");
+            ConsoleUtils.printTable(locations, Arrays.asList("Lessons"));
+
+            System.out.print("\nEnter a location ID to view its corresponding lessons, or -1 to return: ");
+            int locationId = requestLocationId(locations);
+
+            List<Lesson> allLessons = LessonCollection.getLessonsByLocationId(locationId);
+
+            if (allLessons.isEmpty()) {
+                System.out.println("\nNo lessons available.");
+                scanner.nextLine();
                 return;
             }
 
-            ConsoleUtils.printTable(instructorLessons,
-                    Arrays.asList("Id", "Location Id", "Is Available", "Assigned Instructor Id", "Booking Id",
-                            "Booking"));
+            ConsoleUtils.printTable(allLessons,
+                    Arrays.asList("Id", "Location Id", "Is Available", "Booking Id", "Booking",
+                            "Assigned Instructor Id"));
 
             System.out.print("\nEnter the ID of a lesson to view details or type -1 to exit: ");
-            Lesson selectedLesson = requestLessonId(instructorLessons);
-
+            Lesson selectedLesson = requestLessonId(allLessons);
             if (selectedLesson == null) {
                 break;
             }
 
             Location location = LocationCollection.getById(selectedLesson.getLocationId());
             List<Booking> bookings = BookingCollection.getByLessonId(selectedLesson.getId());
+            Instructor instructor = InstructorCollection.getById(selectedLesson.getAssignedInstructorId());
 
-            displayLessonDetails(selectedLesson, location, bookings);
+            displayLessonDetails(selectedLesson, location, bookings, instructor);
 
-            System.out.print("\nType 'u' to un-assign yourself from this offering or 'b' to go back: ");
+            System.out.print("\nType 'd' to delete this unassigned lesson or 'b' to go back: ");
             String userAction = scanner.nextLine().trim().toLowerCase();
 
-            if (userAction.equals("u")) {
-                selectedLesson.setAssignedInstructorId(null);
-                LessonCollection.updateLesson(selectedLesson);
-                InstructorCollection.update(instructor);
-                System.out.println("\nSuccessfully unassigned from the lesson.");
+            if (userAction.equals("d") && LessonCollection.delete(selectedLesson.getId())) {
+                System.out.println("\nLesson deleted successfully.");
+                scanner.nextLine();
             } else if (!userAction.equals("b")) {
-                System.out.println("\nInvalid selection. Please try again.");
+                System.out.println(
+                        "\nThe lesson cannot be deleted as it is assigned to an instructor.");
                 scanner.nextLine();
             }
         }
     }
 
-    private void displayLessonDetails(Lesson lesson, Location location, List<Booking> bookings) {
+    private Integer requestLocationId(List<Location> locations) {
+        int locationId = -1;
+        while (true) {
+            try {
+                String input = scanner.nextLine();
+                locationId = Integer.parseInt(input);
+
+                if (LocationCollection.getById(locationId) != null) {
+                    return locationId;
+                } else {
+                    System.out.print("\nInvalid ID. Please enter a valid location ID: ");
+                }
+            } catch (NumberFormatException e) {
+                System.out.print("\nInvalid input. Please enter a numeric ID: ");
+            }
+        }
+    }
+
+    private void displayLessonDetails(Lesson lesson, Location location, List<Booking> bookings, Instructor instructor) {
         System.out.println("\nLesson Details:");
         System.out.println("Lesson Title: " + lesson.getTitle());
-        System.out.println("Location: " + (location != null ? location.getName() : "Unknown"));
+        System.out.println("Location: " + location.getName());
+        System.out.println("Instructor: "
+                + (lesson.getAssignedInstructorId() != null ? instructor.getFirstName() + " " + instructor.getLastName()
+                        : "None"));
 
         if (bookings != null && !bookings.isEmpty()) {
             for (Booking booking : bookings) {
@@ -105,25 +123,25 @@ public class ViewEditOfferingsCommand implements Command {
 
     private Lesson requestLessonId(List<Lesson> lessons) {
         Lesson selectedLesson = null;
-        boolean invalidSelection = true;
+        boolean validSelection = false;
 
-        while (invalidSelection) {
+        while (!validSelection) {
             try {
                 int selection = Integer.parseInt(scanner.nextLine());
 
                 if (selection == -1) {
-                    return null;
+                    return selectedLesson;
                 }
 
                 for (Lesson lesson : lessons) {
                     if (lesson.getId() == selection) {
                         selectedLesson = lesson;
-                        invalidSelection = false;
+                        validSelection = true;
                         break;
                     }
                 }
 
-                if (invalidSelection) {
+                if (!validSelection) {
                     System.out.print("Invalid lesson ID. Please enter a valid lesson ID: ");
                 }
             } catch (InputMismatchException e) {

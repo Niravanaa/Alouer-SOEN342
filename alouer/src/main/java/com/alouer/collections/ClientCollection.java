@@ -8,7 +8,7 @@ import com.alouer.models.Client;
 import com.alouer.utils.DatabaseManager;
 
 public class ClientCollection {
-    private static final String INSERT_CLIENT_SQL = "INSERT INTO client (firstName, lastName, email, password, role) VALUES (?, ?, ?, ?, ?)";
+    private static final String INSERT_CLIENT_SQL = "INSERT INTO client (firstName, lastName, email, password, phoneNumber, role) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String SELECT_CLIENT_BY_ID_SQL = "SELECT * FROM client WHERE id = ?";
     private static final String SELECT_CLIENT_BY_EMAIL_SQL = "SELECT * FROM client WHERE email = ?";
     private static final String SELECT_ALL_CLIENTS_SQL = "SELECT * FROM client";
@@ -27,12 +27,13 @@ public class ClientCollection {
                         resultSet.getString("firstName"),
                         resultSet.getString("lastName"),
                         resultSet.getString("email"),
-                        resultSet.getString("password"));
+                        resultSet.getString("password"),
+                        resultSet.getString("phoneNumber"));
                 client.setId(resultSet.getInt("id"));
                 clients.add(client);
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
+            e.printStackTrace();
         }
         return clients;
     }
@@ -50,7 +51,8 @@ public class ClientCollection {
                             resultSet.getString("firstName"),
                             resultSet.getString("lastName"),
                             resultSet.getString("email"),
-                            resultSet.getString("password"));
+                            resultSet.getString("password"),
+                            resultSet.getString("phoneNumber"));
                     client.setId(resultSet.getInt("id"));
                 }
             }
@@ -73,7 +75,8 @@ public class ClientCollection {
                             resultSet.getString("firstName"),
                             resultSet.getString("lastName"),
                             resultSet.getString("email"),
-                            resultSet.getString("password"));
+                            resultSet.getString("password"),
+                            resultSet.getString("phoneNumber"));
                     client.setId(resultSet.getInt("id"));
                 }
             }
@@ -83,8 +86,9 @@ public class ClientCollection {
         return client;
     }
 
-    public static boolean createClient(String firstName, String lastName, String email, String password) {
-        Client newClient = new Client(firstName, lastName, email, password);
+    public static boolean createClient(String firstName, String lastName, String email, String password,
+            String phoneNumber) {
+        Client newClient = new Client(firstName, lastName, email, password, phoneNumber);
         return add(newClient);
     }
 
@@ -127,7 +131,8 @@ public class ClientCollection {
                             resultSet.getString("firstName"),
                             resultSet.getString("lastName"),
                             resultSet.getString("email"),
-                            resultSet.getString("password"));
+                            resultSet.getString("password"),
+                            resultSet.getString("phoneNumber"));
                     client.setId(resultSet.getInt("id"));
                     return client;
                 }

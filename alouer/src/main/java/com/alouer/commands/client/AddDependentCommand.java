@@ -46,7 +46,7 @@ public class AddDependentCommand implements Command {
     }
 
     private String requestFirstName() {
-        System.out.println("Enter dependent's first name:");
+        System.out.print("\nEnter dependent's first name: ");
         while (true) {
             String input = scanner.nextLine().trim();
             if (input.matches("[A-Za-z]+")) {
@@ -57,7 +57,7 @@ public class AddDependentCommand implements Command {
     }
 
     private String requestLastName() {
-        System.out.println("Enter dependent's last name:");
+        System.out.print("\nEnter dependent's last name: ");
         while (true) {
             String input = scanner.nextLine().trim();
             if (input.matches("[A-Za-z]+")) {
@@ -68,12 +68,12 @@ public class AddDependentCommand implements Command {
     }
 
     private LocalDate requestDateOfBirth() {
-        System.out.println("Enter dependent's date of birth (e.g., 'Jan 01, 2010' or '01-01-2010'):");
+        System.out.print("\nEnter dependent's date of birth (e.g., 'Jan 01, 2010' or '01-01-2010'): ");
 
         DateTimeFormatter[] formatters = {
-                DateTimeFormatter.ofPattern("MMM dd, yyyy"), // e.g., "Jan 01, 2010"
-                DateTimeFormatter.ofPattern("dd-MM-yyyy"), // e.g., "01-01-2010"
-                DateTimeFormatter.ofPattern("yyyy-MM-dd") // e.g., "2010-01-01"
+                DateTimeFormatter.ofPattern("MMM dd, yyyy"),
+                DateTimeFormatter.ofPattern("dd-MM-yyyy"),
+                DateTimeFormatter.ofPattern("yyyy-MM-dd")
         };
 
         while (true) {
@@ -85,7 +85,6 @@ public class AddDependentCommand implements Command {
                     dateOfBirth = LocalDate.parse(input, formatter);
                     break;
                 } catch (DateTimeParseException e) {
-                    // Continue to next formatter if parsing fails
                 }
             }
 

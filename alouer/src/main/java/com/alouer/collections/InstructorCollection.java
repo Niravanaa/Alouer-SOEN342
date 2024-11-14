@@ -8,8 +8,8 @@ import com.alouer.models.Instructor;
 import com.alouer.utils.DatabaseManager;
 
 public class InstructorCollection {
-    private static final String UPDATE_INSTRUCTOR_SQL = "UPDATE instructor SET firstName = ?, lastName = ?, email = ?, password = ? WHERE id = ?";
-    private static final String INSERT_INSTRUCTOR_SQL = "INSERT INTO instructor (firstName, lastName, email, password, role) VALUES (?, ?, ?, ?, ?)";
+    private static final String UPDATE_INSTRUCTOR_SQL = "UPDATE instructor SET firstName = ?, lastName = ?, email = ?, password = ?, phoneNumber = ? WHERE id = ?";
+    private static final String INSERT_INSTRUCTOR_SQL = "INSERT INTO instructor (firstName, lastName, email, password, phoneNumber, role) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String SELECT_INSTRUCTOR_BY_ID_SQL = "SELECT * FROM instructor WHERE id = ?";
     private static final String SELECT_INSTRUCTOR_BY_EMAIL_SQL = "SELECT * FROM instructor WHERE email = ?";
     private static final String SELECT_ALL_INSTRUCTORS_SQL = "SELECT * FROM instructor";
@@ -28,7 +28,8 @@ public class InstructorCollection {
                         resultSet.getString("firstName"),
                         resultSet.getString("lastName"),
                         resultSet.getString("email"),
-                        resultSet.getString("password"));
+                        resultSet.getString("password"),
+                        resultSet.getString("phoneNumber"));
                 instructor.setId(resultSet.getInt("id"));
                 instructors.add(instructor);
             }
@@ -51,7 +52,8 @@ public class InstructorCollection {
                             resultSet.getString("firstName"),
                             resultSet.getString("lastName"),
                             resultSet.getString("email"),
-                            resultSet.getString("password"));
+                            resultSet.getString("password"),
+                            resultSet.getString("phoneNumber"));
                     instructor.setId(resultSet.getInt("id"));
                 }
             }
@@ -74,7 +76,8 @@ public class InstructorCollection {
                             resultSet.getString("firstName"),
                             resultSet.getString("lastName"),
                             resultSet.getString("email"),
-                            resultSet.getString("password"));
+                            resultSet.getString("password"),
+                            resultSet.getString("phoneNumber"));
                     instructor.setId(resultSet.getInt("id"));
                 }
             }
@@ -84,8 +87,9 @@ public class InstructorCollection {
         return instructor;
     }
 
-    public static boolean createInstructor(String firstName, String lastName, String email, String password) {
-        Instructor newInstructor = new Instructor(firstName, lastName, email, password);
+    public static boolean createInstructor(String firstName, String lastName, String email, String password,
+            String phoneNumber) {
+        Instructor newInstructor = new Instructor(firstName, lastName, email, password, phoneNumber);
         return add(newInstructor);
     }
 
@@ -128,7 +132,8 @@ public class InstructorCollection {
                             resultSet.getString("firstName"),
                             resultSet.getString("lastName"),
                             resultSet.getString("email"),
-                            resultSet.getString("password"));
+                            resultSet.getString("password"),
+                            resultSet.getString("phoneNumber"));
                     instructor.setId(resultSet.getInt("id"));
                     return instructor;
                 }

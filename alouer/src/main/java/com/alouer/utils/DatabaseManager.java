@@ -41,9 +41,9 @@ public class DatabaseManager {
     private static void resetAndSeedDatabase(Connection conn) {
         try {
             System.out.println("Resetting database...");
-            executeSqlFile(conn, SCHEMA_FILE); // Reapply schema
+            executeSqlFile(conn, SCHEMA_FILE);
             System.out.println("Seeding initial data...");
-            executeSqlFile(conn, SEED_FILE); // Reinsert seed data
+            executeSqlFile(conn, SEED_FILE);
         } catch (Exception e) {
             System.err.println("Error resetting and seeding database: " + e.getMessage());
         }
