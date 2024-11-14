@@ -1,6 +1,5 @@
 package com.alouer.commands.admin;
 
-import com.alouer.models.Administrator;
 import com.alouer.models.Location;
 import com.alouer.utils.ConsoleUtils;
 
@@ -14,11 +13,10 @@ import com.alouer.commands.Command;
 import com.alouer.enums.LessonType;
 
 public class CreateLessonCommand implements Command {
-    private Administrator admin;
     private Scanner scanner;
 
-    public CreateLessonCommand(Administrator admin, Scanner scanner) {
-        this.admin = admin;
+    public CreateLessonCommand(Scanner scanner) {
+        this.scanner = scanner;
     }
 
     @Override
@@ -27,52 +25,57 @@ public class CreateLessonCommand implements Command {
 
         ConsoleUtils.printTable(locations, Arrays.asList("Lessons"));
 
-        System.out.println("\nEnter a location ID to view its corresponding lessons: ");
-
-        // Request Location ID
+        System.out.print("\nEnter the location ID for which you wish to create a new lesson: ");
         int locationId = requestLocationId(locations);
 
-        // Request lesson type
         LessonType lessonType = requestLessonTypeInput();
 
-        // Request startTime and endTime
         String startTime = requestTimeInput("start time (HH:mm)");
         String endTime = requestTimeInput("end time (HH:mm)");
 
-        // Validate that endTime is greater than startTime
         while (!isEndTimeGreaterThanStartTime(startTime, endTime)) {
-            System.out.println("End time must be greater than start time. Please enter valid times again.");
+            System.out.println("\nEnd time must be greater than start time. Please enter valid times again.");
             startTime = requestTimeInput("start time (HH:mm)");
             endTime = requestTimeInput("end time (HH:mm)");
         }
 
-        // Request title of lesson
         String title = requestTitle();
 
-        // Request schedule
         String schedule = requestScheduleInput();
 
-        // Request confirmation
         String confirmation = requestConfirmation(locationId, startTime, endTime, schedule);
 
         if ("yes".equals(confirmation) && LessonCollection.validateLesson(locationId, startTime, endTime, schedule)
                 && LessonCollection.createLesson(locationId, title, lessonType, startTime, endTime, schedule)) {
-            System.out.println("Successfully created a new lesson.");
+            System.out.println("\nSuccessfully created a new lesson.");
+        } else if ("no".equals(confirmation)) {
+            System.out.println("\nLesson creation terminated.");
         } else {
-            System.out.println("There was an error creating the lesson");
+            System.out.println("\nThere was an error creating the lesson.");
         }
     }
 
-    private String requestConfirmation(Integer locationId, String startTime, String endTime,
-            String schedule) {
-        System.out.println("\nPlease confirm the details:");
-        System.out.println("Location ID: " + locationId);
-        System.out.println("Start Time: " + startTime);
-        System.out.println("End Time: " + endTime);
-        System.out.println("Schedule: " + schedule);
-        System.out.println("Is this correct? (yes/no)");
+    private String requestConfirmation(Integer locationId, String startTime, String endTime, String schedule) {
+        String response;
 
-        return scanner.nextLine().trim().toLowerCase();
+        while (true) {
+            System.out.println("\nPlease confirm the details:");
+            System.out.println("Location ID: " + locationId);
+            System.out.println("Start Time: " + startTime);
+            System.out.println("End Time: " + endTime);
+            System.out.println("Schedule: " + schedule);
+
+            System.out.print("\nIs this correct? (yes/no): ");
+            response = scanner.nextLine().trim().toLowerCase();
+
+            if (response.equals("yes") || response.equals("no")) {
+                break;
+            } else {
+                System.out.println("\nInvalid input. Please enter 'yes' or 'no'.");
+            }
+        }
+
+        return response;
     }
 
     private Integer requestLocationId(List<Location> locations) {
@@ -82,13 +85,21 @@ public class CreateLessonCommand implements Command {
                 String input = scanner.nextLine();
                 locationId = Integer.parseInt(input);
 
-                if (locationId - 1 >= -1 && locationId - 1 < locations.size()) {
+                boolean validId = false;
+                for (Location location : locations) {
+                    if (location.getId() == locationId) {
+                        validId = true;
+                        break;
+                    }
+                }
+
+                if (validId) {
                     return locationId;
                 } else {
-                    System.out.println("Invalid ID. Please enter a valid location ID: ");
+                    System.out.print("\nInvalid ID. Please enter a valid location ID: ");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a numeric ID: ");
+                System.out.print("\nInvalid input. Please enter a numeric ID: ");
             }
         }
     }
@@ -96,14 +107,14 @@ public class CreateLessonCommand implements Command {
     private LessonType requestLessonTypeInput() {
         LessonType lessonType = null;
         while (true) {
-            System.out.println("Please enter the lesson type (PRIVATE or GROUP): ");
+            System.out.print("\nPlease enter the lesson type (PRIVATE or GROUP): ");
             String input = scanner.nextLine().trim().toUpperCase();
 
             try {
                 lessonType = LessonType.valueOf(input);
                 return lessonType;
             } catch (IllegalArgumentException e) {
-                System.out.println("Invalid lesson type. Please enter either 'PRIVATE' or 'GROUP'.");
+                System.out.println("\nInvalid lesson type.");
             }
         }
     }
@@ -111,12 +122,12 @@ public class CreateLessonCommand implements Command {
     private String requestTimeInput(String timeType) {
         String time;
         while (true) {
-            System.out.println("Please enter the " + timeType + ": ");
+            System.out.print("\nPlease enter the " + timeType + ": ");
             time = scanner.nextLine().trim();
             if (time.matches("^(2[0-3]|[01]?[0-9]):[0-5][0-9]$")) {
                 return time;
             } else {
-                System.out.println("Invalid time format. Please use military time (HH:mm).");
+                System.out.println("\nInvalid time format. Please use military time (HH:mm).");
             }
         }
     }
@@ -137,7 +148,7 @@ public class CreateLessonCommand implements Command {
         String schedule;
         String[] validDays = { "M", "Tu", "W", "Th", "F", "Sa", "Su" };
         while (true) {
-            System.out.println("Please enter the schedule (e.g., M-Tu-W): ");
+            System.out.print("\nPlease enter the schedule (e.g., M-Tu-W): ");
             schedule = scanner.nextLine().trim();
             String[] days = schedule.split("-");
 
@@ -152,7 +163,7 @@ public class CreateLessonCommand implements Command {
             if (valid) {
                 return schedule;
             } else {
-                System.out.println("Invalid schedule format. Please use the format M-Tu-W-Th-F-Sa-Su.");
+                System.out.println("\nInvalid schedule format. Please use the format M-Tu-W-Th-F-Sa-Su.");
             }
         }
     }
@@ -160,15 +171,15 @@ public class CreateLessonCommand implements Command {
     private String requestTitle() {
         String title;
         while (true) {
-            System.out.println("Please enter the lesson title: ");
+            System.out.print("\nPlease enter the lesson title: ");
             title = scanner.nextLine().trim();
 
             if (!title.isEmpty() && title.length() <= 100) {
                 return title;
             } else if (title.isEmpty()) {
-                System.out.println("Title cannot be empty. Please enter a valid title.");
+                System.out.println("\nTitle cannot be empty. Please enter a valid title.");
             } else {
-                System.out.println("Title is too long. Please keep it under 100 characters.");
+                System.out.println("\nTitle is too long. Please keep it under 100 characters.");
             }
         }
     }

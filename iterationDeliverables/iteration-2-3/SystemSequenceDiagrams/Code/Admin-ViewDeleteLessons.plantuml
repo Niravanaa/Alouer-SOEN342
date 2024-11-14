@@ -1,0 +1,36 @@
+@startuml System Sequence Diagram for Admin's "View or Delete Lessons" Use Case
+title System Sequence Diagram for Admin's "View or Delete Lessons" Use Case
+skinparam sequenceMessageAlign center 
+
+actor "<u>:Administrator" as admin
+participant "<u>:System" as system
+
+loop while (true)
+    admin -> system : enterViewDeleteLessonsCommandId()
+    system --> admin : requestLocationId
+    admin -> system : enterLocationId(locationId)
+    alt location Id entered
+        system -> system : lessons := getLessonsByLocationId(locationId)
+        system -> system : display(lessons)
+        system --> admin : requestLessonId
+        admin -> system : enterLessonId(lessonId)
+        system -> system : lesson := getLessonById(lessonId)
+        system -> system : location := getLocationByLessonId(lessonId)
+        system -> system : bookings := getBookingsByLessonId(lessonId)
+        system -> system : instructor := getInstructorByByLessonId(lessonId)
+        system -> system : display(lesson, location, bookings, instructor)
+        system --> admin : requestResponse
+        admin -> system : enterResponse(response)
+        alt response == "delete"
+            system -> system : delete(lessonId)
+            alt successful deletion
+                system --> admin : displaySuccess
+            else deletion failure
+                system --> admin : displayError
+            end
+        end
+    else admin wishes to exit
+        system -> system : break
+        system --> admin : mainMenu
+end
+@enduml

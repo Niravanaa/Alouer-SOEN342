@@ -1,0 +1,39 @@
+@startuml System Sequence Diagram for Client's "View or Edit Bookings" Use Case
+title System Sequence Diagram for Client's "View or Edit Bookings" Use Case
+skinparam sequenceMessageAlign center 
+
+actor "<u>:Client" as client
+participant "<u>:System" as system
+
+client -> system : enterViewEditBookingsCommandId()
+system -> client : getId()
+client --> system : clientId
+loop while (true)
+    system -> system : bookings := getByClientId(clientId)
+    system -> system : display(bookings)
+    system --> client : requestBookingId
+    alt booking Id entered
+        client -> system : enterBookingId(bookingId)
+        system -> system : booking = getById(bookingId)
+        system -> system : lesson = getById(booking.getLessonId())
+        system -> system : location = getById(lesson.getLocationId())
+        system -> system : instructor = getById(lesson.getAssignedInstructorId())
+        system -> system : child = getById(booking.getChildId())
+        system -> system : display(lesson, location, instructor, child)
+        system --> client : requestResponse
+        client -> system : enterResponse(response)
+        alt response == "delete"
+            system -> system : delete(bookingId)
+            alt successful deletion
+                system --> client : displaySuccess
+            else deletion failure
+                system --> client : displayError
+            end
+        end
+    else client wishes to exit
+        system -> system : break
+        system --> client : mainMenu
+    end
+end
+
+@enduml

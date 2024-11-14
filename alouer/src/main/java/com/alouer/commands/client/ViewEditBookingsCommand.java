@@ -14,7 +14,7 @@ import com.alouer.models.lessonManagement.Booking;
 import com.alouer.models.lessonManagement.Lesson;
 import com.alouer.utils.ConsoleUtils;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -30,59 +30,102 @@ public class ViewEditBookingsCommand implements Command {
 
     @Override
     public void execute() {
-        boolean keepViewing = true;
 
         List<Booking> clientBookings = BookingCollection.getByClientId(client.getId());
 
         if (clientBookings.isEmpty()) {
-            System.out.println("You have no bookings.");
+            System.out.println("\nYou have no bookings.");
+            scanner.nextLine();
             return;
         }
 
-        while (keepViewing) {
+        while (true) {
             clientBookings = BookingCollection.getByClientId(client.getId());
 
             if (clientBookings.isEmpty()) {
-                System.out.println("You have no bookings.");
+                System.out.println("\nYou have no bookings.");
+                scanner.nextLine();
                 return;
             }
 
-            ConsoleUtils.printTable(clientBookings,
-                    Arrays.asList("Id", "Client Id", "Lesson Id", "Child Id"));
+            List<String> headers = new ArrayList<>();
+            headers.add("Booking ID");
+            headers.add("Lesson Title");
+            headers.add("Location Name");
+            headers.add("Instructor Name");
+            headers.add("Child Name");
 
-            System.out.print("Enter the ID of a lesson to view details or type -1 to exit: ");
+            List<Integer> bookingIds = new ArrayList<>();
+            List<String> lessonTitles = new ArrayList<>();
+            List<String> locationNames = new ArrayList<>();
+            List<String> instructorNames = new ArrayList<>();
+            List<String> childNames = new ArrayList<>();
+
+            for (Booking booking : clientBookings) {
+                Lesson lesson = LessonCollection.getById(booking.getLessonId());
+                Location location = LocationCollection.getById(lesson.getLocationId());
+                Instructor instructor = InstructorCollection.getById(lesson.getAssignedInstructorId());
+                Child child = null;
+
+                if (booking.getChildId() != null) {
+                    child = ChildCollection.getById(booking.getChildId());
+                }
+
+                String locationName = location.getName();
+                String instructorName = instructor.getFirstName();
+                String childName = (child != null) ? child.getFirstName() + " " + child.getLastName() : "N/A";
+
+                bookingIds.add(booking.getId());
+                lessonTitles.add(lesson.getTitle());
+                locationNames.add(locationName);
+                instructorNames.add(instructorName);
+                childNames.add(childName);
+            }
+
+            ConsoleUtils.printMultipleListsAsTable(
+                    headers,
+                    bookingIds,
+                    lessonTitles,
+                    locationNames,
+                    instructorNames,
+                    childNames);
+
+            System.out.print("\nEnter the ID of a lesson to view details or type -1 to exit: ");
             int bookingId = requestBookingId(clientBookings);
             if (bookingId == -1) {
-                keepViewing = false;
+                break;
             }
 
             Booking selectedBooking = BookingCollection.getById(bookingId);
 
             if (selectedBooking == null) {
-                System.out.println("The selected booking does not exist. Please try again");
+                System.out.println("\nThe selected booking does not exist. Please try again");
             }
 
             Lesson selectedLesson = LessonCollection.getById(selectedBooking.getLessonId());
 
             Location location = LocationCollection.getById(selectedLesson.getLocationId());
             Instructor instructor = InstructorCollection.getById(selectedLesson.getAssignedInstructorId());
-            Child child = ChildCollection.getById(selectedBooking.getChildId());
+            Child child = null;
 
-            displayLessonDetails(selectedLesson, location, instructor, child);
+            if (selectedBooking.getChildId() != null) {
+                child = ChildCollection.getById(selectedBooking.getChildId());
+            }
 
-            System.out.print("Type 'd' to delete this booking or 'b' to go back: ");
-            String userAction = scanner.next().trim().toLowerCase();
+            displayBookingDetails(selectedLesson, location, instructor, child);
+
+            System.out.print("\nType 'd' to delete this booking or 'b' to go back: ");
+            String userAction = scanner.nextLine().trim().toLowerCase();
 
             if (userAction.equals("d") && BookingCollection.delete(bookingId)) {
-                keepViewing = true;
-                System.out.println("Successfully deleted the booking.");
+                System.out.println("\nSuccessfully deleted the booking.");
             } else if (!userAction.equals("b")) {
-                System.out.println("Invalid selection. Please try again.");
+                System.out.println("\nInvalid selection. Please try again.");
             }
         }
     }
 
-    private void displayLessonDetails(Lesson lesson, Location location, Instructor instructor, Child child) {
+    private void displayBookingDetails(Lesson lesson, Location location, Instructor instructor, Child child) {
         System.out.println("\nLesson Details:");
         System.out.println("Lesson ID: " + lesson.getId());
         System.out.println("Location: " + (location != null ? location.getName() : "Unknown"));
@@ -90,33 +133,23 @@ public class ViewEditBookingsCommand implements Command {
                 + (instructor != null ? instructor.getFirstName() + " " + instructor.getLastName() : "Unknown"));
         if (child != null)
             System.out.println("Child: " + child.getFirstName() + " " + child.getLastName());
-        System.out.println();
     }
 
     private Integer requestBookingId(List<Booking> clientBookings) {
         int bookingId = -1;
-        boolean keepViewing = false;
 
         try {
-            while (!keepViewing) {
-                System.out.print("Enter a booking ID (or -1 to cancel): ");
-                bookingId = scanner.nextInt();
+            while (true) {
+                bookingId = Integer.parseInt(scanner.nextLine());
 
-                int maxBookingId = clientBookings.stream()
-                        .mapToInt(Booking::getId)
-                        .max()
-                        .orElse(-1);
-
-                if ((bookingId >= 0 && bookingId <= maxBookingId && BookingCollection.getById(bookingId) != null)
-                        || bookingId == -1) {
-                    keepViewing = true;
+                if (bookingId == -1 || (BookingCollection.getById(bookingId) != null)) {
+                    break;
                 } else {
-                    System.out.println("Invalid booking ID. Please try again.");
+                    System.out.print("\nInvalid booking ID. Please try again: ");
                 }
             }
         } catch (InputMismatchException e) {
-            System.out.println("Invalid input. Please enter a valid integer.");
-            scanner.next();
+            System.out.print("\nInvalid input. Please enter a valid integer: ");
         }
         return bookingId;
     }

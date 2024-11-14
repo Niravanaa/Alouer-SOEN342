@@ -1,0 +1,25 @@
+@startuml System Sequence Diagram for Instructor's "View or Edit Bookings" Use Case
+title System Sequence Diagram for Instructor's "View or Edit Bookings" Use Case
+skinparam sequenceMessageAlign center 
+
+actor "<u>:Instructor" as instructor
+participant "<u>:System" as system
+
+instructor -> system : enterAcceptOfferingCommandId()
+system -> system: locations := getLocations()
+system -> system : display(locations)
+system --> instructor : requestLocationId()
+instructor -> system : enterLocationId(locationId)
+system -> system : availableLessons := getUnassignedLessons(locationId)
+system -> system : display(availableLessons)
+system --> instructor : requestLessonId()
+instructor -> system : enterLessonId(lessonId)
+system -> instructor : getId()
+instructor --> system : instructorId
+system -> system : updateLesson(lessonId, instructorId)
+alt successful update
+    system --> instructor : displaySuccess
+else update failure
+    system --> instructor : displayFailure
+end
+@enduml

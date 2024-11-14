@@ -1,0 +1,56 @@
+@startuml Interaction Diagram for Instructor's "Accept Offering" Use Case
+title Interaction Diagram for Instructor's "Accept Offering" Use Case
+skinparam sequenceMessageAlignment center
+
+actor ":<u>Instructor" as instructor
+participant ":<u>Terminal" as terminal
+participant ":<u>AcceptOfferingCommand" as command
+participant "LocationCollection" as locationCollection
+participant "LessonCollection" as lessonCollection
+
+participant "ConsoleUtils" as cUtil
+participant "selectedLesson:<u>Lesson" as selectedLesson
+participant "DatabaseManager" as databaseManager
+
+instructor -> terminal : enterAcceptOfferingCommandId()
+terminal -> command : execute()
+
+command -> locationCollection : getLocations()
+locationCollection -> databaseManager : getConnection()
+databaseManager --> locationCollection : connection
+locationCollection --> command : locations
+command -> cUtil : printTable(locations, nonDisplayProperties)
+
+command -> command : requestLocationId(locations)
+instructor -> command : enterLocationId(locationId)
+command -> lessonCollection : getUnassignedLessons(locationId)
+lessonCollection -> lessonCollection : getLessons()
+lessonCollection -> databaseManager : getConnection()
+databaseManager --> lessonCollection : connection
+lessonCollection --> command : lessons
+command -> cUtil : printTable(availableLessons, nonDisplayProperties)
+command -> command : requestLessonId(lessons)
+instructor -> command : enterLessonId(lessonId)
+command -> selectedLesson : getAssignedInstructorId()
+selectedLesson --> command : assignedInstructorId
+alt lesson not already assigned to an instructor
+    command -> instructor : getId()
+    instructor --> command : instructorId
+    command -> selectedLesson : setAssignedInstructorId(instructorId)
+    command --> lessonCollection : update(selectedLesson)
+    lessonCollection -> databaseManager : getConnection()
+    databaseManager --> lessonCollection : connection
+    alt successful update
+        lessonCollection --> command : success
+        command --> terminal : success
+        terminal --> instructor : displaySuccess
+    else update failure
+        lessonCollection --> command : failure
+        command --> terminal : failure
+        terminal --> instructor : displayFailure
+    end
+else lesson already assigned to an instructor
+    command --> terminal : failure
+    terminal --> instructor : displayError
+end
+@enduml

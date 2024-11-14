@@ -1,0 +1,50 @@
+@startuml Interaction Diagram for Instructor's "Register as Instructor" Use Case
+title Interaction Diagram for Instructor's "Register as Instructor" Use Case
+skinparam sequenceMessageAlignment center
+
+actor "User" as user
+participant "<u>:Terminal" as terminal
+participant "<u>:RegisterInstructorCommand" as command
+participant "<u>:InstructorCollection" as instructorCollection
+participant "DatabaseManager" as databaseManager
+participant "<u>Instructor:Instructor" as newInstructorObj
+
+user -> terminal : enterRegisterInstructorCommandId()
+terminal -> command : execute()
+command -> command : requestFirstName()
+user -> command : enterFirstName(firstName)
+command -> command : requestLastName()
+user -> command : enterLastName(lastName)
+command -> command : requestEmail()
+user -> command : enterEmail(email)
+command -> command : requestPassword()
+user -> command : enterPassword(password)
+command -> command : requestPhoneNumber()
+user -> command : enterPhoneNumber()
+
+command -> instructorCollection : getByEmail(email)
+instructorCollection -> databaseManager : getConnection()
+databaseManager --> instructorCollection : connection
+instructorCollection --> command : instructor
+
+alt no existing instructor found
+    command -> instructorCollection : createInstructor(firstName, lastName, email, password, phoneNumber)
+    instructorCollection -> newInstructorObj ** : new Instructor(firstName, lastName, email, password, phoneNumber)
+    newInstructorObj --> instructorCollection : newInstructorObj
+    instructorCollection -> instructorCollection : add(newInstructorObj)
+    instructorCollection -> databaseManager : getConnection()
+    databaseManager --> instructorCollection : connection
+    alt successful creation
+        instructorCollection --> command : success
+        command --> terminal : success
+        terminal --> user : displaySuccess
+    else creation failure
+        instructorCollection --> command : failure
+        command --> terminal : failure
+        terminal --> user : displayError
+    end
+else instructor already exists
+    command --> terminal : faillure
+    terminal --> user : displayError
+end
+@enduml

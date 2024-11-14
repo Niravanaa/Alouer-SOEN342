@@ -1,0 +1,72 @@
+@startuml Interaction Diagram for Client's "View or Edit Bookings" Use Case
+title Interaction Diagram for Client's "View or Edit Bookings" Use Case
+skinparam sequenceMessageAlignment center
+
+actor "<u>:Client" as client
+participant "<u>:Terminal" as terminal
+participant "<u>:ViewEditBookingsCommand" as command
+participant "ConsoleUtils" as consoleUtils
+participant "<u>:LocationCollection" as locationCollection
+participant "<u>:ChildCollection" as childCollection
+participant "<u>:BookingCollection" as bookingCollection
+participant "<u>:LessonCollection" as lessonCollection
+participant "<u>:InstructorCollection" as instructorCollection
+participant "DatabaseManager" as databaseManager
+
+client -> terminal : enterViewEditBookingsCommandId()
+terminal -> command : execute()
+loop while True
+    command -> bookingCollection : getByClientId(clientId)
+    bookingCollection -> databaseManager : getConnection()
+    databaseManager --> bookingCollection : connection
+    bookingCollection --> command : bookings
+    command -> command : headers := new ArrayList<>(Arrays.asList("Booking ID", "Lesson Title", "Location Name", "Instructor Name", "Child Name"))
+    command -> command : lessons := new List<Lesson>()
+    command -> command : locations := new List<Location>()
+    command -> command : instructors := new List<Instructor>()
+    command -> command : children := new List<Child>()
+    loop for each booking in bookings :
+        command -> command : lessons.add(LessonCollection.getById(booking.getLessonId()))
+        command -> command : locations.add(LocationCollection.getById(lesson.getLocationId()))
+        command -> command : instructors.add(InstructorCollection.getById(lesson.getAssignedInstructorId()))
+        alt if child is associated to booking
+            command -> command : children.add(ChildCollection.getById(booking.getChildId()))
+        else
+            command -> command : children.add(null)
+        end
+    end
+
+    command -> consoleUtils : printMultipleListsAsTable(headers, bookingIds, lessonTitles, locationNames, instructorNames, childNames)
+    command -> command : requestBookingId(bookings)
+    client -> command : enterBookingId(bookingId)
+
+    command -> bookingCollection : getById(bookingId)
+    bookingCollection --> command : booking
+    command -> lessonCollection : getById(booking.getLessonId())
+    lessonCollection --> command : lesson
+    command -> locationCollection : getById(lesson.getLocationId())
+    locationCollection --> command : location
+    command -> instructorCollection : getById(lesson.getAssignedInstructorId())
+    instructorCollection --> command : instructor
+    command -> childCollection : getById(booking.getChildId())
+    childCollection --> command : child
+    command -> command : displayLessonDetails(selectedLesson, location, instructor, child)
+    command -> command : requestResponse()
+    client -> command : enterResponse(response)
+    alt response == "delete"
+        command -> bookingCollection : delete(bookingId)
+        bookingCollection -> databaseManager : getConnection()
+        databaseManager --> bookingCollection : connection
+        alt successful deletion
+            bookingCollection --> command : success
+            command --> terminal : success
+            terminal --> client : displaySuccess
+        else deletion failure
+            bookingCollection --> command : failure
+            command --> terminal : failure
+            terminal --> client : displayError
+        end
+    end
+end
+
+@enduml

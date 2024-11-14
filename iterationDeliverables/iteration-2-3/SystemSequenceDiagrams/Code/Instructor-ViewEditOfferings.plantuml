@@ -1,0 +1,35 @@
+@startuml System Sequence Diagram for Instructor's "View or Edit Offerings" Use Case
+title System Sequence Diagram for Instructor's "View or Edit Offerings" Use Case
+skinparam sequenceMessageAlign center
+
+actor "<u>:Instructor" as instructor
+participant "<u>:System" as system
+
+instructor -> system : enterViewEditOfferingsCommandId()
+system -> instructor : getId()
+instructor --> system : instructorId
+loop while (true)
+    system -> system : instructorLessons := getByInstructorId(instructorId)
+    system -> system : display(instructorLessons)
+    system --> instructor : requestLessonIdOrExit
+    instructor -> system : enterlessonId(lessonId)
+    alt lessonId provided
+        system -> system : selectedLesson := getLessonDetails(lessonId)
+        system -> system : location := getLessonLocation(lessonId)
+        system -> system : client := getLessonClient(lessonId)
+        system -> system : display(selectedLesson, location, client)
+        system --> instructor : requestUnassignOrReturn
+        instructor -> system : enterResponse(response)
+        alt response == "unassign"
+            system -> system : selectedLesson.unassignedInstructorId()
+            system -> system : updateDb(selectedLesson)
+            system --> instructor : displaySuccess
+        else
+            system --> instructor : display(instructorLessons)
+        end
+    else instructor wishes to exit
+        system -> system : break
+        system --> instructor : mainMenu
+    end
+end
+@enduml

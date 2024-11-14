@@ -3,6 +3,7 @@
 | 1.0             | 2024-10-16 | Initial version            | Nirav Patel                | Internal Announcement   |
 | 1.1             | 2024-10-22 | Refactor use case diagrams | Nirav Patel                | Internal Announcement   |
 | 1.2             | 2024-11-03 | Refactor use case diagrams | Nirav Patel, Laurenz Gomez | Internal Announcement   |
+| 1.3             | 2024-11-13 | Refactor use case diagrams | Nirav Patel, Laurenz Gomez | Internal Announcement   |
 
 # Table of Contents
 
@@ -44,6 +45,14 @@
 | Participating Actor | Administrator                                         |
 | Entry Condition     | Administrator is logged in.                           |
 | Exit Condition      | The selected user account is deleted from the system. |
+
+## View or Delete Lessons
+
+| Name                | Delete User Account                             |
+| ------------------- | ----------------------------------------------- |
+| Participating Actor | Administrator                                   |
+| Entry Condition     | Administrator is logged in.                     |
+| Exit Condition      | The selected lesson is deleted from the system. |
 
 ## Use Case Diagram for Administrator
 
