@@ -33,15 +33,15 @@ public class AddDependentCommand implements Command {
             return;
 
         if (ChildCollection.validateChild(client.getId(), firstName, lastName, dateOfBirth)) {
-            System.out.println("A dependent with these details already exists.");
+            System.out.println("\nA dependent with these details already exists.");
             return;
         }
 
         Integer newChildId = ChildCollection.createChild(client.getId(), firstName, lastName, dateOfBirth);
         if (newChildId != null) {
-            System.out.println("Dependent added successfully.");
+            System.out.println("\nDependent added successfully.");
         } else {
-            System.out.println("Failed to add dependent.");
+            System.out.println("\nFailed to add dependent.");
         }
     }
 

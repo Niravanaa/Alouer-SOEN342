@@ -102,7 +102,8 @@ public class InstructorCollection {
             statement.setString(2, instructor.getLastName());
             statement.setString(3, instructor.getEmail());
             statement.setString(4, instructor.getPassword());
-            statement.setString(5, instructor.getRole().toString());
+            statement.setString(5, instructor.getPhoneNumber());
+            statement.setString(6, instructor.getRole().toString());
 
             int rowsInserted = statement.executeUpdate();
             if (rowsInserted > 0) {

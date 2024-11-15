@@ -28,14 +28,7 @@ public class DatabaseManager {
     }
 
     private static void promptResetAndSeed(Connection conn, Scanner scanner) {
-        System.out.print("Would you like to reset and seed the database? (yes/no): ");
-        String response = scanner.nextLine().trim().toLowerCase();
-
-        if (response.equals("yes")) {
-            resetAndSeedDatabase(conn);
-        } else {
-            System.out.println("Database initialization complete without resetting.");
-        }
+        resetAndSeedDatabase(conn);
     }
 
     private static void resetAndSeedDatabase(Connection conn) {

@@ -41,9 +41,9 @@ public class DeleteUserCommand implements Command {
 
             if (confirmDeletion()) {
                 ClientCollection.delete(userId);
-                System.out.println("Client with ID " + userId + " has been deleted.");
+                System.out.println("\nClient with ID " + userId + " has been deleted.");
             } else {
-                System.out.println("Deletion cancelled.");
+                System.out.println("\nDeletion cancelled.");
             }
         } else if (userType == UserType.INSTRUCTOR) {
             List<Instructor> instructors = InstructorCollection.getInstructors();
@@ -58,15 +58,15 @@ public class DeleteUserCommand implements Command {
 
             if (confirmDeletion()) {
                 InstructorCollection.delete(userId);
-                System.out.println("Instructor with ID " + userId + " has been deleted.");
+                System.out.println("\nInstructor with ID " + userId + " has been deleted.");
             } else {
-                System.out.println("Deletion cancelled.");
+                System.out.println("\nDeletion cancelled.");
             }
         }
     }
 
     private UserType requestUserType() {
-        System.out.println("Would you like to delete a CLIENT or INSTRUCTOR?");
+        System.out.print("\nWould you like to delete a CLIENT or INSTRUCTOR: ");
         while (true) {
             String input = scanner.nextLine().trim().toUpperCase();
             try {
@@ -74,16 +74,16 @@ public class DeleteUserCommand implements Command {
                 if (userType == UserType.CLIENT || userType == UserType.INSTRUCTOR) {
                     return userType;
                 } else {
-                    System.out.println("Only CLIENT or INSTRUCTOR can be deleted. Try again.");
+                    System.out.print("\nOnly CLIENT or INSTRUCTOR can be deleted. Try again: ");
                 }
             } catch (IllegalArgumentException e) {
-                System.out.println("Invalid input. Please enter CLIENT or INSTRUCTOR.");
+                System.out.print("\nInvalid input. Please enter CLIENT or INSTRUCTOR: ");
             }
         }
     }
 
     private Integer requestUserId(List<?> users) {
-        System.out.println("Please enter the ID of the user you wish to delete: ");
+        System.out.print("\nPlease enter the ID of the user you wish to delete: ");
         while (true) {
             try {
                 int userId = Integer.parseInt(scanner.nextLine());
@@ -93,15 +93,15 @@ public class DeleteUserCommand implements Command {
                         return userId;
                     }
                 }
-                System.out.println("Invalid ID. Please enter a valid user ID from the list.");
+                System.out.print("\nInvalid ID. Please enter a valid user ID from the list: ");
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a numeric ID.");
+                System.out.print("\nInvalid input. Please enter a numeric ID: ");
             }
         }
     }
 
     private boolean confirmDeletion() {
-        System.out.println("Are you sure you want to delete this user? This action is irreversible. (yes/no)");
+        System.out.print("\nAre you sure you want to delete this user? This action is irreversible (yes/no): ");
         String confirmation = scanner.nextLine().trim().toLowerCase();
         return confirmation.equals("yes");
     }

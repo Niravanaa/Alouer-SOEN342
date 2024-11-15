@@ -37,6 +37,10 @@ public class ViewDeleteLessonsCommand implements Command {
             System.out.print("\nEnter a location ID to view its corresponding lessons, or -1 to return: ");
             int locationId = requestLocationId(locations);
 
+            if (locationId == -1) {
+                break;
+            }
+
             List<Lesson> allLessons = LessonCollection.getLessonsByLocationId(locationId);
 
             if (allLessons.isEmpty()) {
@@ -82,7 +86,7 @@ public class ViewDeleteLessonsCommand implements Command {
                 String input = scanner.nextLine();
                 locationId = Integer.parseInt(input);
 
-                if (LocationCollection.getById(locationId) != null) {
+                if (LocationCollection.getById(locationId) != null || locationId == -1) {
                     return locationId;
                 } else {
                     System.out.print("\nInvalid ID. Please enter a valid location ID: ");

@@ -28,12 +28,12 @@ public class AcceptOfferingCommand implements Command {
         List<Location> locations = LocationCollection.getLocations();
         ConsoleUtils.printTable(locations, Arrays.asList("Lessons"));
 
-        System.out.println("\nSelect a location by entering its ID: ");
+        System.out.print("\nSelect a location by entering its ID: ");
         int locationId = requestLocationId(locations);
 
         List<Lesson> availableLessons = LessonCollection.getUnassignedLessons(locationId);
         ConsoleUtils.printTable(availableLessons,
-                Arrays.asList("Location Id", "Is Available", "Booking", "Assigned Instructor Id", "Id"));
+                Arrays.asList("Location Id", "Is Available", "Booking", "Assigned Instructor Id", "Id", "Schedule"));
 
         if (availableLessons.isEmpty()) {
             System.out.println("\nNo available lessons found for the selected location.");
@@ -59,16 +59,15 @@ public class AcceptOfferingCommand implements Command {
         boolean validInput = false;
 
         while (!validInput) {
-            System.out.print("\nPlease enter a valid location ID: ");
             try {
                 locationId = Integer.parseInt(scanner.nextLine());
                 if (LocationCollection.getById(locationId) != null) {
                     validInput = true;
                 } else {
-                    System.out.println("\nLocation ID does not exist.");
+                    System.out.print("\nLocation ID does not exist. Please enter a location ID: ");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("\nInvalid input.");
+                System.out.print("\nInvalid input. Please enter a location ID: ");
                 scanner.nextLine();
             }
         }
@@ -85,6 +84,7 @@ public class AcceptOfferingCommand implements Command {
                 int selection = Integer.parseInt(scanner.nextLine());
 
                 if (LessonCollection.getById(selection) != null) {
+                    selectedLesson = LessonCollection.getById(selection);
                     invalidSelection = false;
                 } else {
                     System.out.print("\nInvalid lesson ID. Please enter an integer: ");

@@ -73,7 +73,7 @@ public class RegisterInstructorCommand implements Command {
     }
 
     private String requestPassword() {
-        System.out.print("\nEnter instructor's password:");
+        System.out.print("\nEnter instructor's password: ");
         while (true) {
             String input = scanner.nextLine().trim();
             if (input.length() >= 6) {
@@ -84,7 +84,7 @@ public class RegisterInstructorCommand implements Command {
     }
 
     private String requestPhoneNumber() {
-        System.out.print("\nEnter client's phone number (format: xxx-xxx-xxxx): ");
+        System.out.print("\nEnter instructor's phone number (format: xxx-xxx-xxxx): ");
         while (true) {
             String input = scanner.nextLine().trim();
             if (input.matches("\\d{3}-\\d{3}-\\d{4}")) {

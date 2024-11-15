@@ -22,13 +22,16 @@ INSERT OR IGNORE INTO child (firstName, lastName, dateOfBirth, parentId) VALUES
 INSERT OR IGNORE INTO lesson (type, title, locationId, assignedInstructorId, startTime, endTime) VALUES
 ('GROUP', 'Basic Mathematics', 1, 1, '10:00:00', '11:00:00'),
 ('PRIVATE', 'Introduction to Biology', 1, 2, '11:00:00', '12:00:00'),
-('PRIVATE', 'Creative Arts', 2, 1, '13:00:00', '14:00:00');
+('PRIVATE', 'Creative Arts', 2, 1, '13:00:00', '14:00:00'),
+('GROUP', 'Advanced Chemistry', 2, NULL, '14:00:00', '15:00:00');
 
 INSERT OR IGNORE INTO lesson_schedule (lessonId, dayOfWeek) VALUES
 (1, 'MONDAY'),
 (1, 'WEDNESDAY'),
 (2, 'TUESDAY'),
 (2, 'THURSDAY'),
-(3, 'FRIDAY');
+(3, 'FRIDAY'),
+(4, 'MONDAY'),
+(4, 'WEDNESDAY');
 
 

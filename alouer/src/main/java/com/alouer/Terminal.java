@@ -21,7 +21,6 @@ import com.alouer.utils.Session;
 public class Terminal {
     private static boolean loggedIn = false;
     private static Object user;
-    private static boolean debugMode = false;
 
     public static void main(String[] args) {
         run(true);
@@ -184,20 +183,22 @@ public class Terminal {
                 System.out.println((i + 1) + ". " + commandNames.get(i));
             }
 
-            System.out.print("\nEnter a command number: ");
+            System.out.print("\nEnter a command number, or enter -1 to return: ");
             String input = scanner.nextLine();
 
             try {
                 int commandIndex = Integer.parseInt(input) - 1;
-                if (commandIndex >= -2 && commandIndex < commands.size()) {
+                if (commandIndex >= 0 && commandIndex < commands.size()) {
                     Command command = commands.get(commandIndex);
 
                     command.execute();
 
-                    if (commandIndex == -2 || "Log Out".equalsIgnoreCase(commandNames.get(commandIndex))
+                    if ("Log Out".equalsIgnoreCase(commandNames.get(commandIndex))
                             || "Exit".equalsIgnoreCase(commandNames.get(commandIndex))) {
                         break;
                     }
+                } else if (commandIndex < 0 && commandIndex == -2) {
+                    break;
                 } else {
                     System.out.println("Invalid command number. Please try again.");
                 }

@@ -1,15 +1,3 @@
-DROP TABLE IF EXISTS `instructor_lessons`;
-DROP TABLE IF EXISTS `client_children`;
-DROP TABLE IF EXISTS `lesson_schedule`;
-DROP TABLE IF EXISTS `lesson`;
-DROP TABLE IF EXISTS `booking`;
-DROP TABLE IF EXISTS `location`;
-DROP TABLE IF EXISTS `instructor`;
-DROP TABLE IF EXISTS `client`;
-DROP TABLE IF EXISTS `child`;
-DROP TABLE IF EXISTS `administrator`;
-DROP TABLE IF EXISTS `session`;
-
 CREATE TABLE IF NOT EXISTS administrator (
     firstName TEXT NOT NULL DEFAULT 'Admin',
     lastName TEXT NOT NULL DEFAULT 'User',

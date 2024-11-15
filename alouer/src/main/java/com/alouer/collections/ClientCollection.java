@@ -101,7 +101,8 @@ public class ClientCollection {
             statement.setString(2, client.getLastName());
             statement.setString(3, client.getEmail());
             statement.setString(4, client.getPassword());
-            statement.setString(5, client.getRole().toString());
+            statement.setString(5, client.getPhoneNumber());
+            statement.setString(6, client.getRole().toString());
 
             int rowsInserted = statement.executeUpdate();
             if (rowsInserted > 0) {

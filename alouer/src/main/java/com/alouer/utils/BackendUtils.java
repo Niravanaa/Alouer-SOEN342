@@ -48,7 +48,6 @@ public class BackendUtils {
     }
 
     public static Set<DayOfWeek> parseSchedule(String schedule) {
-        System.out.println(schedule);
         List<DayOfWeek> dayOfWeeks = new ArrayList<>();
         String[] days = schedule.split("-");
         for (String day : days) {
