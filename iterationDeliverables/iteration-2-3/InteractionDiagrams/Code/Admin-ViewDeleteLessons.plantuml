@@ -1,0 +1,65 @@
+@startuml Interaction Diagram for Admin's "View or Delete Lessons" Use Case
+title Interaction Diagram for Admin's "View or Delete Lessons" Use Case
+skinparam sequenceMessageAlignment center
+
+actor "<u>:Administrator" as admin
+participant "<u>:Terminal" as terminal
+participant "<u>:ViewDeleteLessonsCommand" as command
+participant "ConsoleUtils" as consoleUtils
+participant "<u>:LocationCollection" as locationCollection
+participant "<u>:ChildCollection" as childCollection
+participant "<u>:LessonCollection" as lessonCollection
+participant "<u>:BookingCollection" as bookingCollection
+participant "<u>:InstructorCollection" as instructorCollection
+participant "DatabaseManager" as databaseManager
+
+admin -> terminal : enterViewDeleteLessonsCommandId()
+terminal -> command : execute()
+loop while (true)
+    command -> locationCollection : getLocations()
+    locationCollection -> databaseManager : getConnection()
+    databaseManager --> locationCollection : connection
+    locationCollection --> command : locations
+    command -> consoleUtils : printTable(locations)
+    command -> command : requestLocationId()
+    admin -> command : enterLocationId(locationId)
+    command -> lessonCollection : getLessonsByLocationId(locationId)
+    lessonCollection -> databaseManager : getConnection()
+    databaseManager --> lessonCollection : connection
+    lessonCollection --> command : lessons
+    command -> consoleUtils : printTable(lessons)
+    command -> command : requestLessonId()
+    admin -> command : enterLessonId(lessonId)
+    command -> command : selectedLesson := lessons.find(l | l.getId() = lessonId)
+    command -> locationCollection : getById(selectedLesson.getLocationId())
+    locationCollection -> databaseManager : getConnection()
+    databaseManager --> locationCollection : connection
+    locationCollection --> command : location
+    command -> bookingCollection : getById(selectedLesson.getId())
+    bookingCollection -> databaseManager : getConnection()
+    databaseManager --> bookingCollection : connection
+    bookingCollection --> command : bookings
+    command -> instructorCollection : getById(selectedLesson.getAssignedInstructorId())
+    instructorCollection -> databaseManager : getConnection()
+    databaseManager --> instructorCollection : connection
+    instructorCollection --> command : instructor
+    command -> command : displayLessonDetails(selectedLesson, location, bookings, instructor)
+    command -> command : requestResponse()
+    admin -> command : enterResponse(response)
+    alt response == "delete"
+        command -> lessonCollection : delete(selectedLesson.getId())
+        lessonCollection -> databaseManager : getConnection()
+        databaseManager --> lessonCollection : connection
+        alt successful deletion
+            lessonCollection --> command : success
+            command --> terminal : success
+            terminal --> admin : displaySuccess
+        else deletion failure
+            lessonCollection --> command : failure
+            command --> terminal : failure
+            terminal --> admin : displayFailure
+        end
+    end
+end
+
+@enduml

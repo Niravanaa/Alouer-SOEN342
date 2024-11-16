@@ -1,14 +1,3 @@
-DROP TABLE IF EXISTS `instructor_lessons`;
-DROP TABLE IF EXISTS `client_children`;
-DROP TABLE IF EXISTS `lesson_schedule`;
-DROP TABLE IF EXISTS `lesson`;
-DROP TABLE IF EXISTS `booking`;
-DROP TABLE IF EXISTS `location`;
-DROP TABLE IF EXISTS `instructor`;
-DROP TABLE IF EXISTS `client`;
-DROP TABLE IF EXISTS `child`;
-DROP TABLE IF EXISTS `administrator`;
-
 CREATE TABLE IF NOT EXISTS administrator (
     firstName TEXT NOT NULL DEFAULT 'Admin',
     lastName TEXT NOT NULL DEFAULT 'User',
@@ -31,6 +20,7 @@ CREATE TABLE IF NOT EXISTS client (
     lastName TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
+    phoneNumber TEXT NOT NULL,
     role TEXT NOT NULL CHECK (role IN ('CLIENT'))
 );
 
@@ -40,6 +30,7 @@ CREATE TABLE IF NOT EXISTS instructor (
     lastName TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
+    phoneNumber TEXT NOT NULL,
     role TEXT NOT NULL CHECK (role IN ('INSTRUCTOR'))
 );
 
@@ -68,11 +59,10 @@ CREATE TABLE IF NOT EXISTS lesson (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     type TEXT NOT NULL CHECK (type IN ('PRIVATE', 'GROUP')),
     title TEXT NOT NULL,
-    locationId INTEGER,
-    assignedInstructorId INTEGER,
-    isAvailable BOOLEAN DEFAULT TRUE,
     startTime TIME NOT NULL,
     endTime TIME NOT NULL,
+    locationId INTEGER,
+    assignedInstructorId INTEGER,
     bookingId INTEGER,
     FOREIGN KEY (locationId) REFERENCES location(id) ON DELETE SET NULL,
     FOREIGN KEY (assignedInstructorId) REFERENCES instructor(id) ON DELETE SET NULL,
@@ -86,18 +76,12 @@ CREATE TABLE IF NOT EXISTS lesson_schedule (
     PRIMARY KEY (lessonId, dayOfWeek)
 );
 
-CREATE TABLE IF NOT EXISTS client_children (
-    clientId INTEGER NOT NULL,
-    childId INTEGER NOT NULL,
-    FOREIGN KEY (clientId) REFERENCES client(id) ON DELETE CASCADE,
-    FOREIGN KEY (childId) REFERENCES child(id) ON DELETE CASCADE,
-    PRIMARY KEY (clientId, childId)
-);
-
-CREATE TABLE IF NOT EXISTS instructor_lessons (
-    instructorId INTEGER NOT NULL,
-    lessonId INTEGER NOT NULL,
-    FOREIGN KEY (instructorId) REFERENCES instructor(id) ON DELETE CASCADE,
-    FOREIGN KEY (lessonId) REFERENCES lesson(id) ON DELETE CASCADE,
-    PRIMARY KEY (instructorId, lessonId)
+CREATE TABLE IF NOT EXISTS session (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId INTEGER,  -- Keep for client and instructor
+    email TEXT,      -- For administrator
+    role TEXT NOT NULL CHECK (role IN ('CLIENT', 'INSTRUCTOR', 'ADMINISTRATOR')),
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expiresAt TIMESTAMP DEFAULT (DATETIME('now', '+1 hour')),  -- Adjust as needed
+    UNIQUE(userId, email, role)  -- To prevent duplicate sessions
 );

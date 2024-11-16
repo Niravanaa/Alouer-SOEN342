@@ -2,10 +2,12 @@ package com.alouer.commands.instructor;
 
 import com.alouer.commands.Command;
 import com.alouer.collections.BookingCollection;
+import com.alouer.collections.ChildCollection;
 import com.alouer.collections.ClientCollection;
 import com.alouer.collections.InstructorCollection;
 import com.alouer.collections.LessonCollection;
 import com.alouer.collections.LocationCollection;
+import com.alouer.models.Child;
 import com.alouer.models.Client;
 import com.alouer.models.Instructor;
 import com.alouer.models.Location;
@@ -29,89 +31,103 @@ public class ViewEditOfferingsCommand implements Command {
 
     @Override
     public void execute() {
-        boolean keepViewing = true;
-
         List<Lesson> instructorLessons = LessonCollection.getByInstructorId(instructor.getId());
 
         if (instructorLessons.isEmpty()) {
-            System.out.println("You have no assigned lessons.");
-            scanner.next();
+            System.out.println("\nYou have no assigned lessons.");
+            scanner.nextLine();
             return;
         }
 
-        while (keepViewing) {
+        while (true) {
             instructorLessons = LessonCollection.getByInstructorId(instructor.getId());
 
             if (instructorLessons.isEmpty()) {
-                System.out.println("You have no assigned lessons.");
+                System.out.println("\nYou have no assigned lessons.");
                 return;
             }
 
             ConsoleUtils.printTable(instructorLessons,
-                    Arrays.asList("Id", "Location Id", "Is Available", "Assigned Instructor Id", "Booking Id"));
+                    Arrays.asList("Id", "Location Id", "Is Available", "Assigned Instructor Id", "Booking Id",
+                            "Booking"));
 
-            System.out.print("Enter the ID of a lesson to view details or type -1 to exit: ");
+            System.out.print("\nEnter the ID of a lesson to view details or type -1 to exit: ");
             Lesson selectedLesson = requestLessonId(instructorLessons);
 
             if (selectedLesson == null) {
-                System.out.println("The selected lesson does not exist. Please try again.");
-                continue;
+                break;
             }
 
             Location location = LocationCollection.getById(selectedLesson.getLocationId());
-            Booking booking = BookingCollection.getByLessonId(selectedLesson.getId());
-            Client client = booking != null ? ClientCollection.getById(booking.getClientId()) : null;
+            List<Booking> bookings = BookingCollection.getByLessonId(selectedLesson.getId());
 
-            displayLessonDetails(selectedLesson, location, client);
+            displayLessonDetails(selectedLesson, location, bookings);
 
-            System.out.print("Type 'u' to un-assign yourself from this offering or 'b' to go back: ");
-            String userAction = scanner.next().trim().toLowerCase();
+            System.out.print("\nType 'u' to un-assign yourself from this offering or 'b' to go back: ");
+            String userAction = scanner.nextLine().trim().toLowerCase();
 
             if (userAction.equals("u")) {
                 selectedLesson.setAssignedInstructorId(null);
                 LessonCollection.updateLesson(selectedLesson);
-
                 InstructorCollection.update(instructor);
-
-                keepViewing = true;
+                System.out.println("\nSuccessfully unassigned from the lesson.");
             } else if (!userAction.equals("b")) {
-                System.out.println("Invalid selection. Please try again.");
+                System.out.println("\nInvalid selection. Please try again.");
+                scanner.nextLine();
             }
         }
     }
 
-    private void displayLessonDetails(Lesson lesson, Location location, Client client) {
+    private void displayLessonDetails(Lesson lesson, Location location, List<Booking> bookings) {
         System.out.println("\nLesson Details:");
-        System.out.println("Lesson ID: " + lesson.getId());
+        System.out.println("Lesson Title: " + lesson.getTitle());
         System.out.println("Location: " + (location != null ? location.getName() : "Unknown"));
-        System.out.println("Client: "
-                + (client != null ? client.getFirstName() + " " + client.getLastName() : "No client assigned"));
-        System.out.println();
+
+        if (bookings != null && !bookings.isEmpty()) {
+            for (Booking booking : bookings) {
+                Client client = ClientCollection.getById(booking.getClientId());
+
+                if (client != null) {
+                    System.out.print("Client: " + client.getFirstName() + " " + client.getLastName());
+
+                    if (booking.getChildId() != null) {
+                        Child child = ChildCollection.getById(booking.getChildId());
+                        System.out.print(" (" + child.getFirstName() + " " + child.getLastName()
+                                + " - dependent under " + client.getFirstName() + ")");
+                    }
+                    System.out.println();
+                }
+            }
+        } else {
+            System.out.println("Client(s): None");
+        }
     }
 
     private Lesson requestLessonId(List<Lesson> lessons) {
         Lesson selectedLesson = null;
-        boolean validSelection = false;
+        boolean invalidSelection = true;
 
-        while (!validSelection) {
-            System.out.print("Select a lesson by ID: ");
+        while (invalidSelection) {
             try {
-                int selection = scanner.nextInt();
+                int selection = Integer.parseInt(scanner.nextLine());
+
+                if (selection == -1) {
+                    return null;
+                }
 
                 for (Lesson lesson : lessons) {
                     if (lesson.getId() == selection) {
                         selectedLesson = lesson;
-                        validSelection = true;
+                        invalidSelection = false;
                         break;
                     }
                 }
 
-                if (!validSelection) {
-                    System.out.println("Invalid lesson ID. Please enter a valid lesson ID.");
+                if (invalidSelection) {
+                    System.out.print("Invalid lesson ID. Please enter a valid lesson ID: ");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter an integer.");
-                scanner.next();
+                System.out.print("Invalid input. Please enter an integer: ");
             }
         }
         return selectedLesson;

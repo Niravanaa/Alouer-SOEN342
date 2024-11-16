@@ -28,22 +28,15 @@ public class DatabaseManager {
     }
 
     private static void promptResetAndSeed(Connection conn, Scanner scanner) {
-        System.out.print("Would you like to reset and seed the database? (yes/no): ");
-        String response = scanner.nextLine().trim().toLowerCase();
-
-        if (response.equals("yes")) {
-            resetAndSeedDatabase(conn);
-        } else {
-            System.out.println("Database initialization complete without resetting.");
-        }
+        resetAndSeedDatabase(conn);
     }
 
     private static void resetAndSeedDatabase(Connection conn) {
         try {
             System.out.println("Resetting database...");
-            executeSqlFile(conn, SCHEMA_FILE); // Reapply schema
+            executeSqlFile(conn, SCHEMA_FILE);
             System.out.println("Seeding initial data...");
-            executeSqlFile(conn, SEED_FILE); // Reinsert seed data
+            executeSqlFile(conn, SEED_FILE);
         } catch (Exception e) {
             System.err.println("Error resetting and seeding database: " + e.getMessage());
         }
