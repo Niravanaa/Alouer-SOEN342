@@ -4,7 +4,6 @@
 
 # Demonstration Video of the Alouer System
 
-<video controls>
-  <source src="DemoVideo-NiravPatel-LaurenzGomez.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+[https://youtu.be/C4KfwW3huX0?si=PyoPn5ObCdYMCXaM](https://youtu.be/C4KfwW3huX0?si=PyoPn5ObCdYMCXaM)
+
+https://github.com/user-attachments/assets/1790410b-4343-4267-b5b7-5a8dbec046c9
