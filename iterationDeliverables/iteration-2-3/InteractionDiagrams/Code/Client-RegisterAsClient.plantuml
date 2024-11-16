@@ -1,0 +1,48 @@
+@startuml Interaction Diagram for Client's "Register as Client" Use Case
+title Interaction Diagram for Client's "Register as Client" Use Case
+skinparam sequenceMessageAlignment center
+
+actor "User" as user
+participant "<u>:Terminal" as terminal
+participant "<u>:RegisterClientCommand" as command
+participant "<u>:ClientCollection " as clientCollection
+collections "<u>:Instructor" as instructors
+participant "DatabaseManager" as databaseManager
+participant "<u>Client:Client" as newClientObj
+
+user -> terminal : enterRegisterClientCommandId()
+terminal -> command : execute()
+command -> command : requestFirstName()
+user -> command : enterFirstName(firstName)
+command -> command : requestLastName()
+user -> command : enterLastName(lastName)
+command -> command : requestEmail()
+user -> command : enterEmail(email)
+command -> command : requestPassword()
+user -> command : enterPassword(password)
+command -> command : requestPhoneNumber()
+user -> command : enterPhoneNumber(phoneNumber)
+
+command -> clientCollection : getByEmail(email)
+clientCollection -> databaseManager : getConnection()
+databaseManager --> clientCollection : connection
+clientCollection --> command : client
+
+alt no existing client found
+    command -> clientCollection : createClient(firstName, lastName, email, password, phoneNumber)
+    clientCollection -> newClientObj ** : new Client(firstName, lastName, email, password, phoneNumber)
+    newClientObj --> clientCollection : newClientObj
+    clientCollection -> clientCollection : add(newClientObj)
+    clientCollection -> databaseManager : getConnection()
+    databaseManager --> clientCollection : connection
+    alt successful creation
+        clientCollection --> command : success
+        command --> terminal : success
+        terminal --> user : displaySuccess
+    else creation failure
+        clientCollection --> command : failure
+        command --> terminal : failure
+        terminal --> user : displayFailure
+    end
+end
+@enduml

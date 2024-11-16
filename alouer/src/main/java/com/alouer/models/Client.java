@@ -8,38 +8,44 @@ public class Client {
     private String lastName;
     private String email;
     private String password;
+    private String phoneNumber;
     private UserType role;
 
-    public Client(String firstName, String lastName, String email, String password) {
+    public Client(String firstName, String lastName, String email, String password, String phoneNumber) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+        this.phoneNumber = phoneNumber;
         this.role = UserType.CLIENT;
     }
 
     public Integer getId() {
-        return id;
+        return this.id;
     }
 
     public String getFirstName() {
-        return firstName;
+        return this.firstName;
     }
 
     public String getLastName() {
-        return lastName;
+        return this.lastName;
     }
 
     public String getEmail() {
-        return email;
+        return this.email;
     }
 
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
     public UserType getRole() {
-        return role;
+        return this.role;
+    }
+
+    public String getPhoneNumber() {
+        return this.phoneNumber;
     }
 
     public void setId(Integer id) {
@@ -60,5 +66,9 @@ public class Client {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

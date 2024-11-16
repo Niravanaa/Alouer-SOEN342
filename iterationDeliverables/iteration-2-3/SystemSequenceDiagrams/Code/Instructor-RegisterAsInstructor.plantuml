@@ -1,0 +1,29 @@
+@startuml System Sequence Diagram for Instructor's "Register as Instructor" Use Case
+title System Sequence Diagram for Instructor's "Register as Instructor" Use Case
+skinparam sequenceMessageAlign center 
+
+actor "User" as user
+participant "<u>:System" as system
+
+user -> system : enterRegisterInstructorCommandId()
+system --> user: requestFirstName
+user-> system : enterFirstName(firstName)
+system --> user: requestLastName
+user-> system : enterLastName(lastName)
+system --> user: requestEmail
+user-> system : enterEmail(email)
+system --> user: requestPassword
+user -> system : enterPassword(password)
+system --> user : requestPhoneNumber
+user -> system : enterPhoneNumber(phoneNumber)
+system -> system : instructor := getByEmail(email)
+alt no existing instructor found
+    system -> system : createInstructor(firstName, lastName, email, password)
+    alt successful creation
+        system --> user : displaySuccess
+    else creation failure
+        system --> user : displayFailure
+    end
+end
+
+@enduml

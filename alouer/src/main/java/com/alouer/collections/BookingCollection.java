@@ -4,6 +4,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.alouer.enums.LessonType;
 import com.alouer.models.lessonManagement.Booking;
 import com.alouer.models.lessonManagement.Lesson;
 import com.alouer.utils.DatabaseManager;
@@ -14,20 +15,21 @@ public class BookingCollection {
     private static final String SELECT_BOOKINGS_BY_CLIENT_ID_SQL = "SELECT * FROM booking WHERE clientId = ?";
     private static final String SELECT_BOOKING_BY_LESSON_ID_SQL = "SELECT * FROM booking WHERE lessonId = ?";
     private static final String DELETE_BOOKING_SQL = "DELETE FROM booking WHERE id = ?";
+    private static final String GET_ALL_BOOKINGS_SQL = "SELECT * FROM booking";
 
     public static List<Booking> getBookings() {
         List<Booking> bookings = new ArrayList<>();
-        String query = "SELECT * FROM booking";
 
         try (Connection connection = DatabaseManager.getConnection();
-                PreparedStatement statement = connection.prepareStatement(query);
+                PreparedStatement statement = connection.prepareStatement(GET_ALL_BOOKINGS_SQL);
                 ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
+                Integer childId = (Integer) resultSet.getObject("childId");
                 Booking booking = new Booking(
                         resultSet.getInt("clientId"),
                         resultSet.getInt("lessonId"),
-                        resultSet.getInt("childId"));
+                        childId);
                 booking.setId(resultSet.getInt("id"));
                 bookings.add(booking);
             }
@@ -46,10 +48,11 @@ public class BookingCollection {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
+                    Integer childId = (Integer) resultSet.getObject("childId");
                     booking = new Booking(
                             resultSet.getInt("clientId"),
                             resultSet.getInt("lessonId"),
-                            resultSet.getInt("childId"));
+                            childId);
                     booking.setId(resultSet.getInt("id"));
                 }
             }
@@ -87,26 +90,51 @@ public class BookingCollection {
         return false;
     }
 
-    public static boolean validateBooking(Integer selectedLessonId) {
+    public static boolean validateBooking(Integer selectedLessonId, Integer clientId) {
         Lesson selectedLesson = LessonCollection.getById(selectedLessonId);
 
         if (selectedLesson == null) {
             return false;
         }
 
-        if (!selectedLesson.isAvailable() || selectedLesson.getAssignedInstructorId() == null) {
+        if (selectedLesson.getAssignedInstructorId() == null) {
             return false;
         }
 
-        Booking existingBooking = getByLessonId(selectedLesson.getId());
-        return existingBooking == null;
+        List<Booking> existingBookings = getByLessonId(selectedLesson.getId());
+
+        for (Booking booking : existingBookings) {
+            if (booking.getClientId().equals(clientId)) {
+                return false;
+            }
+        }
+
+        if (selectedLesson.getType() == LessonType.PRIVATE && existingBookings.size() != 0) {
+            return false;
+        }
+
+        List<Booking> existingClientBookings = getByClientId(clientId);
+
+        for (Booking clientBooking : existingClientBookings) {
+            Lesson clientLesson = LessonCollection.getById(clientBooking.getLessonId());
+
+            if (clientLesson != null) {
+                if (selectedLesson.getSchedule().stream().anyMatch(clientLesson.getSchedule()::contains)) {
+                    if (selectedLesson.getStartTime().isBefore(clientLesson.getEndTime()) &&
+                            clientLesson.getStartTime().isBefore(selectedLesson.getEndTime())) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     public static Integer createBooking(Integer clientId, Integer lessonId, Integer childId) {
         Booking newBooking = new Booking(clientId, lessonId, childId);
 
         if (add(newBooking)) {
-            System.out.println("Booking created successfully for lesson ID: " + lessonId);
             return newBooking.getId();
         }
         return null;
@@ -121,10 +149,11 @@ public class BookingCollection {
             statement.setInt(1, clientId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
+                    Integer childId = (Integer) resultSet.getObject("childId");
                     Booking booking = new Booking(
                             resultSet.getInt("clientId"),
                             resultSet.getInt("lessonId"),
-                            resultSet.getInt("childId"));
+                            childId);
                     booking.setId(resultSet.getInt("id"));
                     bookings.add(booking);
                 }
@@ -135,26 +164,28 @@ public class BookingCollection {
         return bookings;
     }
 
-    public static Booking getByLessonId(Integer lessonId) {
-        Booking booking = null;
+    public static List<Booking> getByLessonId(Integer lessonId) {
+        List<Booking> bookings = new ArrayList<>();
 
         try (Connection connection = DatabaseManager.getConnection();
                 PreparedStatement statement = connection.prepareStatement(SELECT_BOOKING_BY_LESSON_ID_SQL)) {
 
             statement.setInt(1, lessonId);
             try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    booking = new Booking(
+                while (resultSet.next()) {
+                    Integer childId = (Integer) resultSet.getObject("childId");
+                    Booking booking = new Booking(
                             resultSet.getInt("clientId"),
                             resultSet.getInt("lessonId"),
-                            resultSet.getInt("childId"));
+                            childId);
                     booking.setId(resultSet.getInt("id"));
+                    bookings.add(booking);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return booking;
+        return bookings;
     }
 
     public static boolean delete(Integer id) {

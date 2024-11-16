@@ -1,0 +1,74 @@
+@startuml Interaction Diagram for Client's "Create Booking" Use Case
+title Interaction Diagram for Client's "Create Booking" Use Case
+skinparam sequenceMessageAlignment center
+
+actor "<u>:Client" as client
+participant "<u>:Terminal" as terminal
+participant "<u>:CreateBookingCommand" as command
+participant "ConsoleUtils" as consoleUtils
+participant "<u>:LocationCollection" as locationCollection
+participant "<u>:ChildCollection" as childCollection
+participant "<u>:BookingCollection" as bookingCollection
+participant "<u>:LessonCollection" as lessonCollection
+participant "<u>booking:Booking" as bookingObj
+participant "DatabaseManager" as databaseManager
+
+client -> terminal : enterCreateBookingCommandId()
+terminal -> command : execute()
+command -> locationCollection : getLocations()
+locationCollection -> databaseManager : getConnection()
+databaseManager --> locationCollection : connection
+locationCollection --> command : locations
+command -> consoleUtils : printTable(locations, nonDisplayProperties)
+command -> command : getValidLocationId()
+client -> command : enterLocationId(locationId)
+command -> lessonCollection : getAvailableLessons(locationId)
+lessonCollection -> lessonCollection : getLessons()
+lessonCollection -> databaseManager : getConnection()
+databaseManager --> lessonCollection : connection
+lessonCollection --> command : availableLessons
+command -> consoleUtils : printTable(availableLessons, nonDisplayProperties)
+command -> command : requestLessonId(availableLessons)
+client -> command : enterLessonId(lessonId)
+command -> client : getId()
+client --> command : clientId
+command -> childCollection : getChildrenByClientId(clientId)
+childCollection -> databaseManager : getConnection()
+databaseManager --> childCollection : connection
+childCollection --> command : children
+alt children.size() > 0 and client booking for dependent
+    command -> consoleUtils : printTable(children, nonDisplayProperties)
+    command -> command : requestChildId(children)
+    client -> command : enterChildId(childId)
+end
+command -> bookingCollection : validateBooking(lessonId, clientId)
+bookingCollection -> lessonCollection : getById(lessonId)
+lessonCollection -> databaseManager : getConnection()
+databaseManager --> lessonCollection : connection
+alt lesson not found
+    lessonCollection --> bookingCollection : null
+    bookingCollection --> command : failure
+    command --> terminal : failure
+    terminal --> client : displayError
+else lesson found
+    lessonCollection --> bookingCollection : lesson
+    alt lesson is available, assigned to an instructor, and not already booked by the client
+        bookingCollection --> command : true
+        command -> bookingCollection : createBooking(clientId, lessonId, childId | null)
+        bookingCollection -> bookingObj ** : new Booking(clientId, lessonId, childId | null)
+        bookingObj --> bookingCollection : newBooking
+        bookingCollection -> bookingCollection : add(newBooking)
+        bookingCollection -> databaseManager : getConnection()
+        databaseManager --> bookingCollection : connection
+        alt successful creation
+            bookingCollection --> command : success
+            command --> terminal : success
+            terminal --> client : displaySuccess
+        else creation failure
+            bookingCollection --> command : failure
+            command --> terminal : failure
+            terminal --> client : displayError
+        end
+    end
+end
+@enduml

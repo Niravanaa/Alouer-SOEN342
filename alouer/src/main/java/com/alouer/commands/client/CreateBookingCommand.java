@@ -27,11 +27,10 @@ public class CreateBookingCommand implements Command {
 
     @Override
     public void execute() {
-
         List<Location> locations = LocationCollection.getLocations();
         ConsoleUtils.printTable(locations, Arrays.asList("Lessons"));
 
-        System.out.print("Enter the location ID you wish to view available lessons for: ");
+        System.out.print("\nEnter the location ID you wish to view available lessons for: ");
         int locationId = getValidLocationId(locations);
 
         List<Lesson> availableLessons = LessonCollection.getAvailableLessons(locationId);
@@ -39,13 +38,13 @@ public class CreateBookingCommand implements Command {
                 Arrays.asList("Location Id", "Is Available", "Booking", "Assigned Instructor Id", "Id"));
 
         if (availableLessons.isEmpty()) {
-            System.out.println("No available lessons found for the selected location.");
+            System.out.println("\nNo available lessons found for the selected location.");
             return;
         }
 
         Integer lessonId = selectLesson(availableLessons);
         if (lessonId == null) {
-            System.out.println("Invalid selection. Booking process aborted.");
+            System.out.println("\nInvalid selection. Booking process aborted.");
             return;
         }
 
@@ -53,59 +52,52 @@ public class CreateBookingCommand implements Command {
         Integer childId = null;
 
         if (children != null) {
-            System.out.print("Is this booking for an underage dependent? (yes/no): ");
-            String response = scanner.next().trim().toLowerCase();
+            System.out.print("\nIs this booking for an underage dependent? (yes/no): ");
+            String response = scanner.nextLine().trim().toLowerCase();
 
             if (response.equals("yes")) {
                 if (children.isEmpty()) {
-                    System.out.println("No children found for this client.");
+                    System.out.println("\nNo children found for this client.");
                     return;
                 }
 
                 ConsoleUtils.printTable(children, Arrays.asList("Id", "Parent Id"));
-                System.out.print("Enter the child ID you wish to book for: ");
+                System.out.print("\nEnter the child ID you wish to book for, or enter -1 to skip child selection: ");
                 childId = getValidChildId(children);
+
                 if (childId == null) {
-                    System.out.println("Invalid child ID. Booking process aborted.");
+                    System.out.println("\nInvalid child ID. Booking process aborted.");
                     return;
                 }
             }
         }
 
-        boolean isValid = BookingCollection.validateBooking(lessonId);
-        if (isValid) {
+        if (BookingCollection.validateBooking(lessonId, client.getId())) {
             BookingCollection.createBooking(client.getId(), lessonId, childId);
-            System.out.println("Booking created successfully!");
+            System.out.println("\nBooking created successfully!");
         } else {
-            System.out.println("Booking validation failed.");
+            System.out.println(
+                    "\nBooking validation failed, this lesson intersects with an existing booking that you made.");
         }
     }
 
     private Integer selectLesson(List<Lesson> lessons) {
-        boolean validSelection = false;
-
-        int maxId = lessons.stream()
-                .mapToInt(Lesson::getId)
-                .max()
-                .orElse(-1);
+        boolean invalidSelection = true;
 
         Integer selection = null;
 
-        while (!validSelection) {
-            System.out.print("Select a lesson by ID: ");
+        while (invalidSelection) {
+            System.out.print("\nSelect a lesson by ID: ");
             try {
-                selection = scanner.nextInt();
+                selection = Integer.parseInt(scanner.nextLine());
 
-                if (selection < 0 || selection > maxId) {
-                    System.out.println("Invalid selection.");
-                } else if (LessonCollection.getById(selection) != null) {
-                    validSelection = true;
+                if (LessonCollection.getById(selection) != null) {
+                    invalidSelection = false;
                 } else {
-                    System.out.println("No lesson found with that ID.");
+                    System.out.println("\nNo lesson found with that ID.");
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Invalid input. Please enter an integer.");
-                scanner.next();
             }
         }
         return selection;
@@ -113,28 +105,20 @@ public class CreateBookingCommand implements Command {
 
     private int getValidLocationId(List<Location> locations) {
         int locationId = -1;
-        boolean validInput = false;
+        boolean invalidInput = true;
 
-        int maxId = locations.stream()
-                .mapToInt(Location::getId)
-                .max()
-                .orElse(-1);
-
-        while (!validInput) {
+        while (invalidInput) {
             System.out.print("Please enter a valid location ID (integer): ");
             try {
-                locationId = scanner.nextInt();
+                locationId = Integer.parseInt(scanner.nextLine());
 
-                if (locationId < 0 || locationId > maxId) {
-                    System.out.println("Location ID does not exist. Please enter a valid location ID.");
-                } else if (LocationCollection.getById(locationId) != null) {
-                    validInput = true;
+                if (LocationCollection.getById(locationId) != null) {
+                    invalidInput = false;
                 } else {
                     System.out.println("Location ID does not exist. Please enter a valid location ID.");
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Invalid input. Please enter an integer.");
-                scanner.next();
             }
         }
         return locationId;
@@ -146,7 +130,12 @@ public class CreateBookingCommand implements Command {
 
         while (!validInput) {
             try {
-                int enteredId = scanner.nextInt();
+                int enteredId = Integer.parseInt(scanner.nextLine());
+
+                if (enteredId == -1) {
+                    return -1;
+                }
+
                 for (Child child : children) {
                     if (child.getId() == enteredId) {
                         childId = enteredId;
@@ -158,8 +147,7 @@ public class CreateBookingCommand implements Command {
                     System.out.print("Invalid child ID. Please enter a valid child ID: ");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter an integer.");
-                scanner.next();
+                System.out.print("Invalid input. Please enter an integer: ");
             }
         }
         return childId;
